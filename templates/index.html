@@ -1,0 +1,182 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <!-- font imports -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:opsz,wght@6..12,300&display=swap" rel="stylesheet">
+    <!-- font awsome cdn -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    {% block css %}{% endblock css %}
+</head>
+<body>
+    <body>
+        <header>
+            <nav class="navbar">
+                <article class="navbar__article navbar__article--1">
+                    <a href="#" class="">
+                        <img src="{% static 'img/gurukul.png' %}" alt="" srcset="" class="navbar__logo">
+                    </a>
+                    <div class="institution-info">
+                        <button class="btn btn--hamburger">
+                            <i class="fa-solid fa-bars"></i>
+                        </button>
+                        <img src="/img/school_icon.jpg" alt="" class="navbar__logo">
+                        <p class="institution-info__title">
+                            <strong>GURUKUL INSTITUTE OF TECHNOLOGY AND SCIENCE</strong>
+                        </p>
+                    </div>
+                </article>
+                <article class="navbar__article navbar__article--2 ">
+                    <ul class="nav">
+                        <li>
+                            <a href="#" class="nav__link nav__link--3">
+                                <i class="fa-solid fa-bell"></i>
+                            </a>
+                        </li>
+                        <li>
+                            <label class="nav__link nav__link--1 dropdown__btn">
+                                <input type="checkbox" name="hi" id="" class="check">
+                                <img src="{% static 'img/profile.png' %}" alt="" class="userlogo">
+                                <div class="dropdown">
+                                    <div class="card">
+                                        <img src="{% static 'img/profile.png' %}" alt="" class="card__img">
+                                        <div class="card__body">
+                                            <p class=" card__title card__text">
+                                                Murali
+                                            </p>
+                                            <p class="card__text ">
+                                                Murali@gmail.com
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <ul class="dropdown__list">
+                                        <li>
+                                            <a href="#" class="dropdown__item">Profile</a>
+                                        </li>
+                                        <li>
+                                            <a href="#" class="dropdown__item">Settings</a>
+                                        </li>
+                                        <li>
+                                            <a href="#" class="dropdown__item">Logout</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </label>
+                            
+                        </li>
+                    </ul>
+                </article>
+            </nav>
+        </header>
+        <main class="project-main">
+            <aside class="sidenav">
+                <ul class="side-nav">
+                    <li class="side-nav__item">
+                        <a href="{% url 'dashboard' %}" class="side-nav__link">
+                            <i class="fa-solid fa-table-columns"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    
+                    <li class="side-nav__item">
+                        <a href="{% url 'students' %}" class="side-nav__link">
+                            <i class="fa-solid fa-book-open-reader"></i>
+                            <span>Students</span>
+                        </a>
+                    </li>
+                    <li class="side-nav__item">
+                        <a href="{% url 'staffs' %}" class="side-nav__link">
+                            <i class="fa-solid fa-users"></i>
+                            <span>Staffs</span>
+                        </a>
+                    </li>
+                    <li class="side-nav__item">
+                        <a href="{% url 'accounts' %}" class="side-nav__link">
+                            <i class="fa-solid fa-file-invoice-dollar"></i>
+                            <span>Accounts</span>
+                        </a>
+                    </li>
+                    <li class="side-nav__item">
+                        <a href="{% url 'classes' %}" class="side-nav__link">
+                            <i class="fa-solid fa-book-open"></i>
+                            <span>Classes</span>
+                        </a>
+                    </li>
+                    <li class="side-nav__item">
+                        <a href="{% url 'timetable' %}" class="side-nav__link">
+                            <i class="fa-regular fa-clock"></i>
+                            <span>TimeTable</span>
+                        </a>
+                    </li>
+                    <li class="side-nav__item">
+                        <a href="{% url 'attendance' %}" class="side-nav__link">
+                            <i class="fa-regular fa-calendar-check"></i>
+                            <span>Attendance</span>
+                        </a>
+                    </li>
+                    <li class="side-nav__item">
+                        <a href="{% url 'assignments' %}" class="side-nav__link">
+                            <i class="fa-solid fa-book"></i>
+                            <span>Assignments</span>
+                        </a>
+                    </li>
+                    <li class="side-nav__item">
+                        <a href="{% url 'examinations' %}" class="side-nav__link">
+                            <i class="fa-solid fa-address-card"></i>
+                            <span>Examinations</span>
+                        </a>
+                    </li>
+                    <li class="side-nav__item">
+                        <a href="{% url 'gradings' %}" class="side-nav__link">
+                            <i class="fa-solid fa-star"></i>
+                            <span>Gradings</span>
+                        </a>
+                    </li>
+                    <li class="side-nav__item">
+                        <a href="{% url 'notice' %}" class="side-nav__link">
+                            <i class="fa-solid fa-circle-exclamation"></i>
+                            <span>Notice</span>
+                        </a>
+                    </li>
+                    
+                    <li class="side-nav__item">
+                        <a href="{% url 'transportation' %}" class="side-nav__link">
+                            <i class="fa-solid fa-bus-simple"></i>
+                            <span>Transportion</span>
+                        </a>
+                    </li>
+                    <li class="side-nav__item">
+                        <a href="{% url 'settings' %}" class="side-nav__link">
+                            <i class="fa-solid fa-gear"></i>
+                            <span>Settings</span>
+                        </a>
+                    </li>
+                    <li class="side-nav__item">
+                        <a href="{% url 'users' %}" class="side-nav__link">
+                            <i class="fa-solid fa-user"></i>
+                            <span>User</span>
+                        </a>
+                    </li>
+                    {% comment %} <li class="side-nav__item">
+                        <a href="" class="side-nav__link">
+                            <i class="fa-solid fa-file"></i>
+                            <span class="my-1">Report</span>
+                        </a>
+                    </li> {% endcomment %}
+                </ul>
+            </aside>
+            <section class="main-body">
+            <!-- Space for Other Html start -->
+                {% block content %}
+                {% endblock content %}
+            <!-- Space for Other Html end -->
+            </section>
+        </main>
+    {% block js %}{% endblock js %}
+</body>
+</html>

@@ -1,0 +1,611 @@
+{% extends "index.html" %}
+{% block css %}
+    <title>Studenst</title>
+{% endblock css %}
+{% block content %}
+<div class="student_head">
+    <div>
+        <p class="heading__primary heading__primary--animation">Students Management</p>
+    </div>
+    <div>
+        <button class="btn btn--create" onclick="openForm('registration')">Register New Student</button>
+        <!-- Filter Button -->
+        <button class="btn btn--filter" onclick="openForm('filter')">
+            <i class="fa-solid fa-filter"></i>Filter</button>
+        <!-- Import Button -->
+        <button class="btn btn--import" onclick="openForm('import')">
+            <i class="fa-solid fa-upload"></i>Import</button>
+        <!-- Export Button -->
+        <button class="btn btn--export" onclick="openForm('export')">
+            <i class="fa-solid fa-download"></i> Export</button>
+    </div>
+</div>
+{% comment %} Registration Form {% endcomment %}
+<section class="form-section registration">
+    <div class="main-header">
+        <h1 class="header-form">Student Registration Form</h1>
+        <a href="javascript:void(0)" class="closebtn" onclick="closeNav('registration')">&times;</a>
+    </div>
+    <div class="container">
+        <form id="student-form" name="form" class="form" action="#" method="post" enctype="multipart/form-data">
+            {% csrf_token %}        
+            {% comment %} <img src="" alt="" id="student_img"> {% endcomment %}
+             <input type="hidden" name="id" id="id">
+            <div class="accordion">
+                <!-- Basic Details Section -->
+                <div class="list">
+                    <input type="checkbox" name="accordion" id="first" class="check_accord" checked>
+                    <label for="first" class="details" id="label1">Basic Details</label>
+                    <div class="contents">
+                        <div class="fields">
+                            <input type="hidden" name="pk" id="pk">
+                            <div class="input-field">
+                                <label class="labels">Full Name <span>*</span></label>
+                                <input type="text" class="form-input" name="first_name" id="first_name"
+                                    placeholder="Enter your Full Name" >
+                            </div>
+                            <div class="input-field">
+                                <label class="labels">Date of Birth</label>
+                                <input type="date" class="form-input" name="date_of_birth" id="date_of_birth">
+                            </div>
+
+                        </div>
+                        <div class="fields">
+                            <div class="input-field">
+                                <label class="labels">Registration Date <span>*</span></label>
+                                <input type="date" class="form-input" name="admission_date" id="admission_date"
+                                    >
+                            </div>
+                            <div class="input-field">
+                                <label class="labels">Gender <span>*</span></label>
+                                <select name="student_gender" id="student_gender" class="gender-list" >
+                                    <option selected disabled>Select Gender</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="fields">
+                            <div class="input-field">
+                                <label class="labels">Blood Group</label>
+                                <select name="blood_group" id="blood_group" class="gender-list">
+                                    <option selected>Select Blood Group</option>
+                                    <option value="O+">O+</option>
+                                    <option value="A+">A+</option>
+                                    <option value="B+">B+</option>
+                                    <option value="AB+">AB+</option>
+                                    <option value="O-">O-</option>
+                                    <option value="A-">A-</option>
+                                    <option value="B-">B-</option>
+                                    <option value="AB-">AB-</option>
+                                </select>
+                            </div>
+                            <div class="input-field">
+                                <label class="labels">Photo <span>*</span></label>
+                                <input type="file" class="form-input" id="student_photo" accept="image/jpeg,image/jpg"
+                                    name="student_photo" >
+                            </div>
+                            <p class="file-info">(Maximum size for photo is 500 kb.)</p>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="list">
+                    <input type="checkbox" name="accordion" id="second" class="check_accord">
+                    <label for="second" class="details" id="label1">Contact Details</label>
+                    <div class="contents">
+                        <div class="fields">
+
+                            <div class="input-field">
+                                <label class="labels">Mobile No <span></span></label>
+                                <input type="text" class="form-input" name="phone_number" id="phone_number"
+                                    maxlength="10" minlength="10" title="Enter valid Number"
+                                    oninput="allowOnlyNumbers(this)">
+                            </div>
+                            <div class="input-field">
+                                <label class="labels">Email Id</label>
+                                <input type="email" class="form-input" name="email" id="email"
+                                    placeholder="Enter Email Address">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="list">
+                    <input type="checkbox" name="accordion" id="third" class="check_accord">
+                    <label for="third" class="details" id="label1">Address Details</label>
+                    <div class="contents">
+                        <div class="fields">
+                            <div class="input-field">
+                                <label class="labels">Address Line <span>*</span></label>
+                                <input type="text" class="form-input" name="address"
+                                    id="address" placeholder="Enter Address" >
+                            </div>
+                        </div>
+                        <div class="fields">
+                            <div class="input-field">
+                                <label class="labels">City <span>*</span></label>
+                                <input type="text" class="form-input" name="student_city" id="student_city"
+                                    placeholder="Enter City" >
+                            </div>
+                            <div class="input-field">
+                                <label class="labels">State <span>*</span></label>
+                                <select name="student_state" id="student_state"  class="gender-list">
+                                    <option value="AP">Andhra Pradesh</option>
+                                    <option value="TS">Telangana</option>
+                                    <option value="MH">Maharashtra</option>
+                                    <option value="DL">Delhi</option>
+                                    <option value="HP">Himachal Pradesh</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="fields">
+                            <div class="input-field">
+                                <label class="labels">Country <span>*</span></label>
+                                <input type="text" class="form-input" placeholder="Enter Country" type="text"
+                                    placeholder="Enter Country " name="student_country" id="student_country" >
+                            </div>
+                            <div class="input-field">
+                                <label class="labels"> Pincode<span>*</span></label>
+                                <input type="text" class="form-input" name="student_pincode" id="student_pincode"
+                                    placeholder="Enter Pincode" >
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="list">
+                    <input type="checkbox" name="accordion" id="fourth" class="check_accord">
+                    <label for="fourth" class="details" id="label1">Parents Details</label>
+                    <div class="contents">
+                        <div class="fields">
+                            <div class="input-field">
+                                <label class="labels">Full Name <span>*</span></label>
+                                <input type="text" class="form-input" placeholder="Enter FullName" id="parent_1"
+                                    class="form-control" name="parent_1" >
+                            </div>
+                            <div class="input-field">
+                                <label class="labels">Relation With Student <span>*</span></label>
+                                <select name="relation_with_student_1" id="relation_with_student_1" class="gender-list">
+                                    <option value="father">Father</option>
+                                    <option value="mother">Mother</option>
+                                    <option value="gurdian">Gurdian</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="fields">
+                            <div class="input-field">
+                                <label class="labels">Mobile No</label>
+                                <input type="text" class="form-input" placeholder="Enter Mobile No "
+                                    name="parent_mobile" id="parent_mobile" minlength="10" maxlength="10">
+                            </div>
+                            <div class="input-field">
+                                <label class="labels"> Email Id<span></span></label>
+                                <input type="email" class="form-input" placeholder="Enter Email Address"
+                                    name="parent_email" id="parent_email">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="list">
+                    <input type="checkbox" name="accordion" id="fifth" class="check_accord"> 
+                    <label for="fifth" class="details" id="label1">Class</label>
+                    <div class="contents">
+                        <div class="fields">
+                            <div class="input-field">
+                                <label class="labels">Class <span>*</span></label>
+                                <select name="class_id" id="class_id" class="gender-list" >
+                                    <option>Class 1</option>
+                                    <option>Class 2</option>
+                                    <option>Class 3</option>
+                                    <option>Class 4</option>
+                                    <option>Class 5</option>
+                                    <option>Class 6</option>
+                                    <option>Class 7</option>
+                                </select>
+                            </div>
+                            <div class="input-field">
+                                <label class="labels">Section<span>*</span></label>
+                                <select name="section" class="gender-list" >
+                                    <option>Section A</option>
+                                    <option>Section B</option>
+                                    <option>Section C</option>
+                                    <option>Section D</option>
+                                </select>
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+                <div class="list">
+                    <input type="checkbox" name="accordion" id="six" class="check_accord">
+                    <label for="six" class="details" id="label1">Transportation</label>
+                    <div class="contents">
+                        <div class="fields">
+                            <div class="input-field">
+                                <label class="form-label">Route Name</label>
+                                <select name="transport_id" id="transport_id" class="gender-list">
+                                    <option>Gachibowli</option>
+                                    <option>Gachibowli</option>
+                                    <option>Gachibowli</option>
+                                    <option>Gachibowli</option>
+                                    <option>Gachibowli</option>
+                                </select>
+                            </div>
+                            <div class="input-field">
+                                <label class="labels">Pickup Point</label>
+                                <input type="text" class="form-input">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="list">
+                    <input type="checkbox" name="accordion" id="seven" class="check_accord">
+                    <label for="seven" class="details" id="label1">Documents</label>
+                    <div class="contents">
+                        <div class="fields">
+                            <div class="input-field">
+                                <label class="labels">Document Name</label>
+                                <input type="text" name="document_name" class="form-input">
+                            </div>
+                            <div class="input-field">
+                                <label class="labels">File Path</label>
+                                <input type="file" id="document_attachment" class="form-input"
+                                    name="document_attachment">
+                            </div>
+                            <p class="file-info">(Maximum size for document is 3 MB.)</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sticky">
+                <a onclick="closeNav('registration')" class="btn btn--cancel"><label>Cancel</label> </a>
+                <button class="btn btn--save" type="submit">Save</button>
+            </div>
+        </form>
+    </div>
+</section>
+
+{% comment %} Fiter {% endcomment %}
+
+<section class="form-section filter">
+    <div class="main-header">
+        <h1 class="header-form">Filter Students</h1>
+        <a href="javascript:void(0)" class="closebtn" onclick="closeNav('filter')">&times;</a>
+    </div>
+    <div class="container">
+        <form id="transactionForm" method="POST" enctype="multipart/formdata" action="#" class="form">
+            <div class="contents" id="form-field">
+                <div class="fields">
+                    <div class="input-field">
+                        <label class="labels">Class <span>*</span></label>
+                        <select name="fileter_class_name" class="gender-list">
+                            <option value="all" selected>All</option>
+                            <option>Class 1</option>
+                            <option>Class 2</option>
+                            <option>Class 3</option>
+                            <option>Class 4</option>
+                            <option>Class 5</option>
+                            <option>Class 6</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="fields">
+                    <div class="input-field">
+                        <label class="labels">Section<span>*</span></label>
+                        <select name="section" class="gender-list">
+                            <option>Section-A</option>
+                            <option>Section-B</option>
+                            <option>Section-C</option>
+                            <option>Section-D</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="sticky">
+                <a onclick="closeNav('filter')" class="btn btn--cancel"><span>Cancel</span></a>
+                <button type="submit" class="btn btn--save"><span>Submit</span></button>
+            </div>
+        </form>
+    </div>
+</section>
+
+{% comment %} Export {% endcomment %}
+
+<section class="form-section export">
+    <div class="main-header">
+       <h1 class="header-form">Export Students in bulk</h1>
+       <a href="javascript:void(0)" class="closebtn" onclick="closeNav('export')">&times;</a>
+     </div>
+     <div class="container">
+        <div class="img-field">
+            <img src="https://cdn-icons-png.flaticon.com/512/6133/6133884.png" height="70px">
+          </div>
+          <form action="#" id="studentExportXl" method="POST" enctype="multipart/form-data" class="form">
+              <div class="input-field">
+                  <label class="labels">Class <span>*</span></label>
+                  <select name="export_class_id"  name="export_class_id" class="gender-list" style="width:111px;">
+                      <option value="all" selected>All</option> 
+                     <option>Class 1</option>
+                     <option>Class 2</option>
+                     <option>Class 3</option>
+                     <option>Class 4</option>
+                     <option>Class 5</option>
+                     <option>Class 6</option>
+                  </select>
+              </div>
+            <div class="sticky upload">
+              <a onclick="closeNav('export')" class="btn btn--cancel"><label>Cancel</label> </a>
+              <button class="btn btn--save" type="submit">Upload</button>
+            </div>
+          </form>
+     </div>   
+</section>
+
+{% comment %} Import {% endcomment %}
+
+<section class="form-section import">
+    <div class="main-header">
+       <h1 class="header-form">Import Students in bulk</h1>
+       <a href="javascript:void(0)" class="closebtn" onclick="closeNav('import')">&times;</a>
+     </div>
+     <div class="container">
+     <div class="img-field">
+        <img src="https://cdn-icons-png.flaticon.com/512/6133/6133884.png" height="70px">
+      </div>
+      <div class="input-field addfile">
+        <input type="file" id="fileInput">
+        <label for="fileInput" id="fileInputLabel">
+          <span class="sp1">Download Sample file</span> <br> Put your
+          existing Students in the specific format and upload below.</label>
+      </div>
+      <form method="POST" enctype="multipart/form-data" id="studentFormXl" class="form">
+        <div class="input-box">
+          <label>Upload CSV File </label>
+          <br/>
+          <input type="file" class="files" name="fileXl">
+        </div>
+        <div class="sticky upload">
+          <a onclick="closeNav('import')" class="btn btn--cancel"><label>Cancel</label> </a>
+          <button class="btn btn--save" type="submit">Upload</button>
+        </div>
+      </form>
+     </div>
+</section>
+
+<script>
+    // Function to close the form section
+    function closeNav(formClass) {
+        console.log("done");
+        document.querySelector("." + formClass).classList.remove("form-show");
+    }
+
+    // Function to open the form section
+    function openForm(formClass) {
+        document.querySelector("." + formClass).classList.add("form-show");
+    }
+</script>
+
+<div>
+    <table class="tbl">
+        <th>S.No</th>
+        <th>Student Name</th>
+        <th>Roll Number</th>
+        <th>class</th>
+        <th>Section</th>
+        <th>Gender</th>
+        <th>Blood Group</th>
+        <th>Action</th>
+
+        <tbody class="tbl__bdy">
+            {% for student in student_data %}
+            <tr class="tr-student-{{student.id}}">
+                <td>{{forloop.counter}}</td>
+                <td class="first_name">{{student.first_name}}</td>
+                <td>101</td>
+                <td>8 class</td>
+                <td>Section A</td>
+                <td>male</td>
+                <td class="blood_group">{{student.blood_group}}</td>
+                <td>
+                    <a href="#" onclick="EditButton(this)" data-id="{{student.id}}">
+                        <i class="fa-sharp fa-solid fa-pen"></i>
+                    </a>
+                    <a href="#" onclick="DeleteButton(this)" data-id="{{student.id}}">
+                        <i class="fa-solid fa-trash"></i>
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+
+
+<script>
+
+     let isEditMode = false;
+
+        //  Create for Students
+        document.getElementById('student-form').addEventListener('submit', function(event) {
+        event.preventDefault();
+        console.log("insideeeeeeeeeeejssssss")
+       
+        const formData = new FormData(document.getElementById('student-form'));
+        const data = {
+            "id" : formData.get("id"),
+            "first_name" : formData.get("first_name"),
+            "last_name" : "",
+            "age" : 10,
+            "date_of_birth": formData.get("date_of_birth"),
+            "blood_group": formData.get("blood_group"),
+            "address": formData.get("address"),
+            "email": formData.get("email"),
+            "phone_number": formData.get("phone_number"),  
+        };
+ 
+        console.log("data from form:", data);
+       
+        
+        console.log("create update check id",data.id)
+        // const url = "http://127.0.0.1:8000/";
+        const url = isEditMode ? `http://127.0.0.1:8000/Students/${data.id}` : 'http://127.0.0.1:8000/Students/';
+        console.log(url)
+        const method = isEditMode ? 'PUT' : 'POST';
+        console.log(method)
+        fetch(url, {
+            method: method,
+           
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok.');
+            }
+            return response.json();
+        })
+        .then(data => {
+           
+            if (isEditMode) { 
+                console.log("inside ifff")
+                const updateData = data["response"]
+                {% comment %} console.log(updateData) {% endcomment %}
+                const tr = document.querySelector(`.tr-student-${updateData["id"]}`)
+                console.log(tr)
+                for (const key in updateData) {
+                    try{
+                        tr.querySelector(`.${key}`).textContent = updateData[key]
+                        closeNav('registration');
+                        document.getElementById('student-form').reset();
+                    }
+                    catch{
+                        
+                    }
+                }
+            }
+            else {
+                const tableBody = document.querySelector('.tbl__bdy');
+                const newRow = document.createElement('tr');
+                const response = data["response"]
+                console.log("response",response)
+            
+                newRow.innerHTML = `
+                    <td>${tableBody.children.length + 1}</td>
+                    <td>${response.first_name}</td>
+                    <td>101</td>
+                    <td>8 class</td>
+                    <td>Section A</td>
+                    <td>male</td>
+                    <td>${response.blood_group}</td>
+                    <td>
+                        <a href="#" onclick="EditButton(this)" data-id="${response.id}">
+                            <i class="fa-sharp fa-solid fa-pen"></i>
+                        </a>
+                        <a href="#" onclick="DeleteButton(this)" data-id="${response.id}">
+                            <i class="fa-solid fa-trash"></i>
+                        </a>
+                    </td>
+                `;
+
+                tableBody.appendChild(newRow);
+                closeNav('registration');
+                document.getElementById('student-form').reset();
+                isEditMode = false;
+            }
+        })
+        .catch(error => {
+            console.log('Upgrade error:', error); 
+            
+        });
+    });
+    
+
+
+    function EditButton(element){
+        event.preventDefault();
+    
+        console.log("inside edit button");
+        
+        const id = element.getAttribute('data-id');
+        console.log(" each id", id)
+        const url = `http://127.0.0.1:8000/Students/student_id?student_id=${id}`;
+
+        fetch(url, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok.');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Data received from API:', data);
+            openForm('registration');
+            response = data["response"]
+            
+            document.getElementById("id").value = response.id;
+            document.getElementById("first_name").value = response.first_name;
+            document.getElementById("date_of_birth").value = response.date_of_birth;
+            document.getElementById("blood_group").value = response.blood_group;
+            document.getElementById("address").value = response.address;
+            document.getElementById("email").value = response.email;
+            document.getElementById("phone_number").value = response.phone_number;
+        
+            isEditMode = true;
+        })
+        .catch(error => {
+            console.log('Fetch error:', error);
+        });
+    }
+
+
+    function DeleteButton(element){
+        event.preventDefault();
+    
+        console.log("inside Delete button");
+        
+        const id = element.getAttribute('data-id');
+        console.log(" each id", id)
+        const url = `http://127.0.0.1:8000/Students/${id}`;
+
+        fetch(url, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok.');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Data Deleted from API:', data);
+            
+            const DeleteRow = document.querySelector(`.tr-student-${id}`);
+            if (DeleteRow) {
+                DeleteRow.remove();
+            } else {
+                console.log('Row not found in the table');
+            }
+        
+            isEditMode = true;
+        })
+        .catch(error => {
+            console.log('Fetch error:', error);
+        });
+    }
+</script>
+{% endblock %}

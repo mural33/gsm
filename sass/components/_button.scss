@@ -1,0 +1,67 @@
+.btn,
+.btn:link,
+.btn:visited{
+    text-transform: capitalize;
+    text-decoration: none;
+    padding: 1rem 3rem;
+    display: inline-block;
+    border: 1px solid lightgreen;
+    background: #fff;
+    border-radius:2rem;
+    transition:all .10s ease-in-out;
+}
+// button report
+.btn--report{
+    background-color:black;
+    color: whitesmoke;
+}
+// btn--hamburger
+.btn--hamburger{
+    padding:0;
+    font-size:3rem;
+    background:none;
+    outline: none;
+    border: none;
+    &:active{
+        transform: translateZ(-1rem);
+    }
+}
+.btn--create{
+    border:1px solid lightgreen;
+    background-color: rgb(51, 183, 51);
+    color: white;
+    font-size: 1.5rem;
+    font-weight: 500;
+    &:hover{
+        opacity: 0.8;
+        transform: translateY(-.2rem);
+    }
+    &:active{
+        transform: translateY(-.1rem);
+    }
+}
+.btn--save {
+    background-color: #23ae73;
+    background-image: linear-gradient(to top, #11995f, #11995f 1%, #27b679);
+    border: 1px solid #23ae73;
+    color: white;
+    padding: 1rem 2rem;
+    &:hover{
+        opacity: 0.8;
+    }
+}
+.btn--cancel {
+    padding: 1rem 2rem;
+    background-color: #FFF;
+    color: #000;
+    border: 1px solid #dddbe4;
+    &:hover{
+        opacity: 0.8;
+    }
+}
+.fa-pen{
+    color:  #1a53ff;
+  }
+  .fa-trash{
+    color:  #ff1a1a;
+  } 

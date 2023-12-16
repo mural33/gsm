@@ -1,0 +1,301 @@
+{% extends "index.html" %}
+{% load static %}
+{% block css %}
+    <title>Staff</title>
+{% endblock css %}
+{% block content %}
+<div class="student_head">
+    <div>
+        <p class="heading__primary heading__primary--animation">Staff Management</p>
+    </div>
+    <div>
+        <button class="btn btn--create" onclick="openForm()">
+            Register New Staff
+        </button>
+        <!-- Export Button -->
+        <button class="btn btn--export">
+            <i class="fa-solid fa-download"></i> Export
+        </button>
+    </div>
+</div>
+<section class="form-section">
+    <div class="main-header">
+        <h1 class="header-form">Staff Registration Form</h1>
+        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+    </div>
+    <div class="container">
+        <form id="student-form" name="form" class="form" action="#" method="post" enctype="multipart/form-data">
+            <div class="accordion">
+                <!-- Basic Details Section -->
+                <div class="list">
+                    <input type="checkbox" name="accordion" id="first" class="check_accord" checked>
+                    <label for="first" class="details" id="label1">Basic Details</label>
+                    <div class="contents">
+                        <div class="fields">
+                            <div class="input-field">
+                                <label class="labels">Full Name <span>*</span></label>
+                                <input type="text" class="form-input" name="staff_name" id="staff_name"
+                                    placeholder="Enter your Full Name" required>
+                            </div>
+                            <div class="input-field">
+                                <label class="labels">Designation</label>
+                                <input type="text" placeholder="Enter Designation" class="form-input" required>
+                            </div>
+
+                        </div>
+                        <div class="fields">
+                            <div class="input-field">
+                                <label class="labels">Joining Date <span>*</span></label>
+                                <input type="date" class="form-input" required>
+                            </div>
+                            <div class="input-field">
+                                <label class="labels">Date Of Birth</label>
+                                <input type="date" class="form-input">
+                            </div>
+                        </div>
+                        <div class="fields">
+                            <div class="input-field">
+                                <label class="labels">Gender</label>
+                                <select class="gender-list" required>
+                                    <option selected>Select Gender</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                            <div class="input-field">
+                                <label class="labels">Blood Group</label>
+                                <select class="gender-list">
+                                    <option selected>Select Blood Group</option>
+                                    <option value="O+">O+</option>
+                                    <option value="A+">A+</option>
+                                    <option value="B+">B+</option>
+                                    <option value="AB+">AB+</option>
+                                    <option value="O-">O-</option>
+                                    <option value="A-">A-</option>
+                                    <option value="B-">B-</option>
+                                    <option value="AB-">AB-</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="fields">
+                            <div class="input-field">
+                                <label class="labels">Photo <span>*</span></label>
+                                <input type="file" class="form-input" accept="image/jpeg,image/jpg" required>
+                            </div>
+                            <div class="input-field">
+                            </div>
+                            <p class="file-info" style="margin-left:0;">(Maximum size for photo is 500 kb.)</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="list">
+                    <input type="checkbox" name="accordion" id="second" class="check_accord">
+                    <label for="second" class="details" id="label1">Contact Details</label>
+                    <div class="contents">
+                        <div class="fields">
+                            <div class="input-field">
+                                <label class="labels">Mobile No <span></span></label>
+                                <input type="text" class="form-input" 
+                                    maxlength="10" minlength="10" placeholder="Enter valid Number">
+                            </div>
+                            <div class="input-field">
+                                <label class="labels">Email Id</label>
+                                <input type="email" class="form-input" name="student_email" id="student_email"
+                                    placeholder="Enter Email Address">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="list">
+                    <input type="checkbox" name="accordion" id="third" class="check_accord">
+                    <label for="third" class="details" id="label1">Professional Details</label>
+                    <div class="contents">
+                        <div class="fields">
+                            <div class="input-field">
+                                <label class="labels">Specialization</label>
+                                <input type="text" class="form-input"  placeholder="Where You Specialize" name="specialization" id="specialization" required>
+                            </div>
+                            <div class="input-field">
+                                <label class="labels">Experience</label>
+                                <input type="text" class="form-input"  placeholder="Write Your Experience" name="experience" id="experience">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="list">
+                    <input type="checkbox" name="accordion" id="fourth" class="check_accord">
+                    <label for="fourth" class="details" id="label1">Payroll Details</label>
+                    <div class="contents">
+                        <div class="fields">
+                            <div class="input-field">
+                                <label for="id">Employment Type<span style="color: red;">*</span></label>
+                                <select class="gender-list" name="id" id="id">
+                                  <option>Full Time</option>
+                                  <option>Part Time</option>
+                                  <option>Trainee</option>
+                                  <option>Full Time</option>
+                                  <option>Part Time</option>
+                                </select>
+                            </div>
+                            <div class="input-field">
+                                <label class="labels">Salary Amount</label>
+                                <input type="text" class="form-input"  placeholder="Enter Salary Amount" id="salary" name="salary">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="list">
+                    <input type="checkbox" name="accordion" id="fifth" class="check_accord">
+                    <label for="fifth" class="details" id="label1">Address Details</label>
+                    <div class="contents">
+                        <div class="fields">
+                            <div class="input-field">
+                                <label class="labels">Address Line <span>*</span></label>
+                                <input type="text" class="form-input" name="student_address_lane"
+                                    id="student_address_lane" placeholder="Enter Address" required>
+                            </div>
+                        </div>
+                        <div class="fields">
+                            <div class="input-field">
+                                <label class="labels">City <span>*</span></label>
+                                <input type="text" class="form-input" name="student_city" id="student_city"
+                                    placeholder="Enter City" required>
+                            </div>
+                            <div class="input-field">
+                                <label class="labels">State <span>*</span></label>
+                                <select name="student_state" id="student_state" required class="gender-list">
+                                    <option value="AP">Andhra Pradesh</option>
+                                    <option value="TS">Telangana</option>
+                                    <option value="MH">Maharashtra</option>
+                                    <option value="DL">Delhi</option>
+                                    <option value="HP">Himachal Pradesh</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="fields">
+                            <div class="input-field">
+                                <label class="labels">Country <span>*</span></label>
+                                <input type="text" class="form-input" placeholder="Enter Country" type="text"
+                                    placeholder="Enter Country" name="student_country" id="student_country" required>
+                            </div>
+                            <div class="input-field">
+                                <label class="labels"> Pincode<span>*</span></label>
+                                <input type="text" class="form-input" name="student_pincode" id="student_pincode"
+                                    placeholder="Enter Pincode" required>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+ 
+                <div class="list">
+                    <input type="checkbox" name="accordion" id="six" class="check_accord">
+                    <label for="six" class="details" id="label1">Transportation</label>
+                    <div class="contents">
+                        <div class="fields">
+                            <div class="input-field">
+                                <label class="form-label">Route Name</label>
+                                <select name="transport_id" id="transport_id" class="gender-list">
+                                    <option>Gachibowli</option>
+                                    <option>Gachibowli</option>
+                                    <option>Gachibowli</option>
+                                    <option>Gachibowli</option>
+                                    <option>Gachibowli</option>
+                                </select>
+                            </div>
+                            <div class="input-field">
+                                <label class="labels">Pickup Point</label>
+                                <input type="text" class="form-input">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="sticky">
+                <a onclick="closeNav()" class="btn btn--cancel"><label>Cancel</label> </a>
+                <button class="btn btn--save" type="submit">Save</button>
+            </div>
+        </form>
+    </div>
+</section>
+
+<script>
+    // Function to close the form section
+    function closeNav() {
+        console.log("done");
+        document.querySelector(".form-section").classList.remove("form-show");
+    }
+
+    // Function to open the form section
+    function openForm() {
+        document.querySelector(".form-section").classList.add("form-show");
+    }
+</script>
+
+<div>
+    <table class="tbl">
+        <th>Photo</th>
+        <th>Staff Name</th>
+        <th>Role</th>
+        <th>Specialization</th>
+        <th>Contact Number</th>
+        <th>Date Of Joining</th>
+        <th>Gender</th>
+        <th>Blood Group</th>
+        <th>Action</th>
+
+        <tbody class="tbl__bdy">
+            <tr>
+                <td> <img src="{% static 'img/profile.png' %}" class="imgstaff" alt=""></td>
+                <td>Haritha</td>
+                <td>Teacher</td>
+                <td>Math</td>
+                <td>9986775788</td>
+                <td>09-08-2022</td>
+                <td>Female</td>
+                <td>B +ve</td>
+
+                <td>
+                    <i class="fa-sharp fa-solid fa-pen"></i>
+
+                    <i class="fa-solid fa-trash"></i>
+
+                </td>
+            </tr>
+            <tr>
+                <td> <img src="{% static 'img/profile.png' %}" class="imgstaff" alt=""></td>
+                <td>Fasi</td>
+                <td>Teacher</td>
+                <td>Math</td>
+                <td>9986775788</td>
+                <td>09-08-2022</td>
+                <td>Male</td>
+                <td>B +ve</td>
+                <td>
+                    <i class="fa-sharp fa-solid fa-pen"></i>
+
+                    <i class="fa-solid fa-trash"></i>
+                </td>
+            </tr>
+            <tr>
+                <td> <img src="{% static 'img/profile.png' %}" class="imgstaff" alt=""></td>
+                <td>krishna</td>
+                <td>Teacher</td>
+                <td>Math</td>
+                <td>9986775788</td>
+                <td>09-08-2022</td>
+                <td>Male</td>
+                <td>B +ve</td>
+                <td>
+                    <i class="fa-sharp fa-solid fa-pen"></i>
+
+                    <i class="fa-solid fa-trash"></i>
+                </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+{% endblock %}

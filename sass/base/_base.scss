@@ -1,0 +1,39 @@
+:root{
+    // values
+    --side-nav-width:16%;
+    --nav-height:4rem;
+    --large_screen-side-nav:12%;
+    --from-height:40rem;
+    --form-content-height:80rem;
+    // colors 
+    --primary-color:#181f38;
+    // --nav-color:#D2DE32;
+    --nav-color:#9EB8D9;
+    // --side-nav-color:#181f38;
+    --side-nav-color:#7C93C3;
+    --side-nav-hover:#99B080;
+    --table-color:#eeeeee;
+}
+*,
+*::before,
+*::after{
+    box-sizing: border-box;
+    padding: 0%;
+    margin: 0%;
+}
+html{
+    font-size: 62.5%;
+    @media (max-width: 2390){
+        font-size: 90%;
+    }
+    @media (max-width:400){
+            font-size: 10%;
+    }
+}
+body{
+    font-family: 'Nunito Sans', sans-serif;
+    overflow: hidden;
+    &::-webkit-scrollbar {
+        width: 20px;
+    }
+}

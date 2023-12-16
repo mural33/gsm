@@ -1,0 +1,21 @@
+.heading__primary {
+    font-size: 2rem;
+    font-weight: 600;
+    word-spacing: 1.6%; /* Corrected value to be a percentage */
+    &--animation {
+        animation: move-right 5s  0.1s; /* Corrected value to 0.1s */
+        animation-fill-mode: backwards;
+    }
+}
+
+@keyframes move-right {
+    0% {
+        transform: translateX(-120%);
+    }
+    50% {
+        transform: translateX(30%);
+    }
+    100% {
+        transform: translateX(0);
+    }
+}
