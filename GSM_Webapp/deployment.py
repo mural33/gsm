@@ -2,9 +2,6 @@ import os
 from .settings import *
 from .settings import BASE_DIR
 
-# djaango secret key
-SECRET_KEY = os.environ.get("SECRET_KEY")
-
 # setting DEBUG = False
 DEBUG = False
 
