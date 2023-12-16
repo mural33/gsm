@@ -1,6 +1,8 @@
+
+
 {% extends "index.html" %}
 {% block css %}
-    <title>Studenst</title>
+    <title>Students</title>
 {% endblock css %}
 {% block content %}
 <div class="student_head">
@@ -41,7 +43,7 @@
                             <input type="hidden" name="pk" id="pk">
                             <div class="input-field">
                                 <label class="labels">Full Name <span>*</span></label>
-                                <input type="text" class="form-input" name="first_name" id="first_name"
+                                <input type="text" class="form-input" name="student_name" id="student_name"
                                     placeholder="Enter your Full Name" >
                             </div>
                             <div class="input-field">
@@ -160,12 +162,12 @@
                         <div class="fields">
                             <div class="input-field">
                                 <label class="labels">Full Name <span>*</span></label>
-                                <input type="text" class="form-input" placeholder="Enter FullName" id="parent_1"
-                                    class="form-control" name="parent_1" >
+                                <input type="text" class="form-input" placeholder="Enter FullName" id="parent_name"
+                                    class="form-control" name="parent_name" >
                             </div>
                             <div class="input-field">
                                 <label class="labels">Relation With Student <span>*</span></label>
-                                <select name="relation_with_student_1" id="relation_with_student_1" class="gender-list">
+                                <select name="relation_with_student" id="relation_with_student" class="gender-list">
                                     <option value="father">Father</option>
                                     <option value="mother">Mother</option>
                                     <option value="gurdian">Gurdian</option>
@@ -176,10 +178,10 @@
                             <div class="input-field">
                                 <label class="labels">Mobile No</label>
                                 <input type="text" class="form-input" placeholder="Enter Mobile No "
-                                    name="parent_mobile" id="parent_mobile" minlength="10" maxlength="10">
+                                    name="parent_phone" id="parent_phone" minlength="10" maxlength="10">
                             </div>
                             <div class="input-field">
-                                <label class="labels"> Email Id<span></span></label>
+                                <label class="labels"> Email Id <span></span></label>
                                 <input type="email" class="form-input" placeholder="Enter Email Address"
                                     name="parent_email" id="parent_email">
                             </div>
@@ -196,22 +198,13 @@
                             <div class="input-field">
                                 <label class="labels">Class <span>*</span></label>
                                 <select name="class_id" id="class_id" class="gender-list" >
-                                    <option>Class 1</option>
-                                    <option>Class 2</option>
-                                    <option>Class 3</option>
-                                    <option>Class 4</option>
-                                    <option>Class 5</option>
-                                    <option>Class 6</option>
-                                    <option>Class 7</option>
+                                    
                                 </select>
                             </div>
                             <div class="input-field">
                                 <label class="labels">Section<span>*</span></label>
-                                <select name="section" class="gender-list" >
-                                    <option>Section A</option>
-                                    <option>Section B</option>
-                                    <option>Section C</option>
-                                    <option>Section D</option>
+                                <select name="section_id" id="section_id" class="gender-list" >
+                                    
                                 </select>
                             </div>
 
@@ -219,7 +212,7 @@
 
                     </div>
                 </div>
-                <div class="list">
+                {% comment %} <div class="list">
                     <input type="checkbox" name="accordion" id="six" class="check_accord">
                     <label for="six" class="details" id="label1">Transportation</label>
                     <div class="contents">
@@ -240,7 +233,7 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> {% endcomment %}
                 <div class="list">
                     <input type="checkbox" name="accordion" id="seven" class="check_accord">
                     <label for="seven" class="details" id="label1">Documents</label>
@@ -402,19 +395,19 @@
 
         <tbody class="tbl__bdy">
             {% for student in student_data %}
-            <tr class="tr-student-{{student.id}}">
+            <tr class="tr-student-{{student.student_id}}">
                 <td>{{forloop.counter}}</td>
-                <td class="first_name">{{student.first_name}}</td>
-                <td>101</td>
-                <td>8 class</td>
-                <td>Section A</td>
-                <td>male</td>
-                <td class="blood_group">{{student.blood_group}}</td>
+                <td class="student_name">{{ student.student_name }}</td>
+                <td class="roll_number">{{ student.roll_number }}</td>
+                <td class="class_name">{{ student.class_name }}</td>
+                <td class="section_name">{{ student.section_name }}</td>
+                <td class="gender">{{ student.gender }}</td>
+                <td class="blood_group">{{ student.blood_group }}</td>
                 <td>
-                    <a href="#" onclick="EditButton(this)" data-id="{{student.id}}">
+                    <a href="#" onclick="EditButton(this)" data-id="{{student.student_id}}">
                         <i class="fa-sharp fa-solid fa-pen"></i>
                     </a>
-                    <a href="#" onclick="DeleteButton(this)" data-id="{{student.id}}">
+                    <a href="#" onclick="DeleteButton(this)" data-id="{{student.student_id}}">
                         <i class="fa-solid fa-trash"></i>
                     </a>
                 </td>
@@ -424,120 +417,245 @@
     </table>
 </div>
 
-
-
+<!-- SweetAlert CDN -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 
-     let isEditMode = false;
+// Create & Update For student
 
-        //  Create for Students
-        document.getElementById('student-form').addEventListener('submit', function(event) {
-        event.preventDefault();
-        console.log("insideeeeeeeeeeejssssss")
-       
-        const formData = new FormData(document.getElementById('student-form'));
-        const data = {
-            "id" : formData.get("id"),
-            "first_name" : formData.get("first_name"),
-            "last_name" : "",
-            "age" : 10,
+let isEditMode = false;
+document.getElementById('student-form').addEventListener('submit', function (event) {
+    event.preventDefault();
+
+    const formData = new FormData(document.getElementById('student-form'));
+    const studentData = {
+            "institute_id": 1,
+            "student_id" : formData.get("id"),
+            "student_name": formData.get("student_name"),
+            "gender": formData.get("student_gender"),
             "date_of_birth": formData.get("date_of_birth"),
             "blood_group": formData.get("blood_group"),
             "address": formData.get("address"),
+            "phone_number": formData.get("phone_number"),
             "email": formData.get("email"),
-            "phone_number": formData.get("phone_number"),  
-        };
- 
-        console.log("data from form:", data);
-       
-        
-        console.log("create update check id",data.id)
-        // const url = "http://127.0.0.1:8000/";
-        const url = isEditMode ? `http://127.0.0.1:8000/Students/${data.id}` : 'http://127.0.0.1:8000/Students/';
-        console.log(url)
-        const method = isEditMode ? 'PUT' : 'POST';
-        console.log(method)
-        fetch(url, {
-            method: method,
-           
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(data),
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok.');
-            }
-            return response.json();
-        })
-        .then(data => {
-           
-            if (isEditMode) { 
-                console.log("inside ifff")
-                const updateData = data["response"]
-                {% comment %} console.log(updateData) {% endcomment %}
-                const tr = document.querySelector(`.tr-student-${updateData["id"]}`)
-                console.log(tr)
+            "admission_date": formData.get("admission_date"),
+            "roll_number": '1010',
+            "photo": "url",
+            "slug": formData.get("student_name"),
+            "class_id": formData.get("class_id"),
+            "section_id": formData.get("section_id"),
+            "transport_id": 11,
+    };
+
+    console.log("data from 1st api", studentData);
+    
+    // For Checking Student Create or Update based on Student_id
+    const url = isEditMode ? `{{ URL }}Students/update_student/${studentData.student_id}` : '{{ URL }}Students/create_student/';
+    const method = isEditMode ? 'PUT' : 'POST';
+
+    fetch(url, {
+        method: method,
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(studentData),
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok.');
+        }
+        return response.json();
+    })
+    .then(createdStudentData => {
+        // For Student & Parent Updating Details
+        if (isEditMode) {
+            const updatedParentData = {
+                        "parent_phone": formData.get("parent_phone"),
+                        "parent_gender": "string",
+                        "relation_with_student": formData.get("relation_with_student"),
+                        "parent_profession": "string",
+                        "student_id": formData.get("id"), 
+                        "parent_profile": "string",
+                        "parent_name": formData.get("parent_name"),
+                        "parent_email": formData.get("parent_email"),
+                        "parent_age": "string",
+                        "parent_address": "string",
+                        "photo": "string"
+            };
+            fetch(`{{ URL }}Parents/update/${studentData.student_id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(updatedParentData),
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok.');
+                }
+                return response.json();
+            })
+            .then(updatedParentResponse => {
+                console.log('Updated Parent Data:', updatedParentResponse);
+                
+                const updateData = createdStudentData["response"];
+                const tr = document.querySelector(`.tr-student-${updateData["student_id"]}`);
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Student Updated Successfully!',
+                    position: 'top-end',
+                    toast: true,
+                    showConfirmButton: false,
+                    timer: 3000,
+                    padding: '1rem',
+                    customClass: {
+                        title: 'small-title',
+                    },
+                });
                 for (const key in updateData) {
-                    try{
-                        tr.querySelector(`.${key}`).textContent = updateData[key]
+                    try {
+                        tr.querySelector(`.${key}`).textContent = updateData[key];
+
                         closeNav('registration');
                         document.getElementById('student-form').reset();
-                    }
-                    catch{
-                        
+                    } catch (error) {
+                        // Handle error if any
                     }
                 }
-            }
-            else {
-                const tableBody = document.querySelector('.tbl__bdy');
-                const newRow = document.createElement('tr');
-                const response = data["response"]
-                console.log("response",response)
-            
-                newRow.innerHTML = `
-                    <td>${tableBody.children.length + 1}</td>
-                    <td>${response.first_name}</td>
-                    <td>101</td>
-                    <td>8 class</td>
-                    <td>Section A</td>
-                    <td>male</td>
-                    <td>${response.blood_group}</td>
-                    <td>
-                        <a href="#" onclick="EditButton(this)" data-id="${response.id}">
-                            <i class="fa-sharp fa-solid fa-pen"></i>
-                        </a>
-                        <a href="#" onclick="DeleteButton(this)" data-id="${response.id}">
-                            <i class="fa-solid fa-trash"></i>
-                        </a>
-                    </td>
-                `;
-
-                tableBody.appendChild(newRow);
                 closeNav('registration');
                 document.getElementById('student-form').reset();
                 isEditMode = false;
+
+
+                
+            })
+            .catch(error => {
+                console.error('Error updating parent:', error);
+            });
+        }
+            else {
+                console.log("Students data Successful");
+                console.log('Response from creating student:', createdStudentData);
+
+                const response = createdStudentData.response; 
+                console.log("response",response);
+                const tableBody = document.querySelector('.tbl__bdy');
+                // const newRow = document.createElement('tr');
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Student Created Successfully!',
+                    position: 'top-end',
+                    toast: true,
+                    showConfirmButton: false,
+                    timer: 3000,
+                    padding: '1rem',
+                    customClass: {
+                        title: 'small-title',
+                    },
+                });
+                newRow = `
+                <tr class="tr-student-${response.student_id}">
+                    <td>${tableBody.children.length + 1}</td>
+                    <td class="student_name">${response.student_name}</td>
+                    <td class="roll_number">${response.roll_number}</td>
+                    <td class="class_name">${response.class_id}</td>
+                    <td class="section_name">${response.section_id}</td>
+                    <td class="gender">${response.gender}</td>
+                    <td class="blood_group">${response.blood_group}</td>
+                    <td>
+                        <a href="#" onclick="EditButton(this)" data-id="${response.student_id}">
+                            <i class="fa-sharp fa-solid fa-pen"></i>
+                        </a>
+                        <a href="#" onclick="DeleteButton(this)" data-id="${response.student_id}">
+                            <i class="fa-solid fa-trash"></i>
+                        </a>
+                    </td>
+                </tr>
+                `;
+
+                
+                tableBody.innerHTML += newRow;
+        
+                    // Parentssssssss
+                    const createdStudentId = createdStudentData.response.student_id;
+                    console.log('Created Student ID:', createdStudentId);
+
+                        // Use the created student_id in the payload for creating a parent
+                        const parentData = {
+                            "parent_phone": formData.get("parent_phone"),
+                            "parent_gender": "string",
+                            "relation_with_student": formData.get("relation_with_student"),
+                            "parent_profession": "string",
+                            "student_id": createdStudentId, 
+                            "parent_profile": "string",
+                            "parent_name": formData.get("parent_name"),
+                            "parent_email": formData.get("parent_email"),
+                            "parent_age": "string",
+                            "parent_address": "string",
+                            "photo": "string"
+                        };
+
+                        console.log("Parents data",parentData);
+                        // Make POST request to create a parent associated with the student
+                        fetch('{{ URL }}Parents/add_parent/', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify(parentData),
+                        })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Network response was not ok.');
+                            }
+                            return response.json();
+                        })
+                        .then(createdParentData => {
+                            console.log('Created Parent Data:', createdParentData);
+                            // Further handling of created parent data
+
+                            
+                            })
+                        .catch(error => {
+                            console.error('Error creating parent:', error);
+                        });
+                        
+                
+                
+                closeNav('registration');
+                document.getElementById('student-form').reset();
+                
+            
             }
-        })
+
+                    
+                
+            })
         .catch(error => {
-            console.log('Upgrade error:', error); 
+            console.error('Error creating student:', error);
             
         });
-    });
-    
+});
 
 
-    function EditButton(element){
-        event.preventDefault();
-    
-        console.log("inside edit button");
-        
-        const id = element.getAttribute('data-id');
-        console.log(" each id", id)
-        const url = `http://127.0.0.1:8000/Students/student_id?student_id=${id}`;
 
-        fetch(url, {
+
+
+
+
+// ###############           For Getting data into the Form             ##############
+function EditButton(element) {
+    event.preventDefault();
+
+    console.log("inside edit button");
+
+    const id = element.getAttribute('data-id');
+    console.log("each id", id)
+
+    const studentUrl = `{{ URL }}Students/get_student/?student_id=${id}`;
+
+    fetch(studentUrl, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -550,35 +668,88 @@
             return response.json();
         })
         .then(data => {
-            console.log('Data received from API:', data);
+            console.log('Student Data received from API:', data);
             openForm('registration');
-            response = data["response"]
+            const studentResponse = data["response"];
+
             
-            document.getElementById("id").value = response.id;
-            document.getElementById("first_name").value = response.first_name;
-            document.getElementById("date_of_birth").value = response.date_of_birth;
-            document.getElementById("blood_group").value = response.blood_group;
-            document.getElementById("address").value = response.address;
-            document.getElementById("email").value = response.email;
-            document.getElementById("phone_number").value = response.phone_number;
-        
+            document.getElementById("id").value = studentResponse.student_id;
+            document.getElementById("student_name").value = studentResponse.student_name;
+            document.getElementById("student_gender").value = studentResponse.gender;
+            document.getElementById("date_of_birth").value = studentResponse.date_of_birth;
+            document.getElementById("blood_group").value = studentResponse.blood_group;
+            document.getElementById("admission_date").value = studentResponse.admission_date;
+            document.getElementById("email").value = studentResponse.email;
+            document.getElementById("phone_number").value = studentResponse.phone_number;
+            document.getElementById("address").value = studentResponse.address;
+            document.getElementById("class_id").value = studentResponse.class_id;
+            document.getElementById("section_id").value = studentResponse.section_id;
+
+            const student_id = studentResponse.student_id; 
+            console.log("student_id",student_id);
+            const parentUrl = `{{ URL }}Parents/parent/student_id?student_id=${student_id}`;
+
+            
+            fetch(parentUrl, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                })
+                .then(parentResponse => {
+                    if (!parentResponse.ok) {
+                        throw new Error('Network response for parent was not ok.');
+                    }
+                    return parentResponse.json();
+                })
+                .then(parentData => {
+                    console.log('Parent Data received from API:', parentData);
+                    const parentResponse = parentData["response"];
+
+                    
+                    document.getElementById("parent_name").value = parentResponse.parent_name;
+                    document.getElementById("relation_with_student").value = parentResponse.relation_with_student;
+                    document.getElementById("parent_email").value = parentResponse.parent_email;
+                    document.getElementById("parent_phone").value = parentResponse.parent_phone;
+                    
+                })
+                .catch(parentError => {
+                    console.log('Fetch error for parent:', parentError);
+                });
+
             isEditMode = true;
         })
         .catch(error => {
-            console.log('Fetch error:', error);
+            console.log('Fetch error for student:', error);
         });
-    }
+}
 
+
+
+// #############        For Deleting student data              ################
 
     function DeleteButton(element){
+
+        Swal.fire({
+        title: 'Are you sure?',
+        text: 'You are about to delete this student data.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+        if (result.isConfirmed) {
+
         event.preventDefault();
-    
+   
         console.log("inside Delete button");
-        
+       
         const id = element.getAttribute('data-id');
         console.log(" each id", id)
-        const url = `http://127.0.0.1:8000/Students/${id}`;
-
+        const url = `{{ URL }}Students/delete_student/?student_id=${id}`;
+    
+        
         fetch(url, {
             method: 'DELETE',
             headers: {
@@ -593,19 +764,99 @@
         })
         .then(data => {
             console.log('Data Deleted from API:', data);
-            
+           
             const DeleteRow = document.querySelector(`.tr-student-${id}`);
             if (DeleteRow) {
                 DeleteRow.remove();
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Deleted!',
+                    text: 'Student data deleted Successfully',
+                });
             } else {
                 console.log('Row not found in the table');
             }
-        
-            isEditMode = true;
+       
+            
         })
         .catch(error => {
             console.log('Fetch error:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'Something went wrong while deleting.',
+            });
         });
     }
+})
+    };
+</script>
+
+
+
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const URL = "{{URL|escapejs}}";
+        const classSelect = document.querySelector("#class_id");
+        const sectionSelect = document.querySelector("#section_id");
+
+       function fetchSectionsByClass(classId) {
+            const url = `https://gsm-fastapi.azurewebsites.net/Sections/get_sections_by_class/?class_id=1`
+
+            fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok.');
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Clear previous sections
+                sectionSelect.innerHTML = "";
+
+                // Populate sections dropdown with fetched data
+                for (const item of data) {
+                    const option = document.createElement("option");
+                    option.value = item["section_id"];
+                    option.innerText = item["section_name"];
+                    sectionSelect.appendChild(option);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+
+        
+        fetch(`{{ URL }}Classes/get_classes_by_institute/?institite_id=1`)
+            .then(response => response.json())
+            .then(classes => {
+                
+                for (const item of classes) {
+                    const option = document.createElement("option");
+                    option.value = item["class_id"];
+                    option.innerText = item["class_name"];
+                    classSelect.appendChild(option);
+                }
+
+                
+                classSelect.addEventListener("change", (event) => {
+                    const selectedClassId = event.target.value;
+                    fetchSectionsByClass(selectedClassId); 
+                });
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    });
+
 </script>
 {% endblock %}

@@ -34,4 +34,5 @@ urlpatterns = [
     path('',include('Timetable.urls')),
     path('',include('Transportation.urls')),
     path('',include('Users.urls')),
+    path('',include('Registration.urls')),
 ]+static(settings.MEDIA_URL,document_root = settings.MEDIA_ROOT)
