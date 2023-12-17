@@ -99,7 +99,7 @@
    
     
     console.log("create update check id",data.class_id)
-    const url = isEditMode ? `{{URL}}Classes/${data.class_id}` : '{{URL}}Classes/create_class/';
+    const url = isEditMode ? `{{ URL }}/Classes/${data.class_id}` : '{{ URL }}/Classes/create_class/';
     console.log(url)
     const method = isEditMode ? 'PUT' : 'POST';
     console.log(method)
@@ -203,7 +203,7 @@
         
         const classId = element.getAttribute('data-class-id');
         console.log(" each id", classId)
-        const url = `{{URL}}Classes/class_id/?class_id=${classId}`;
+        const url = `{{ URL }}/Classes/class_id/?class_id=${classId}`;
 
         fetch(url, {
             method: 'GET',
@@ -250,7 +250,7 @@
         }).then((result) => {
             if (result.isConfirmed) {
                 // User confirmed, proceed with deletion
-                const url = `{{URL}}Classes/${class_Id}`;
+                const url = `{{ URL }}/Classes/${class_Id}`;
     
                 fetch(url, {
                     method: 'DELETE',

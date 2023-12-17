@@ -309,7 +309,7 @@ document.getElementById('staff-form').addEventListener('submit', function (event
     }
     console.log("formData", staffData);
 
-    const url = isEditMode ? `{{ URL }}StaffS/update_staff/?staff_id=${staffData.staff_id}` : '{{ URL }}StaffS/create_staff/';
+    const url = isEditMode ? `{{ URL }}/StaffS/update_staff/?staff_id=${staffData.staff_id}` : '{{ URL }}/StaffS/create_staff/';
     const method = isEditMode ? 'PUT' : 'POST';
     console.log("url", url)
     console.log("method", method)
@@ -337,7 +337,7 @@ document.getElementById('staff-form').addEventListener('submit', function (event
                             "payment_mode": "string",
                             "payroll_details": "string"
                         };
-            fetch(`{{ URL }}StaffPayrole/update_payroll/?staff_id=${staffData.staff_id}`, {
+            fetch(`{{ URL }}/StaffPayrole/update_payroll/?staff_id=${staffData.staff_id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -454,7 +454,7 @@ document.getElementById('staff-form').addEventListener('submit', function (event
                 });
                         console.log("Payroll data",payrollData);
                         // Make POST request to create a parent associated with the student
-                        fetch('{{ URL }}StaffPayrole/add_payroll/', {
+                        fetch('{{ URL }}/StaffPayrole/add_payroll/', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
@@ -504,7 +504,7 @@ function EditButton(element) {
     const id = element.getAttribute('data-id');
     console.log("each id", id)
 
-    const staffUrl = `{{ URL }}StaffS/get_staff_by_id/?staff_id=${id}`;
+    const staffUrl = `{{ URL }}/StaffS/get_staff_by_id/?staff_id=${id}`;
 
     fetch(staffUrl, {
             method: 'GET',
@@ -541,7 +541,7 @@ function EditButton(element) {
 
             const staff_id = staffResponse.staff_id; 
             console.log("staff_id",staff_id);
-            const payrollUrl = `{{ URL }}StaffPayrole/get_payroll_data/?staff_id=${staff_id}`;
+            const payrollUrl = `{{ URL }}/StaffPayrole/get_payroll_data/?staff_id=${staff_id}`;
 
             
             fetch(payrollUrl, {
@@ -600,7 +600,7 @@ function DeleteButton(element){
        
         const id = element.getAttribute('data-id');
         console.log(" each id", id)
-        const url = `{{ URL }}StaffS/delete_staff/?staff_id=${id}`;
+        const url = `{{ URL }}/StaffS/delete_staff/?staff_id=${id}`;
  
         fetch(url, {
             method: 'DELETE',

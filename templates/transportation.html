@@ -255,7 +255,7 @@
 
         console.log("data from form:", data)
         console.log("created updated check id ", data.id)
-        const url = isEditMode ? `{{URL}}Transport/update_transport/?transport_id=${data.id}` : `{{URL}}Transport/create_transport/`;
+        const url = isEditMode ? `{{ URL }}/Transport/update_transport/?transport_id=${data.id}` : `{{ URL }}/Transport/create_transport/`;
         const method = isEditMode ? 'PUT' : 'POST'
         console.log(method, "ok")
         fetch(url, {
@@ -371,7 +371,7 @@
 
         const id = element.getAttribute('data-id');
         console.log(" each id", id)
-        const url = `{{URL}}Transport/get_transport_data_by_id/?transport_id=${id}`;
+        const url = `{{ URL }}/Transport/get_transport_data_by_id/?transport_id=${id}`;
 
         fetch(url, {
             method: 'GET',
@@ -420,7 +420,7 @@
             // User clicked the confirm button
             const id = element.getAttribute('data-id');
             console.log(" each id", id)
-            const url = `{{URL}}Transport/delete_transport/?transport_id=${id}`;
+            const url = `{{ URL }}/Transport/delete_transport/?transport_id=${id}`;
 
             fetch(url, {
                 method: 'DELETE',
@@ -478,7 +478,7 @@
 function displayStopages() {
     const transport_id = 11;
 
-    fetch(`https://gsm-fastapi.azurewebsites.net/Stops/get_all_stopages_by_transport/?transport_id=${transport_id}`)
+    fetch(`{{URL}}/Stops/get_all_stopages_by_transport/?transport_id=${transport_id}`)
         .then(response => {
             if (!response.ok) {
                 throw new Error("Network response was not ok");
@@ -544,7 +544,7 @@ function Editstopage(element){
     console.log("inside stopage edit button");
     const id=element.getAttribute("datastop-id");
     // console.log("stopage id",id)
-    const url=`https://gsm-fastapi.azurewebsites.net/Stops/get_all_stopages_by_transport/?transport_id=${id}`;
+    const url=`{{URL}}/Stops/get_all_stopages_by_transport/?transport_id=${id}`;
     fetch(url, {
             method: 'GET',
             headers: {
@@ -574,7 +574,7 @@ function deleteStoppage(element) {
     console.log("deleted")
     const id=element.getAttribute('datastop-id');
     console.log("each id",id)
-    const url=`{{URL}}Stops/delete_stop/?stop_id=${id}`;
+    const url=`{{ URL }}/Stops/delete_stop/?stop_id=${id}`;
 
 
     fetch(url, {
@@ -620,7 +620,7 @@ function addMore() {
             transport_id: transport_id,
         };
 
-        fetch('{{URL}}Stops/create_stopage/', {
+        fetch('{{ URL }}/Stops/create_stopage/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

@@ -450,7 +450,7 @@ document.getElementById('student-form').addEventListener('submit', function (eve
     console.log("data from 1st api", studentData);
     
     // For Checking Student Create or Update based on Student_id
-    const url = isEditMode ? `{{ URL }}Students/update_student/${studentData.student_id}` : '{{ URL }}Students/create_student/';
+    const url = isEditMode ? `{{ URL }}/Students/update_student/${studentData.student_id}` : '{{ URL }}/Students/create_student/';
     const method = isEditMode ? 'PUT' : 'POST';
 
     fetch(url, {
@@ -653,7 +653,7 @@ function EditButton(element) {
     const id = element.getAttribute('data-id');
     console.log("each id", id)
 
-    const studentUrl = `{{ URL }}Students/get_student/?student_id=${id}`;
+    const studentUrl = `{{ URL }}/Students/get_student/?student_id=${id}`;
 
     fetch(studentUrl, {
             method: 'GET',
@@ -747,7 +747,7 @@ function EditButton(element) {
        
         const id = element.getAttribute('data-id');
         console.log(" each id", id)
-        const url = `{{ URL }}Students/delete_student/?student_id=${id}`;
+        const url = `{{ URL }}/Students/delete_student/?student_id=${id}`;
     
         
         fetch(url, {
@@ -836,7 +836,7 @@ function EditButton(element) {
 
 
         
-        fetch(`{{ URL }}Classes/get_classes_by_institute/?institite_id=1`)
+        fetch(`{{ URL }}/Classes/get_classes_by_institute/?institite_id=1`)
             .then(response => response.json())
             .then(classes => {
                 
