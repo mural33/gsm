@@ -1,49 +1,5 @@
-from django.shortcuts import redirect, render
-from datetime import datetime
-import requests
-from faker import Faker
-fake = Faker()
-import random
+from django.shortcuts import render
 
 # Create your views here.
-import os
-from dotenv import load_dotenv
-load_dotenv()
-URL = os.environ.get('api_url')
-
-
-
 def transportation(request):
-  print("start",datetime.now())
-  url = f"{URL}Transport/get_all_transports/"
-  response = requests.get(url)
-  if response.status_code == 200:
-    data = response.json()
-    payload = {
-      'transportation': data,
-      'URL':URL,
-    }
-    print("End",datetime.now())
-    return render(request, 'transportation.html', payload)
-  else:
-        print("error End",datetime.now())
-        # Handle the error case, e.g., return an error page or redirect
-        return redirect("/transportation/")
-  
-
-
-def stapages(request):
-  print("start",datetime.now())
-  url = f'{URL}Stops/get_all_stopages/'
-  response = requests.get(url)
-  if response.status_code == 200:
-    data = response.json()
-    payload = {
-      'stopage': data
-    }
-    print("End",datetime.now())
-    return render(request, 'transportation.html', payload)
-  else:
-        print("error End",datetime.now())
-        # Handle the error case, e.g., return an error page or redirect
-        return redirect("/transportation/")
+  return render(request, 'transportation.html')
