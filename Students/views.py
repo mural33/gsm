@@ -5,13 +5,14 @@ import requests
 from faker import Faker
 fake = Faker()
 import random
-
-URL = "https://gsm-fastapi.azurewebsites.net"
+from GSM_Webapp.settings import API_URL
+# URL = os.environ.get('api_url')
+URL = API_URL
 
 
 def student(request):
     print("start", datetime.now())
-    url_students = f'{URL}Students/get_students_by_intitute/?institute_id=1'
+    url_students = f'{URL}/Students/get_students_by_intitute/?institute_id=1'
     print("url students", url_students)
     response_students = requests.get(url_students)
     if response_students.status_code == 200:

@@ -6,16 +6,15 @@ fake = Faker()
 import random
 
 # Create your views here.
-import os
-from dotenv import load_dotenv
-load_dotenv()
-URL = os.environ.get('api_url')
+from GSM_Webapp.settings import API_URL
+# URL = os.environ.get('api_url')
+URL = API_URL
 
 
 
 def transportation(request):
   print("start",datetime.now())
-  url = f"{URL}Transport/get_all_transports/"
+  url = f"{URL}/Transport/get_all_transports/"
   response = requests.get(url)
   if response.status_code == 200:
     data = response.json()

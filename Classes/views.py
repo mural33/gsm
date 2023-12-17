@@ -8,12 +8,13 @@ from datetime import datetime
 import random
 import requests
 import os
+from GSM_Webapp.settings import API_URL
 # URL = os.environ.get('api_url')
-URL = "https://gsm-fastapi.azurewebsites.net"
+URL = API_URL
 
 def classes(req):
     # print(datetime.now())
-    url = f'{URL}Classes/get_classes_by_institute/?institite_id=1'
+    url = f'{URL}/Classes/get_classes_by_institute/?institite_id=1'
     response = requests.get(url)
     # print(response)
     if response.status_code == 200:
