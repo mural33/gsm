@@ -1,41 +1,33 @@
 import os
 from .settings import *
+from .settings import BASE_DIR
 
-# Set DEBUG to False
-DEBUG = True
+# setting DEBUG = False
+DEBUG = False
 
-# Add your Azure Web App domain to ALLOWED_HOSTS
-ALLOWED_HOSTS = ['https://gsmwebtest.azurewebsites.net']
+# setting ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['*']
 
-SECRET_KEY = 'django-insecure-0%60if2d8bu&pm&84%&_%ud#j_bg@_5*=hjn74rrr(s6rsk8kx'
+# seeting csrf cookie secure
+CSRF_Trusted_Origins = ['*']
 
-
-
-# Set CSRF cookie secure
-CSRF_USE_SESSIONS = True
-CSRF_COOKIE_SECURE = True
-CSRF_COOKIE_SAMESITE = None
-
-# Update MIDDLEWARE
+# middleware
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    "whitenoise.middleware.WhiteNoiseMiddleware",
 ]
-
-# Static files settings
+# static files
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # add this
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),
+    os.path.join(BASE_DIR,"static")
 ]
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-# Media files settings (if applicable)
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+# # whitenoise static files
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+# media files
