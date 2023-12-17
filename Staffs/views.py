@@ -5,9 +5,7 @@ from faker import Faker
 fake = Faker()
 import random
 import os
-from dotenv import load_dotenv
-load_dotenv()
-URL = os.environ.get('api_url')
+URL = "https://gsm-fastapi.azurewebsites.net"
 
 # Create your views here.
 def staffs(request):

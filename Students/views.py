@@ -5,9 +5,8 @@ import requests
 from faker import Faker
 fake = Faker()
 import random
-from dotenv import load_dotenv
-load_dotenv()
-URL = os.environ.get('api_url')
+
+URL = "https://gsm-fastapi.azurewebsites.net"
 
 
 def student(request):
