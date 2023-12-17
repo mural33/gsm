@@ -5,3 +5,6 @@ django-dotenv == 1.4.2
 whitenoise == 5.3.0
 django-logging-json
 django-cors-headers == 3.8.0
+Django==4.2.3
+Requests==2.31.0
+psycopg2==2.9.7
