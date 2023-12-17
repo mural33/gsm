@@ -2,10 +2,14 @@ import os
 from .settings import *
 
 # Set DEBUG to False
-DEBUG = False
+DEBUG = True
 
 # Add your Azure Web App domain to ALLOWED_HOSTS
 ALLOWED_HOSTS = ['https://gsmwebtest.azurewebsites.net']
+
+SECRET_KEY = 'django-insecure-0%60if2d8bu&pm&84%&_%ud#j_bg@_5*=hjn74rrr(s6rsk8kx'
+
+
 
 # Set CSRF cookie secure
 CSRF_USE_SESSIONS = True
