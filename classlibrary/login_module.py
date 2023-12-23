@@ -28,7 +28,4 @@ class Login:
             # Authentication failed
             print(f"Error: {auth_response.status_code}, {auth_response.text}")
             response = HttpResponseRedirect(reverse('login'))
-            request = HttpResponse("hi")
-            messages.error(request,"API NOT WORKING")
             return response
-
