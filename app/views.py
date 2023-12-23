@@ -71,13 +71,7 @@ def login(request):
         password = request.POST.get('password')
         login_instance = Login(API_URL)
         response = login_instance.authenticate_user(phone_number, password)
-        if response.status_code == 200:
-            request.set_cookie(key='access_token', value=response.json().get('access_token'))
-            request.set_cookie(key='institute_id', value=response.json().get('institution_id'))
-            return HttpResponseRedirect(reverse('dashboard'))
-        else:
-            messages.error(request, "Invalid Credentials")
-            return render(request, 'registration.html')
+        return response
     return render(request, 'registration.html')
 
 
