@@ -29,5 +29,5 @@ STATICFILES_DIRS = [
 ]
 
 # # whitenoise static files
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+# STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 # media files
