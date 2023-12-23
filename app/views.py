@@ -67,27 +67,25 @@ def registration(request):
 
 def login(request):
     if request.method == 'POST':
-        phone_number = request.POST.get('phone_number')
+        email = request.POST.get('phone_number')
         password = request.POST.get('password')
-        login_instance = Login(API_URL)
-        response = login_instance.authenticate_user(phone_number, password)
-        if response.status_code == 200:
-            request.set_cookie(key='access_token', value=response.json().get('access_token'))
-            request.set_cookie(key='institute_id', value=response.json().get('institution_id'))
-            return HttpResponseRedirect(reverse('dashboard'))
+        end_point = '/Login/token'
+        payload = {
+            "grant_type": "",
+            "username": email,
+            'password': password,
+            'scope': '',
+        }
+        total_url = API_URL + end_point
+        auth_response = requests.post(total_url, payload)
+        if auth_response.status_code == 200:
+            response = HttpResponseRedirect(reverse('dashboard'))
+            response.set_cookie(key='access_token', value=auth_response.json().get('access_token', ''))
+            response.set_cookie(key='institute_id', value=auth_response.json().get('institution_id', ''))
+            return response
         else:
-            messages.error(request, "Invalid Credentials")
+            messages.error(request, auth_response.json().get('detail', ''))
             return render(request, 'registration.html')
-    return render(request, 'registration.html')
-
-
-def login(request):
-    if request.method == 'POST':
-        phone_number = request.POST.get('phone_number')
-        password = request.POST.get('password')
-        login_instance = Login(API_URL)
-        response = login_instance.authenticate_user(phone_number, password)
-        return response
     return render(request, 'registration.html')
 
 def logout(request):
