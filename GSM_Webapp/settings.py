@@ -29,8 +29,10 @@ DEBUG = True
 ALLOWED_HOSTS = ['*']
 # ALLOWED_HOSTS = ['localhost', 'http://127.0.0.1:8002/students/']
 CSRF_TRUSTED_ORIGINS = ['https://gsm-webapp.azurewebsites.net','https://gsmwebtest.azurewebsites.net']
-
-
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:8000",  # Example: Allow your frontend development server
+    "https://gsmwebtest.azurewebsites.net"
+]
 
 # Application definition
 
@@ -42,11 +44,13 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     "whitenoise.runserver_nostatic",
     "django.contrib.staticfiles",
+    'corsheaders',
     'app'
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     "whitenoise.middleware.WhiteNoiseMiddleware",
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
