@@ -1,0 +1,264 @@
+{% block head %}
+<script type="text/javascript">
+    function noBack() {
+        window.history.forward();
+    }
+
+    // Attach the function to the body's onload event
+    document.body.onload = noBack;
+
+    // Attach the function to the body's onpageshow event
+    document.body.onpageshow = function (event) {
+        if (event.persisted) {
+            noBack();
+        }
+    };
+
+    // Optional: You can use the beforeunload event to show a confirmation message
+    window.onbeforeunload = function () {
+        return "Are you sure you want to leave?";
+    };
+</script>
+{% endblock head %}
+
+{% block content %}
+{% load static %}
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'app-css/registration.css' %}">
+    
+    <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css" integrity="sha384-AYmEC3Yw5cVb3ZcuHtOA93w35dYTsvhLPVnYs9eStHfGJvOvKxVfELGroGkvsg+p" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10">
+    
+    <div class="container" onload="noBack();" onpageshow="if (event.persisted) noBack();" onunload="">
+        <div class="signin-signup">
+            <form action="{% url 'login' %}" method="POST" class="sign-in-form">
+                {% csrf_token %}
+                <img src="{% static 'img/logo-dark.png' %}" alt="Logo" class="image">
+                <h6 class="title">Login to your Account</h6><br />
+                <div class="input-field">
+                    <i class="fa-solid fa-phone"></i>
+        
+                    <input type="email" placeholder="Email ID" name="phone_number" required>
+                </div>
+                <div class="input-field">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" placeholder="Password" name="password" required>
+                </div>
+                <input type="submit" value="Login" class="btn">
+                
+                <p class="account-text">Don't have an account? <a href="#" id="sign-up-btn2">Sign up</a></p>
+                
+            </form>
+            {% comment %} <form action="{% url 'registration' %}" method="POST" class="sign-up-form">
+                {% csrf_token %}
+                <img src="{% static 'img/logo-dark.png' %}" alt="Logo" class="image">
+                <h2 class="title">Sign up</h2><br />
+                <div class="input-field">
+                    <i class="fa-solid fa-building-columns"></i>
+                    <input type="text" placeholder="Enrollment ID" name="institution_id" required>
+                </div>
+                <div class="input-field">
+                    <i class="fa-solid fa-building-columns"></i>
+                    <input type="text" placeholder="Institution Name" name="institution_name" required>
+                </div>
+                <div class="input-field">
+                    <i class="fa-solid fa-user"></i>
+                    <input type="text" placeholder="Full Name" name="full_name" required>
+                </div>
+                <div class="input-field">
+                    <i class="fa-solid fa-envelope"></i>
+                    <input type="email" placeholder="Email ID" name="institute_email" required>
+                </div>
+                <div class="input-field">
+                    <i class="fa-solid fa-phone"></i>
+                    <input type="tel" minlength="10" maxlength="10" placeholder="Contact Number" name="institute_phone" required>
+                </div>
+                <div class="input-field">
+                    <i class="fa-solid fa-lock"></i>
+                    <input type="password" placeholder="Password" name="institute_password" id="password" required >
+                </div>
+                <div class="input-field">
+                    <i class="fa-solid fa-lock"></i>
+                    <input type="password" placeholder="Confirm Password" name="confirm_password" id="confirm_password" required >
+                    <span id="password_error" style="color: red;"></span>
+                </div>
+                
+                <input type="submit" value="Sign up" class="btn" id="submit_button">
+                
+                
+                <p class="account-text">Already have an account? <a href="#" id="sign-in-btn2">Sign in</a></p>
+            </form> {% endcomment %}
+
+            <form action="{% url 'registration' %}" method="POST" class="sign-up-form">
+            {% csrf_token %}
+            <img src="{% static 'img/logo-dark.png' %}" alt="Logo" class="image">
+            <h2 class="title">Sign up</h2><br />
+            <div class="input-field">
+                <i class="fa-solid fa-building-columns"></i>
+                <input type="text" placeholder="Enrollment ID" name="institution_id" required>
+            </div>
+            <div class="input-field">
+                    <i class="fa-solid fa-building-columns"></i>
+                    <input type="text" placeholder="Institution Name" name="institution_name" required>
+                </div>
+                <div class="input-field">
+                    <i class="fa-solid fa-user"></i>
+                    <input type="text" placeholder="Full Name" name="full_name" required>
+                </div>
+                <div class="input-field">
+                    <i class="fa-solid fa-envelope"></i>
+                    <input type="email" placeholder="Email ID" name="institute_email" required>
+                </div>
+                <div class="input-field">
+                    <i class="fa-solid fa-phone"></i>
+                    <input type="tel" minlength="10" maxlength="10" placeholder="Contact Number" name="institute_phone" required>
+                </div>
+            <div class="input-field">
+                <i class="fa-solid fa-lock"></i>
+                <input type="password" placeholder="Password" id="password" name="institute_password" required>
+            </div>
+            <div class="input-field">
+                <i class="fa-solid fa-lock"></i>
+                <input type="password" placeholder="Confirm Password" id="confirm_password" name="confirm_password" required>
+                
+            </div>
+            <div id="password_error" style="color: red;"></div>
+            <input type="submit" value="Sign up" class="btn" id="submit_button">
+            
+            <p class="account-text">Already have an account? <a href="#" id="sign-in-btn2">Sign in</a></p>
+        </form>
+        </div>
+        <div class="panels-container">
+            <div class="panel left-panel">
+                <div class="content">
+                    <img src="{% static 'img/school.jpg' %}" alt="school" class="scl__image">
+                    <h3>Want to Manage Your School?</h3>
+                    <p>Manage your Blog content Seamlessly, effectively and efficiently</p>
+                    
+                    <button class="btn" id="sign-in-btn">Sign in</button>
+                </div>
+              
+            </div>
+            <div class="panel right-panel">
+                
+                <div class="content">
+                    
+                    <img src="{% static 'img/school.jpg' %}" alt="school" class="scl__image">
+                    <h3>New to Gurukul?</h3>
+                    <p>Manage your Blog content Seamlessly, effectively and efficiently</p>
+                    <button class="btn" id="sign-up-btn">Sign up</button>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+    
+
+
+    <script>
+
+        const sign_in_btn = document.querySelector("#sign-in-btn");
+        const sign_up_btn = document.querySelector("#sign-up-btn");
+        const container = document.querySelector(".container");
+        const sign_in_btn2 = document.querySelector("#sign-in-btn2");
+        const sign_up_btn2 = document.querySelector("#sign-up-btn2");
+        sign_up_btn.addEventListener("click", () => {
+            container.classList.add("sign-up-mode");
+        });
+        sign_in_btn.addEventListener("click", () => {
+            container.classList.remove("sign-up-mode");
+        });
+        sign_up_btn2.addEventListener("click", () => {
+            container.classList.add("sign-up-mode2");
+        });
+        sign_in_btn2.addEventListener("click", () => {
+            container.classList.remove("sign-up-mode2");
+        });
+
+    </script>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
+{% if messages %}
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      var successMessages = [];
+      var errorMessages = [];
+      {% for message in messages %}
+        {% if message.tags == "error" %}
+          errorMessages.push("{{ message }}");
+        {% else %}
+          successMessages.push("{{ message }}");
+        {% endif %}
+      {% endfor %}
+      
+      if (successMessages.length > 0) {
+        Swal.fire({
+          toast: true,
+          position: 'top-right',
+          background: 'FFFFFF',
+          showConfirmButton: false,
+          icon: 'success',
+          timer: 4000,
+          title: successMessages.join('<br>'),
+          timerProgressBar: true
+        }).then((result) => {
+          if (result.dismiss === Swal.DismissReason.timer) {
+          }
+        });
+      }
+    
+      if (errorMessages.length > 0) {
+        Swal.fire({
+          toast: true,
+          position: 'top-right',
+          background: 'FFFFFF',
+          showConfirmButton: false,
+          icon: 'error',
+          timer: 4000,
+          title: errorMessages.join('<br>'),
+          timerProgressBar: true
+        }).then((result) => {
+          // This code will be executed when the popup is closed
+          if (result.dismiss === Swal.DismissReason.timer) {
+            // The timer was complete, do something here
+          }
+        });
+      }
+    });
+    </script>
+    {% endif %}
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        function validatePassword() {
+            var password = document.getElementById("password").value;
+            var confirmPassword = document.getElementById("confirm_password").value;
+            var passwordError = document.getElementById("password_error");
+            var submitButton = document.getElementById("submit_button");
+
+            if (password !== confirmPassword) {
+
+                passwordError.innerHTML = "Passwords do not match";
+                submitButton.disabled = true;
+            } else {
+                passwordError.innerHTML = "";
+                submitButton.disabled = false;
+            }
+        }
+
+        // Attach event listeners to the password fields
+        var passwordField = document.getElementById("password");
+        var confirmPasswordField = document.getElementById("confirm_password");
+
+        passwordField.addEventListener("keyup", validatePassword);
+        confirmPasswordField.addEventListener("keyup", validatePassword);
+    });
+</script>
+
+
+{% endblock  %}

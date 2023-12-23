@@ -1,0 +1,297 @@
+{% extends '_layout.html' %}
+{% load static %}
+{% block title %} Staffs Management {% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'app-css/students_html.css' %}">
+<script src="{% static 'app-js/staffs.js' %}"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<div class="row">
+    
+    <div class="col-sm-12 col-md-5 col-xl-8">
+        <h2>Staff Management</h2>
+        <p>Manage your Staffs here.</p>
+    </div>
+    <div class="col-sm-12 col-md-7 col-xl-4">
+        <div class="row">
+            <div class="col text-end">
+                <a href=""class="btn btn-primary btn-block studentAddForm" onclick="openForm(event,'studentForm')">Create Staff</a>
+                <a href=""class="btn btn-secondary btn-block">Export </a>
+                
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Staff table start -->
+    <section class="row" data-jwt-tokens="{{ jwtToken }}" id="jwt_card">
+        <div class="col-md-12">
+            <table class="table table-striped table-hover table-sticky table_students">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>S.No</th>
+                        <th>Staff Name</th>
+                        <th>Emp ID</th>
+                        <th>Role </th>
+                        <th>Phone Number</th>
+                        <th>Joining Date</th>
+                        <th>Gender</th>
+                        <th>Blood Group</th>
+                        <th>Staff Action</th>
+                    </tr>
+                </thead>
+                <tbody  class="tbl__bdy">
+                    {% for staff in staff_data %}
+                    <tr class="tr-staff-{{staff.staff_id}}">
+                        <td>{{forloop.counter}}</td>
+                        <td class="staff_name">{{ staff.staff_name }}</td>
+                        <td class="employee_id">{{ staff.employee_id }}</td>
+                        <td class="role">{{ staff.role }}</td>
+                        <td class="phone_number">{{ staff.phone_number}}</td>
+                        <td class="joining_date">{{ staff.joining_date }}</td>
+                        <td class="gender">{{ staff.gender }}</td>
+                        <td class="blood_group">{{ staff.blood_group }}</td>
+                        <td>
+                            <a href="#" onclick="EditButton(this, event)" data-id="{{staff.staff_id}}"class="btn btn-sm btn-primary" >Edit</a>
+                            <a href="#" onclick="DeleteButton(this, event)" data-id="{{staff.staff_id}}" class="btn btn-sm btn-danger">Delete</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </>
+            </table>
+        </div>
+    </section>
+<!-- student table end -->
+<!-- student Form Start -->
+<section class="form_section bg-grey" id="studentForm">
+    <article class="container-fluid">
+        <div class="row">
+            <div class="col-xl-8"></div>
+            <div class="col-xl-4 form_div">
+                <div class="row">
+                    <div class="col-xl-6">
+                        <h3>Staff Form</h3>
+                    </div>
+                    <div class="col-xl-6 text-end">
+                        <a href="" class="studentCloseForm">*</a>
+                    </div>
+                </div>
+                <form class="container studentForm" id="staff-form" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <input type="hidden" name="id" id="id">
+                    <div class="row form__area">
+                        <div class="col-md-6">
+                            <label for="staff_name" class="form-label">Name</label>
+                            <input type="text" placeholder="Enter your Name" class="form-control" id="staff_name" name="staff_name" required> 
+                        </div>
+                        <div class="col-md-6">
+                            <label for="role" class="form-label">Designation</label>
+                            <input type="text" placeholder="Enter Staff Role" class="form-control" id="role" name="role" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="date_of_birth" class="form-label">Date of Birth</label>
+                            <input type="date" class="form-control" id="date_of_birth" name="date_of_birth" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="joining_date" class="form-label">Joining Date</label>
+                            <input type="date" class="form-control" id="joining_date" name="joining_date" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="blood_group" class="form-label">Blood Group</label>
+                            <select  class="form-select" id="blood_group" name="blood_group" required>
+                                <option selected>Choose...</option>
+                                <option value="A+">A+</option>
+                                <option value="A-">A-</option>
+                                <option value="B+">B+</option>
+                                <option value="B-">B-</option>
+                                <option value="AB+">AB+</option>
+                                <option value="O+">O+</option>
+                                <option value="O-">O-</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="gender" class="form-label">Gender</label>
+                            <select  class="form-select" id="gender"  name="gender" required>
+                                <option selected disabled>Choose...</option>
+                                <option value="Male">Male</option>
+                                <option value="FeMale">FeMale</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="col-md-12">
+                            <label for="photo" class="form-label">Photo</label>
+                            <input type="file" accept=".pdf,.jpg,.jpeg" placeholder="Seletct File" class="form-control" id="photo" name="photo" required>
+                        </div>
+                        <div class="accordion" id="accordionPanelsStayOpenExample">
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="panelsStayOpen-headingOne">
+                                    <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#panelsStayOpen-collapseOne" aria-expanded="true"
+                                        aria-controls="panelsStayOpen-collapseOne">
+                                        Contact Details
+                                    </button>
+                                </h2>
+                                <div id="panelsStayOpen-collapseOne" class="accordion-collapse collapse"
+                                    aria-labelledby="panelsStayOpen-headingOne">
+                                    <div class="accordion-body">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <label for="email" class="form-label">Email</label>
+                                                <input type="text" placeholder="Enter Email Address" class="form-control" id="email" name="email" required>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="phone_number" class="form-label">Phone</label>
+                                                <input type="text" placeholder="Enter Mobile No" class="form-control" id="phone_number" name="phone_number" required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion" id="accordionPanelsStayOpenExample">
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="panelsStayOpen-headingOne">
+                                    <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#panelsStayOpen-collapseTwo" aria-expanded="true"
+                                        aria-controls="panelsStayOpen-collapseTwo">
+                                        Professional Details
+                                    </button>
+                                </h2>
+                                <div id="panelsStayOpen-collapseTwo" class="accordion-collapse collapse"
+                                    aria-labelledby="panelsStayOpen-headingTwo">
+                                    <div class="accordion-body">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <label for="specialization" class="form-label">Specialization</label>
+                                                <input type="text" placeholder="Where you Specialize" class="form-control" id="specialization" name="specialization" required>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="experience" class="form-label">Experience</label>
+                                                <input type="text" placeholder="years of experience" class="form-control" id="experience" name="experience" required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion" id="accordionPanelsStayOpenExample">
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="panelsStayOpen-headingOne">
+                                    <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#panelsStayOpen-collapseThree" aria-expanded="true"
+                                        aria-controls="panelsStayOpen-collapseThree">
+                                        Payroll Details
+                                    </button>
+                                </h2>
+                                <div id="panelsStayOpen-collapseThree" class="accordion-collapse collapse"
+                                    aria-labelledby="panelsStayOpen-headingOne">
+                                    <div class="accordion-body">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <label for="payroll_type" class="form-label">Employee Type</label>
+                                                <select  class="form-select" id="payroll_type" name="payroll_type" required>
+                                                    <option selected disabled>Choose...</option>
+                                                    <option value="FullTime">FullTime</option>
+                                                    <option value="PartTime">PartTime</option>
+                                                    <option value="Temporary">Temporary</option>
+                                                    <option value="Other">Other</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="salary" class="form-label">Salary Amount</label>
+                                                <input type="text" placeholder="Enter Salary Amount" class="form-control" id="salary" name="salary" required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion" id="accordionPanelsStayOpenExample">
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="panelsStayOpen-headingOne">
+                                    <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#panelsStayOpen-collapseFour" aria-expanded="true"
+                                        aria-controls="panelsStayOpen-collapseFour">
+                                        Address Details
+                                    </button>
+                                </h2>
+                                <div id="panelsStayOpen-collapseFour" class="accordion-collapse collapse"
+                                    aria-labelledby="panelsStayOpen-headingFour">
+                                    <div class="accordion-body">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <label for="address" class="form-label">Address Line</label>
+                                                <textarea class="form-control" placeholder="Enter Address" id="address"
+                                                    rows="3" name="address" required></textarea>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="city" class="form-label">City</label>
+                                                <input type="text" placeholder="Enter City" class="form-control" id="city" name="city" >
+                                            </div>
+                                            <!-- state -->
+                                            <div class="col-md-6">
+                                                <label for="state" class="form-label">State</label>
+                                                <input type="text" placeholder="Enter State" class="form-control" id="state" name="state">
+                                            </div>
+                                            <!-- country -->
+                                            <div class="col-md-6">
+                                                <label for="country" class="form-label">Country</label>
+                                                <input type="text" placeholder="Enter Country" class="form-control" id="country" name="country">
+                                            </div>
+                                            <!-- pincode -->
+                                            <div class="col-md-6">
+                                                <label for="pincode" class="form-label">Pincode</label>
+                                                <input type="text" placeholder="Enter Pincode" class="form-control" id="pincode" name="pincode">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion" id="accordionPanelsStayOpenExample">
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="panelsStayOpen-headingOne">
+                                    <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#panelsStayOpen-collapseFive" aria-expanded="true"
+                                        aria-controls="panelsStayOpen-collapseFive">
+                                        Transportation
+                                    </button>
+                                </h2>
+                                <div id="panelsStayOpen-collapseFive" class="accordion-collapse collapse"
+                                    aria-labelledby="panelsStayOpen-headingOne">
+                                    <div class="accordion-body">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <label for="payroll_type" class="form-label">Route</label>
+                                                <select  class="form-select" id="transport_id" name="transport_id" required>
+                                                    <option selected disabled>Choose...</option>
+                                                    
+                                                </select>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="salary" class="form-label">Vehicle</label>
+                                                <input type="text" class="form-control" id="vehicle_number" name="vehicle_number" readonly>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    <div class="col-12 form__btn">
+                        <button type="submit" class="btn btn-danger  w-50 mx-1" onclick="closeForm(event,'studentForm')">Cancel</button>
+                        <button type="submit" class="btn btn-primary w-50 mx-1">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </article>
+</section>
+
+
+<!-- create bootstrap accordian form  -->
+
+
+
+
+{% endblock %}

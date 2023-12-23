@@ -1,0 +1,469 @@
+{% extends '_layout.html' %}
+{% block title %} Classes Management {% endblock %}
+{% load static %}
+{% block content %}
+<link href="{% static 'app-css/classinfo.css' %}" rel="stylesheet"/>
+<script src="{% static 'app-js/classinfo.js' %}"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<div class="row">
+    <div class="col-md-12 d-flex gap-3">
+        <a href="{% url 'classes' %}" class="arrow"><i class="bi bi-arrow-left"></i></a>
+        <h2>{{class_name}}</h2>
+    </div>
+</div>
+<section class="row" data-jwt-token="{{ jwt_token }}" id="jwt_cards">
+    <div class="col-md-12 mt-2">
+        <ul class="nav nav-tabs d-flex gap-4 bg-white" id="myTab" role="tablist">
+            <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="section-tab" data-bs-toggle="tab" data-bs-target="#section" type="button" role="tab" aria-controls="section" aria-selected="true">Section</button>
+            </li>
+            <li class="nav-item" role="presentation">
+            <button class="nav-link" id="subject-tab" data-bs-toggle="tab" data-bs-target="#subject" type="button" role="tab" aria-controls="subject" aria-selected="false">Subject</button>
+            </li>
+            <li class="nav-item" role="presentation">
+            <button class="nav-link" id="calender-tab" data-bs-toggle="tab" data-bs-target="#calender" type="button" role="tab" aria-controls="calender" aria-selected="false">Calender</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="student-tab" data-bs-toggle="tab" data-bs-target="#student" type="button" role="tab" aria-controls="student" aria-selected="false">Students</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="examination-tab" data-bs-toggle="tab" data-bs-target="#examination" type="button" role="tab" aria-controls="examination" aria-selected="false">Examinations</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="gradings-tab" data-bs-toggle="tab" data-bs-target="#gradings" type="button" role="tab" aria-controls="gradings" aria-selected="false">Gradings</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="fees-tab" data-bs-toggle="tab" data-bs-target="#fees" type="button" role="tab" aria-controls="fees" aria-selected="false">Fees</button>
+            </li>
+        </ul>
+
+        <div class="tab-content mt-3" id="myTabContent">
+            {% comment %} _____Section_____ {% endcomment %}
+            <div class="tab-pane fade show active" id="section" role="tabpanel" aria-labelledby="section-tab">
+                <div class="row">
+                    <div class="col-sm-12 col-md-5 col-xl-8">
+                        <h4>Section</h4>
+                    </div>
+                    <div class="col-sm-12 col-md-7 col-xl-4">
+                        <div class="row">
+                            <div class="col text-end">
+                                <a class="btn btn-primary rounded-pill" onclick="openForms('formSection')"><i class="bi bi-plus-circle me-2"></i>Add Section</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <section class="row" id="TabSection">
+                  {% for section in section_data %}
+                    <div class="row mt-2" id="section-{{section.section_id}}">
+                      <div class="col-md-4 bg-white p-2 rounded mt-2">
+                        <div class="d-flex justify-content-between align-items-center mt-2">
+                          <div class="font-size-rem w-50 text-left section3" id="section-name-{{section.section_id}}">
+                            {{section.section_name}}
+                          </div>
+                          <div class="actions d-flex gap-2">
+                            <a href="#" onclick="EditSection(this)" data-section-id={{section.section_id}}>
+                                <i class="bi bi-pencil-square text-primary"></i>
+                            </a>
+                            <a href="#" onclick="DeleteSection(this)" data-section-id={{section.section_id}}>
+                                <i class="bi bi-trash-fill text-danger"></i>                            
+                            </a>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    {% endfor %}
+                </section>                                                                                        
+            </div>
+
+            {% comment %} _____Subject_____ {% endcomment %}
+            <div class="tab-pane fade" id="subject" role="tabpanel" aria-labelledby="subject-tab">
+                <div class="row">
+                    <div class="col-sm-12 col-md-5 col-xl-8">
+                        <h4>Subject</h4>
+                    </div>
+                    <div class="col-sm-12 col-md-7 col-xl-4">
+                        <div class="row">
+                            <div class="col text-end">
+                                <a class="btn btn-primary rounded-pill" onclick="openForms('formSubject')"><i class="bi bi-plus-circle me-2"></i>Add Subject</a>
+                            </div>
+                        </div>
+                
+                    </div>
+                </div>
+                <section class="row" id="TabSubjects">
+                  {% for sub in subject_data %}
+                    <div class="row mt-2" id="subject-{{sub.subject_id}}">
+                      <div class="col-md-4 bg-white p-2 rounded mt-2">
+                        <div class="d-flex justify-content-between align-items-center mt-2">
+                          <div class="font-size-rem w-50 text-left section3" id="subject-name-{{sub.subject_id}}">
+                            {{sub.subject_name}}
+                          </div>
+                          <div class="actions d-flex gap-2">
+                            <a href="#" onclick="EditSubject(this)" data-subject-id={{sub.subject_id}}>
+                                <i class="bi bi-pencil-square text-primary"></i>
+                            </a>
+                            <a href="#" onclick="DeleteSubject(this)" data-subject-id={{sub.subject_id}}>
+                                <i class="bi bi-trash-fill text-danger"></i>                            
+                            </a>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    {% endfor %}
+                </section>  
+            </div>
+
+            {% comment %} _____Calender_____ {% endcomment %}
+            <div class="tab-pane fade" id="calender" role="tabpanel" aria-labelledby="calender-tab">Calender</div>
+            
+            {% comment %} _____Students_____ {% endcomment %}
+            <div class="tab-pane fade" id="student" role="tabpanel" aria-labelledby="student-tab">
+                <div class="row">
+                  <div class="col-sm-12 col-md-5 col-xl-8">
+                      <h4>Students</h4>
+                  </div>
+                  <div class="col-sm-12 col-md-7 col-xl-4">
+                    <div class="row">
+                        <div class="col text-end">
+                          <select class="custom-select custom-select-lg bg-light" id="sectionDropdown" data-class-id={{class_id}}>
+                            <option selected>Select Section</option>
+                            {% for data in section_data %}
+                              <option value="{{ data.section_id }}" data-sections-id={{data.section_id}}>
+                                {{ data.section_name }}
+                              </option>
+                            {% endfor %}
+                          </select>
+                        </div>
+                    </div>
+                </div>
+              </div>
+              <section class="row">
+                <div class="col-md-12">
+                  <table class="table">
+                    <thead>
+                      <tr>
+                        <th>S.No</th>
+                        <th>Student Name</th>
+                        <th>Roll Number</th>
+                        <th>Class</th>
+                        <th>Section</th>
+                        <th>Gender</th>
+                        <th>Blood Group</th>
+                      </tr>
+                    </thead>
+                    <tbody class="tbl__bdy" id="studentTableBody">
+                      {% for stud in student_data %}
+                        <tr>
+                            <td>{{forloop.counter}}</td>
+                            <td>{{stud.student_name}}</td>
+                            <td>{{stud.roll_number}}</td>
+                            <td>{{stud.class_id}}</td>
+                            <td>{{stud.section_id}}</td>
+                            <td>{{stud.gender}}</td>
+                            <td>{{stud.blood_group}}</td>
+                        </tr>
+
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+              </section>
+
+            </div>
+            
+            {% comment %} _____Exam_____ {% endcomment %}
+            <div class="tab-pane fade" id="examination" role="tabpanel" aria-labelledby="examination-tab">
+                <div class="row">
+                  <div class="col-sm-12 col-md-5 col-xl-8">
+                      <h4>Examination</h4>
+                  </div>
+                  <div class="col-sm-12 col-md-7 col-xl-4">
+                    <div class="row">
+                      <div class="col text-end">
+                          <a class="btn btn-primary rounded-pill"  onclick="openForms('examForm')"><i class="bi bi-plus-circle me-2"></i>Add New Examination</a>
+                      </div>
+                  </div>
+                  </div>
+              </div>
+
+              <section class="row">
+                <div class="col-md-12">
+                  <h3 class="text-center">Upcoming Exams</h3>
+                  <table class="table">
+                    <thead>
+                      <tr>
+                        <th>Exam Date</th>
+                        <th>Name of Exam</th>
+                        <th>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody class="tbl__bdy" id="transport_details">
+                        <tr>
+                            <td>11.01.2023</td>
+                            <td>Annual Examination</td>
+                            <td>
+                              <button type="button" class="btn btn-info" onclick="EditButton(this)" data-id="{{transport.transport_id}}" ><i class="bi bi-pencil-square"></i></button>
+                              <button type="button" class="btn btn-danger" onclick="DeleteButton(this)" data-id="{{transport.transport_id}}">
+                                  <i class="bi bi-trash3"></i></button>
+                            </td>
+                        </tr>
+                        <tr>
+                          <td>11.01.2023</td>
+                          <td>Annual Examination</td>
+                          <td>
+                            <button type="button" class="btn btn-info" onclick="EditButton(this)" data-id="{{transport.transport_id}}" ><i class="bi bi-pencil-square"></i></button>
+                            <button type="button" class="btn btn-danger" onclick="DeleteButton(this)" data-id="{{transport.transport_id}}">
+                                <i class="bi bi-trash3"></i></button>
+                          </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="col-md-12">
+                  <h3 class="text-center">Past Exams</h3>
+                  <table class="table">
+                    <thead>
+                      <tr>
+                        <th>Exam Date</th>
+                        <th>Name of Exam</th>
+                        <th>Result Announcement Date</th>
+                      </tr>
+                    </thead>
+                    <tbody class="tbl__bdy" id="transport_details">
+                        <tr>
+                            <td>11.12.2023</td>
+                            <td>Half yearly</td>
+                            <td>05.01.2024</td>
+                        </tr>
+                        <tr>
+                          <td>11.12.2023</td>
+                          <td>Half yearly</td>
+                          <td>05.01.2024</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </section>
+
+            </div>
+            
+            {% comment %} _____Gradings_____ {% endcomment %}
+            <div class="tab-pane fade" id="gradings" role="tabpanel" aria-labelledby="gradings-tab">
+                <div class="row">
+                    <div class="col-sm-12 col-md-5 col-xl-8">
+                        <h4>Gradings</h4>
+                    </div>
+                    <div class="col-sm-12 col-md-7 col-xl-4">
+                        <div class="row">
+                            <div class="col text-end">
+                                <a class="btn btn-primary rounded-pill"  onclick="openForms('gradeForm')"><i class="bi bi-plus-circle me-2"></i>Add New Grade</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <section class="row">
+                    <div class="row mt-2">
+                      <div class="col-md-4 bg-white p-2 rounded mt-2" id="section-{{section.section_id}}">
+                        <div class="d-flex justify-content-between align-items-center mt-2">
+                          <div class="font-size-rem w-50 text-left" id="section-name-{{section.section_id}}">
+                            80% - 90%
+                          </div>
+                          <div class="line-section"><hr></div>
+                          <div class="font-size-rem w-50 text-left">
+                            A+
+                          </div>
+                          <div class="actions d-flex gap-2">
+                            <a href="#" onclick="EditSection(this)" data-section-id={{section.section_id}}>
+                                <i class="bi bi-pencil-square text-primary"></i>
+                            </a>
+                            <a href="#" onclick="DeleteSection(this)" data-section-id={{section.section_id}}>
+                                <i class="bi bi-trash-fill text-danger"></i>                            
+                            </a>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row mt-2">
+                      <div class="col-md-4 bg-white p-2 rounded mt-2" id="section-{{section.section_id}}">
+                        <div class="d-flex justify-content-between align-items-center mt-2">
+                          <div class="font-size-rem w-50 text-left" id="section-name-{{section.section_id}}">
+                            80% - 90%
+                          </div>
+                          <div class="line-section"><hr></div>
+                          <div class="font-size-rem w-50 text-left">
+                            A+
+                          </div>
+                          <div class="actions d-flex gap-2">
+                            <a href="#" onclick="EditSection(this)" data-section-id={{section.section_id}}>
+                                <i class="bi bi-pencil-square text-primary"></i>
+                            </a>
+                            <a href="#" onclick="DeleteSection(this)" data-section-id={{section.section_id}}>
+                                <i class="bi bi-trash-fill text-danger"></i>                            
+                            </a>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                </section>  
+            </div>
+
+            {% comment %} _____Fees_____ {% endcomment %}
+            <div class="tab-pane fade" id="fees" role="tabpanel" aria-labelledby="fees-tab">Fees</div>
+        </div>
+    </div>
+</section>
+
+<section class="form_section bg-grey formSection" id="sectionForm">
+  <article class="container-fluid">
+      <div class="row">
+          <div class="col-xl-8"></div>
+          <div class="col-xl-4 form_div">
+              <div class="row bg-light">
+                  <div class="col-xl-10">
+                      <h3>Add New Section</h3>
+                  </div>
+                  <div class="col-xl-2 text-end">
+                    <a type="button" class="btn-close" onclick="closeForm('formSection')" aria-label="Close"></a>                    
+                  </div>
+              </div>
+              <form class="row g-3 form-class" id="AddSection" method="POST" enctype="multipart/form-data">
+                 {% csrf_token %}
+                  <div class="col-md-12 form-content">
+                    <input type="hidden" id="section_id" name="section_id">
+                    <input type="hidden" id="class_id" value={{class_id}} name="class_id">
+                      <label for="section_name" class="form-label">Section Name</label>
+                      <input type="text" class="form-control" id="section_name" name="section_name" placeholder="Enter a new Section Name">
+                  </div>
+
+                  <div class="col-md-12 btn-action">
+                      <div class="d-flex justify-content-end">
+                        <a class="btn btn-danger me-2" onclick="closeForm('formSection')">Cancel</a>
+                        <button type="submit" class="btn btn-primary">Save</button>
+                      </div>
+                  </div>
+              </form>
+          </div>
+      </div>
+  </article>
+</section>
+
+<section class="form_section bg-grey formSubject" id="subjectForm">
+  <article class="container-fluid">
+      <div class="row">
+          <div class="col-xl-8"></div>
+          <div class="col-xl-4 form_div">
+              <div class="row bg-light">
+                  <div class="col-xl-10">
+                      <h3>Add New Subject</h3>
+                  </div>
+                  <div class="col-xl-2 text-end">
+                    <a type="button" class="btn-close" onclick="closeForm('formSubject')" aria-label="Close"></a>                    
+                  </div>
+              </div>
+              <form class="row g-3 form-class" id="AddSubject" method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                  <div class="col-md-12 form-content">
+                      <input type="hidden" id="subject_id" name="subject_id">
+                      <input type="hidden" id="classes_id" value={{class_id}} name="class_id">
+                      <label for="subject_name" class="form-label">Subject Name</label>
+                      <input type="text" class="form-control" id="subject_name" name="subject_name" placeholder="Enter a Subject Name">
+                  </div>
+
+                  <div class="col-md-12 btn-action">
+                      <div class="d-flex justify-content-end">
+                        <a class="btn btn-danger me-2" onclick="closeForm('formSubject')">Cancel</a>
+                        <button type="submit" class="btn btn-primary">Save</button>
+                      </div>
+                  </div>
+              </form>
+          </div>
+      </div>
+  </article>
+</section>
+
+<section class="form_section bg-grey examForm" id="examinationForm">
+  <article class="container-fluid">
+      <div class="row">
+          <div class="col-xl-8"></div>
+          <div class="col-xl-4 form_div">
+              <div class="row bg-light">
+                  <div class="col-xl-10">
+                      <h3>Add New Examination</h3>
+                  </div>
+                  <div class="col-xl-2 text-end">
+                    <a type="button" class="btn-close" onclick="closeForm('examForm')" aria-label="Close"></a>                    
+                  </div>
+              </div>
+              <form class="row g-3 form-class">
+                  <div class="col-md-12 form-content">
+                      <label for="inputEmail4" class="form-label">Start Date</label>
+                      <input type="text" class="form-control" id="inputEmail4" placeholder="Enter a Subject Name">
+                  </div>
+                  <div class="col-md-12 form-content">
+                    <label for="inputEmail4" class="form-label">End Date</label>
+                    <input type="text" class="form-control" id="inputEmail4" placeholder="Enter a Subject Name">
+                </div>
+                <div class="col-md-12 form-content">
+                  <label for="inputEmail4" class="form-label">Result Date</label>
+                  <input type="text" class="form-control" id="inputEmail4" placeholder="Enter a Subject Name">
+              </div>
+              <div class="col-md-12 form-content">
+                <label for="inputEmail4" class="form-label">Name of Exam</label>
+                <input type="text" class="form-control" id="inputEmail4" placeholder="Enter a Subject Name">
+            </div>
+            <div class="col-md-12 form-content">
+              <label for="inputEmail4" class="form-label">Class</label>
+              <input type="text" class="form-control" id="inputEmail4" placeholder="Enter a Subject Name">
+          </div>
+                  <div class="col-md-12 btn-action">
+                      <div class="d-flex justify-content-end">
+                        <a class="btn btn-danger me-2" onclick="closeForm('examForm')">Cancel</a>
+                          <button type="submit" class="btn btn-primary">Save</button>
+                      </div>
+                  </div>
+              </form>
+          </div>
+      </div>
+  </article>
+</section>
+
+<section class="form_section bg-grey gradeForm" id="gradingForm">
+  <article class="container-fluid">
+      <div class="row">
+          <div class="col-xl-8"></div>
+          <div class="col-xl-4 form_div">
+              <div class="row bg-light">
+                  <div class="col-xl-10">
+                      <h3>Add New Grading</h3>
+                  </div>
+                  <div class="col-xl-2 text-end">
+                    <a type="button" class="btn-close" onclick="closeForm('gradeForm')" aria-label="Close"></a>                    
+                  </div>
+              </div>
+              <form class="row g-3 form-class d-flex gap-2">
+                  <div class="col-md-6 form-content">
+                      <label for="inputEmail4" class="form-label">Min Percentage(%)</label>
+                      <input type="text" class="form-control" id="inputEmail4" placeholder="Enter Min Percentage">
+                  </div>
+                  <div class="col-md-6 form-content">
+                    <label for="inputEmail4" class="form-label">Max Percentage(%)</label>
+                    <input type="text" class="form-control" id="inputEmail4" placeholder="Enter Max Percentage">
+                </div>
+                <div class="col-md-12 form-content">
+                  <label for="inputEmail4" class="form-label">Name of The Grade</label>
+                  <input type="text" class="form-control" id="inputEmail4" placeholder="Enter a Grade Name">
+              </div>
+
+                  <div class="col-md-12 btn-action">
+                      <div class="d-flex justify-content-end">
+                        <a class="btn btn-light me-2" onclick="closeForm('gradeForm')">Cancel</a>
+                          <button type="submit" class="btn btn-success">Save</button>
+                      </div>
+                  </div>
+              </form>
+          </div>
+      </div>
+  </article>
+</section>
+
+{% endblock %}

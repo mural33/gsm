@@ -1,0 +1,79 @@
+{% extends '_layout.html' %}
+{% block title %} Classes Management {% endblock %}
+
+{% block content %}
+{% load static %}
+
+<link href="{% static 'app-css/classes.css' %}" rel="stylesheet"/>
+<script src="{% static 'app-js/class.js' %}"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<div class="row">
+    <div class="col-sm-12 col-md-5 col-xl-8">
+        <h2>Classes</h2>
+        <p>Manage Classes here.</p>
+    </div>
+    <div class="col-sm-12 col-md-7 col-xl-4">
+        <div class="row">
+            <div class="col text-end">
+                <a class="btn btn-primary rounded-pill" onclick="openForm()"><i class="bi bi-plus-circle me-2"></i>Add Class</a>
+            </div>
+        </div>
+
+    </div>
+</div>
+<section class="form_section bg-grey" id="classForm">
+    <article class="container-fluid">
+        <div class="row">
+            <div class="col-xl-8"></div>
+            <div class="col-xl-4 form_div">
+                <div class="row bg-light">
+                    <div class="col-xl-6">
+                        <h3>Add Class</h3>
+                    </div>
+                    <div class="col-xl-6 text-end">
+                        <a type="button" class="btn-close" onclick="closeNav()" aria-label="Close"></a>                    
+                    </div>
+                </div>
+                <form class="row g-3 form-class" method="POST" enctype="multipart/form-data" id="AddClass">
+                    {% csrf_token %}
+                    <div class="col-md-12 form-content">
+                        <input type="hidden" name="class_id" id="class_id">
+                        <label for="class_name" class="form-label">Class Name</label>
+                        <input type="text" class="form-control" id="class_name" name="class_name" placeholder="Enter a Class Name">
+                    </div>
+
+                    <div class="col-md-12 btn-action">
+                        <div class="d-flex justify-content-end">
+                            <a class="btn btn-danger me-2" onclick="closeNav()">Cancel</a>
+                            <button type="submit" class="btn btn-primary">Save</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </article>
+</section>
+<section class="row" data-jwt-tokens="{{ jwt_tokens }}" id="jwt_card">
+    <div class="class_group" id="TabClass">
+        {% for data in class_data %}
+        <div class="card bg-gradient-danger card-img-holder text-white" id="class-id-{{data.class_id}}">
+            <div class="card-body">
+                <div class="lframe-child1">
+                </div>
+                <div class="lframe-item1">
+                </div>
+                <p class="card-text"><a href="{% url 'classinfo' data.slug %}">{{data.class_name}}</a></p>
+                <img src="{% static 'img/open-book.png' %}" class="card-img-top" alt="...">
+                <div class="action-btn d-flex gap-3">
+                    <a onclick="EditClass(this)" data-class-id="{{data.class_id}}"><i class="bi bi-pencil-square text-primary"></i></a>
+                   <a onclick="DeleteClass(this)" data-class-id="{{data.class_id}}"><i class="bi bi-trash-fill text-danger"></i></a>                
+                </div> 
+            </div>   
+       </div>
+       {% endfor %}
+
+    </div>
+    
+</section>
+
+{% endblock %}

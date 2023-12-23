@@ -1,0 +1,105 @@
+{% extends '_layout.html' %}
+{% load static %}
+{% block title %} User Management {% endblock %}
+ 
+{% block content %}
+<script src="{% static 'app-js/user.js' %}"></script> 
+<link href="{% static 'app-css/users.css' %}" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
+
+<div class="row">
+    <div class="col-sm-12 col-md-5 col-xl-8">
+        <h2>User Management</h2>
+       
+    </div>
+    <div class="col-sm-12 col-md-7 col-xl-4">
+        <div class="row">
+            <div class="col text-end">
+                <a class="btn btn-primary btn-block studentAddForm" onclick="openForm(event,'userForm')">Register user</a>
+            </div>
+        </div>
+    </div>
+</div>
+<section class="form_section bg-grey" id="userForm">
+    <article class="container-fluid">
+        <div class="row">
+            <div class="col-xl-8"></div>
+            <div class="col-xl-4 form_div">
+                <div class="row">
+                    <div class="col-xl-6">
+                        <h3>Add user</h3>
+                        <br>
+                    </div>
+                    <div class="col-xl-6 text-end">
+                        <a href="" class="studentCloseForm">&times;</a>
+                    </div>
+                </div>
+                    <form class="row g-2" id="user-form"  method="POST" enctype="multipart/form-data" style="margin-left: 5%;">
+                        {% csrf_token %}
+                        <input type="hidden" id="id" name="id">
+                        <div class="col-md-12">
+                            <label class="form-label">User Name </label>
+                            <input type="text" class="form-control" id="user_name" name="user_name" placeholder=" Enter User Name" required>
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label">User Email</label>
+                            <input type="text" class="form-control" id="user_email" name="user_email" placeholder=" Enter User Email" required>
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label">User Phone </label>
+                            <input type="text" class="form-control" id="user_phone" name="user_phone_number" placeholder=" Enter User phone number" required>
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label">User Role </label>
+                            <input type="text" class="form-control" id="user_role" name="user_role" placeholder=" Enter User role" required>
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label">UserPassword</label>
+                            <input type="Password" class="form-control" name="user_password" id="user_password" placeholder=" Enter Password" required>
+                        </div>
+                        <div class="col-12">
+                            <a  class="btn btn-light" onclick="closeForm(event,'userForm')">Cancel</a>
+                            <button type="submit" class="btn btn-primary">Save</button>
+                        </div>
+                    </form>
+            </div>
+        </div>
+    </article>
+</section>
+
+
+<section class="row" data-jwt-tokens="{{ jwtToken }}" id="jwt_card">
+    <div class="col-xl-12">
+<table class="table">
+    <thead>
+      <tr>
+            <th>User Name</th>
+            <th>User Email</th>
+            <th>User Phone</th>
+            <th>User Role</th>
+            <th>Action</th>
+      </tr>
+    </thead>
+    <tbody class="tbl__bdy" id="user_details">
+        {% for user in user_data %}
+        <tr class="tr-user-{{user.user_id}}">
+        <td class="user_name">{{user.user_name}}</td>
+        <td class="user_email">{{user.user_email}}</td>
+        <td class="user_phone_number">{{user.user_phone_number}}</td>
+        <td class="user_role">{{user.user_role}}</td>
+        <td>
+            <button type="button" class="btn  btn-sm btn-info" onclick="EditButton(this,event)" data-id="{{user.user_id}}">
+                <i class="bi bi-pencil-square"></i>
+            <button type="button" class="btn btn-sm btn-danger" onclick="DeleteButton(this)" data-id="{{user.user_id}}">
+                <i class="bi bi-trash3"></i>
+        </td>
+      </tr>                    
+      {% endfor %}
+    </tbody>
+  </table>
+  </div>
+</section>
+
+{% endblock %}
+ 

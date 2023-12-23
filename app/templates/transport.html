@@ -1,0 +1,186 @@
+{% extends '_layout.html' %}
+{% load static %}
+{% block title %} Transport{% endblock %}
+
+{% block content %}
+<link href="{% static 'app-css/transport.css' %}" rel="stylesheet">
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
+
+
+<div class="row">
+    <div class="col-sm-12 col-md-5 col-xl-8">
+        <h2>Transport Management</h2>
+    </div>
+    <div class="col-sm-12 col-md-7 col-xl-4">
+        <div class="row">
+            <div class="col text-end">
+                <a class="btn btn-success rounded-pill" onclick="showtransportForm()"><i class="bi bi-plus-circle me-2"></i>Register vechile</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<section class="form_section bg-grey" id="transportForm">
+    <article class="container-fluid">
+        <div class="row">
+            <div class="col-xl-8"></div>
+            <div class="col-xl-4 form_div">
+                <div class="row">
+                    <div class="col-xl-6">
+                        <h3>Add transport</h3>
+                    </div>
+                    <div class="col-xl-6 text-end">
+                        <a class="btn-close" onclick="closetransportForm()" aria-label="Close"></a>
+                    </div>
+                </div>
+                    <form class="row g-2" id="transport-form"  method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <input type="hidden" id="id" name="id">
+                        <div class="col-md-12">
+                            <label class="form-label">Vehicle Number </label>
+                            <input type="text" class="form-control" id="vehicle_number" name="vehicle_number" placeholder=" Enter vechile number">
+                        </div>
+                        <div class="col-md-12">
+                            <label for="vehicleDetails" class="form-label">Vehicle Details</label>
+                            <textarea class="form-control" id="vehicle_details" name="vehicle_details" placeholder="Enter vehicle name and driver/conductor"></textarea>
+                        </div>
+                        <div class="col-md-12">
+                            <label for="inputAddress2" class="form-label">Date of Registation</label>
+                            <input type="date" class="form-control" id="register_date" name="register_date">
+                        </div>
+                        <div class="col-md-12">
+                            <label for="inputCity" class="form-label">Route</label>
+                            <input type="text" class="form-control" id="transport_name" name="transport_name" placeholder="route name">
+                        </div>
+                        <div class="col-md-12  btn-action">
+                        <div class="d-flex justify-content-end" style="margin-top:14rem;">
+                            <a onclick="closetransportForm()" class="btn btn-light" style="margin-right: 10px;">Cancel</a>
+                            <button type="submit" class="btn btn-primary">Save</button>
+                        </div>
+                    </div>
+                    </form>
+            </div>
+        </div>
+    </article>
+</section>
+
+<div class="row">
+    <div class="col-12">
+<table class="table" >
+    <thead>
+      <tr>
+        <th>S.NO</th>
+        <th>Vehicle Number</th>
+        <th>Vehicle Details</th>
+        <th>Date of Register</th>
+        <th>transport name</th>
+        <th>Stoppage</th>
+        <th>Students</th>
+        <th>Staffs</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody class="tbl__bdy" id="transport_details">
+        {% for transport in transportation %}
+        <tr class="tr-transport-{{transport.transport_id}}">
+            <td>{{forloop.counter}}</td>
+            <td class="vehicle_number ">{{transport.vehicle_number}}</td>
+            <td class="vehicle_details">{{transport.vehicle_details}}</td>
+            <td class="register_date">{{transport.register_date}}</td> 
+            <td class="transport_name">{{transport.transport_name}}</td>
+            <td>
+                <button class="btn btn-sm btn-dark rounded-pill" onclick="openstopDetails('stopForm','{{ transport.transport_name }}','{{transport.transport_id}}')" data-id="{{transport.transport_id}}">View</button>
+            </td>
+            <td>
+                <button class="btn btn-sm btn-dark rounded-pill openBtn" onclick="showStudentDetails()" data-id="{{transport.transport_id}}"><span id="studentCount">0</span></button>
+
+            </td>
+            <td>
+                <button class="btn  btn-sm btn-dark rounded-pill openBtn" onclick="openstaffDetails('staff')">View</button>
+            </td>
+            <td>
+                <button type="button" class="btn  btn-sm btn-info" onclick="EditButton(this)" data-id="{{transport.transport_id}}">
+                    <i class="bi bi-pencil-square"></i>
+                <button type="button" class="btn btn-sm btn-danger" onclick="DeleteButton(this)" data-id="{{transport.transport_id}}">
+                    <i class="bi bi-trash3"></i>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+  </table>
+  </div>
+  </div>
+
+  <!-- stopage form -->
+  <section class="form_section bg-grey" id="stopForm">
+    <article class="container-fluid">
+        <div class="row">
+            <div class="col-xl-8"></div>
+            <div class="col-xl-4 form_div">
+                <div class="row">
+                    <div class="col-xl-6">
+                        <h4>Stops in this Route</h4>
+                    </div>
+                    <div class="col-xl-6 text-end">
+                        <a class="btn-close" onclick="closestopDetails()" aria-label="Close"></a>
+                    </div>
+                </div>
+                <div id="transportNameContent"></div>
+                <input type="hidden" name="stopage_id" id="stopage_id">
+                <label for="stopage" class="details" id="label1">Add stopages</label>
+                <div class="fields">
+                    <input type="text" class="form-input" id="stopage" placeholder="Add stopage">
+                    <input type="hidden" value="" id="add-stopage-btn">
+                    <button type="button" class="add-stopage-btn btn btn-sm btn-success"  onclick="addMore(this)">Add</button>
+                </div>
+                <div id="stopagesList">
+                   <div class="row">
+                        <div class="col-md-12 d-flex align-items-center"  id="stopage_id_${stopdata['stop_id']}">
+                            <input type="text" class="form-control" value="hi">
+                            <a href="#" onclick="deleteStoppage(this)" data-stop-id="${stopdata['stop_id']}"><i class="bi bi-trash3" style="color: red;"></i></a>`
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </article>
+</section>
+
+<section data-jwt-tokens="{{ jwt_token }}" id="jwt_card"></section>
+<!-- Student form -->
+<section class="form_section bg-grey" id="studentdetailsForm">
+    <article class="container-fluid">
+        <div class="row">
+            <div class="col-xl-8"></div>
+            <div class="col-xl-4 form_div">
+                <div class="row">
+                    <div class="col-xl-6">
+                        <h4>Student Details</h4>
+                    </div>
+                    <div class="col-xl-6 text-end">
+                        <a class="btn-close" onclick="closeStudentDetails()" aria-label="Close"></a>
+                    </div>
+                </div>
+                <form class="form" id="student-form">
+                    <div class="input-field">
+                        <input type="text" class="form-input" placeholder="Enter Roll Number"  id="roll_number">
+                        <button type="button" class="btnAssign" id="btnAssign" onclick="fetchStudentDetails()">Assign</button>
+                    </div>
+                </form>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Roll Number</th> <span> </span> <th>Student Name</th>
+                        </tr>
+                    </thead>
+                    <tbody id="assignedStudents" class="tbl__bdy">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </article>
+</section>
+<script src="{% static 'app-js/transport.js' %}"></script>
+{% endblock %}
