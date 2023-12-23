@@ -3,7 +3,7 @@ from .settings import *
 from .settings import BASE_DIR
 
 # setting DEBUG = False
-DEBUG = False
+DEBUG = True
 
 # setting ALLOWED_HOSTS = ['*']
 ALLOWED_HOSTS = ['*']
@@ -11,6 +11,7 @@ ALLOWED_HOSTS = ['*']
 # seeting csrf cookie secure
 # CSRF_TRUSTED_ORIGINS = ['https://'+ os.environ['WEBSITE_HOSTNAME']]
 CSRF_TRUSTED_ORIGINS = ['https://gsm-webapp.azurewebsites.net','https://gsmwebtest.azurewebsites.net/']
+CSRF_TRUSTED_ORIGINS
 
 # middleware
 MIDDLEWARE = [
@@ -22,6 +23,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'app.middleware.AuthenticateUserMiddleware'
 ]
 # static files
 STATIC_URL = '/assets/'

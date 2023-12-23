@@ -88,6 +88,8 @@ def login(request):
             return render(request, 'registration.html')
     return render(request, 'registration.html')
 
+
+
 def logout(request):
     # Clear the access token from the cookie
     response = HttpResponseRedirect(reverse('login'))
