@@ -1,0 +1,26 @@
+.dh__img{
+    width:25%;
+    /* height:20%; */
+    /* text-align: center  ; */
+    padding: .5rem;
+}
+.cards{
+    display: flex !important;
+    flex-wrap: wrap !important;
+    flex-direction: row !important;
+    justify-content: center !important;
+}
+.cards-body{
+    /* background-color: red; */
+    border-left: 2px solid #ccc !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    flex-direction: column !important;
+    font-size:1rem;
+}
+.cards > .card-title{
+    text-align: center !important;
+    font-weight: 600 !important;
+
+}
