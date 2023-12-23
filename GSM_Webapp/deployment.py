@@ -9,7 +9,8 @@ DEBUG = False
 ALLOWED_HOSTS = ['*']
 
 # seeting csrf cookie secure
-CSRF_Trusted_Origins = ['*']
+# CSRF_TRUSTED_ORIGINS = ['https://'+ os.environ['WEBSITE_HOSTNAME']]
+CSRF_TRUSTED_ORIGINS = ["*"] 
 
 # middleware
 MIDDLEWARE = [
