@@ -10,7 +10,7 @@ ALLOWED_HOSTS = ['*']
 
 # seeting csrf cookie secure
 # CSRF_TRUSTED_ORIGINS = ['https://'+ os.environ['WEBSITE_HOSTNAME']]
-CSRF_TRUSTED_ORIGINS = ["*"] 
+CSRF_TRUSTED_ORIGINS = ['https://gsm-webapp.azurewebsites.net']
 
 # middleware
 MIDDLEWARE = [

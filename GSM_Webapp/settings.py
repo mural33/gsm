@@ -28,6 +28,7 @@ DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 # ALLOWED_HOSTS = ['localhost', 'http://127.0.0.1:8002/students/']
+CSRF_TRUSTED_ORIGINS = ['https://gsm-webapp.azurewebsites.net']
 
 
 
