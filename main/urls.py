@@ -7,6 +7,5 @@ urlpatterns = [
     path('', include('app.urls')),
     path('admin/', admin.site.urls),
     path('app/', include('app.urls')),
-]
-if settings.DEBUG:
-    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+]+static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    

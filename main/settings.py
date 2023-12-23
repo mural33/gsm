@@ -24,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-=+j%$6jdky^ih9ud8ngo7#fju0=#4(-bhf(osw&v^c*zd@me+5'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 CSRF_TRUSTED_ORIGINS = ['https://gsm-webapp.azurewebsites.net']
@@ -137,7 +137,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'assets_dy')
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'assets'),
 ]
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
+# STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field

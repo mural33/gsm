@@ -4,4 +4,6 @@ Faker==20.1.0
 python-dotenv==1.0.0
 Requests==2.31.0
 psycopg2==2.9.7
+Django-json-logging==3.0.0
+```
 
