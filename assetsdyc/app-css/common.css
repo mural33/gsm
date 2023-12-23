@@ -1,5 +1,10 @@
 body{
-    background-color: #fcf5dc !important;
+    background-color: #fcf5dc;;
+}
+@media (min-width: 1024.1px) {
+    [data-layout="horizontal"] .container-fluid,[data-layout="horizontal"] .layout-width{
+     max-width: 100%;
+    }
 }
 .form_section{
     display: none;
@@ -36,6 +41,14 @@ body{
     justify-content: flex-end;
     padding: 1rem;
 }
-.main-content,.wrapper{
-    background-color: var(--tb-header-bg);
+#heading-row{
+    margin-top: -3.2rem;
+}
+.table_students{
+    width: 100%;
+    border-collapse: collapse;
+    border: 1px solid #ddd;
+    height: 30vh !important;
+    overflow:auto !important;
+    /* background-color: #9b9898c8 !important; */
 }
