@@ -9,8 +9,11 @@ DEBUG = False
 ALLOWED_HOSTS = ['*']
 
 # seeting csrf cookie secure
-# CSRF_TRUSTED_ORIGINS = ['https://'+ os.environ['WEBSITE_HOSTNAME']]
-CSRF_TRUSTED_ORIGINS = ["*"] 
+CSRF_TRUSTED_ORIGINS = ["https://gsmwebtest.azurewebsites.net",'https://127.0.0.1:8003/'] 
+CSRF_COOKIE_DOMAIN = 'https://gsmwebtest.azurewebsites.net'
+CSRF_COOKIE_SECURE = True
+CSRF_COOKIE_HTTPONLY = True
+CSRF_USE_SESSIONS = True
 
 # middleware
 MIDDLEWARE = [

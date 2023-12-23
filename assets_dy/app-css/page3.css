@@ -1,0 +1,19 @@
+body{
+    text-align: center;
+}
+img{
+    width: 300px;
+}
+#header{
+    background-color: bisque;
+}
+#footer{
+    background-color: bisque;
+}
+#txtName{
+    border: 2px solid green;
+}
+#btnSubmit{
+    background-color: green;
+    color: white;
+}

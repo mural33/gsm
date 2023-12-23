@@ -7,7 +7,7 @@
 <link href="{% static 'app-css/classes.css' %}" rel="stylesheet"/>
 <script src="{% static 'app-js/class.js' %}"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<div class="row">
+<div class="row" id="heading-row">
     <div class="col-sm-12 col-md-5 col-xl-8">
         <h2>Classes</h2>
         <p>Manage Classes here.</p>
@@ -15,7 +15,7 @@
     <div class="col-sm-12 col-md-7 col-xl-4">
         <div class="row">
             <div class="col text-end">
-                <a class="btn btn-primary rounded-pill" onclick="openForm()"><i class="bi bi-plus-circle me-2"></i>Add Class</a>
+                <a class="btn btn-success rounded-pill" onclick="openForm()"><i class="bi bi-plus-circle me-2"></i>Add Class</a>
             </div>
         </div>
 
@@ -44,8 +44,8 @@
 
                     <div class="col-md-12 btn-action">
                         <div class="d-flex justify-content-end">
-                            <a class="btn btn-danger me-2" onclick="closeNav()">Cancel</a>
-                            <button type="submit" class="btn btn-primary">Save</button>
+                            <a class="btn btn-danger rounded-pill me-2" onclick="closeNav()">Cancel</a>
+                            <button type="submit" class="btn btn-success rounded-pill">Save</button>
                         </div>
                     </div>
                 </form>
