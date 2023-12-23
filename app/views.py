@@ -84,7 +84,7 @@ def login(request):
             response.set_cookie(key='institute_id', value=auth_response.json().get('institution_id', ''))
             return response
         else:
-            messages.error(request, auth_response.json().get('detail', ''))
+            messages.error(request, "Invalid Credentials")
             return render(request, 'registration.html')
     return render(request, 'registration.html')
 
