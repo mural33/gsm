@@ -28,15 +28,4 @@ class Login:
             # Authentication failed
             print(f"Error: {auth_response.status_code}, {auth_response.text}")
             response = HttpResponseRedirect(reverse('login'))
-            messages.error(response,"API NOT WORKING")
             return response
-
-
-def login(request):
-    if request.method == 'POST':
-        phone_number = request.POST.get('phone_number')
-        password = request.POST.get('password')
-        login_instance = Login(API_URL)
-        response = login_instance.authenticate_user(phone_number, password)
-        return response
-    return render(request, 'registration.html')
