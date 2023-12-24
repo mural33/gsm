@@ -4,8 +4,6 @@
 <html lang="en" data-layout="horizontal" data-sidebar="dark" data-sidebar-size="lg" data-preloader="disable"
     data-theme="creative" data-bs-theme="light">
 
-<>
-
     <meta charset="utf-8">
     <title>Gurukul - {% block title %}School Automation{% endblock %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -41,7 +39,7 @@
         <div class="app-menu navbar-menu">
             <!-- LOGO -->
             <div class="navbar-brand-box">
-                <a href="index.html" class="logo logo-dark">
+                <a href="#" class="logo logo-dark">
                     <span class="logo-sm">
                         <img src="{% static 'theme/images/logo-sm.png' %}" alt="" height="40">
                     </span>
@@ -49,7 +47,7 @@
                         <img src="{% static 'theme/images/logo-dark.png' %}" alt="" height="40">
                     </span>
                 </a>
-                <a href="index.html" class="logo logo-light">
+                <a href="#" class="logo logo-light">
                     <span class="logo-sm">
                         <img src="{% static 'theme/images/logo-sm.png' %}" alt="" height="40">
                     </span>
@@ -71,7 +69,6 @@
                     </div>
                     <ul class="navbar-nav" id="navbar-nav">
 
-                        <li class="menu-title"><span data-key="t-menu">Menu</span></li>
                         <li class="nav-item">
                             <a class="nav-link menu-link collapsed" href="/app/dashboard"
                                 aria-controls="sidebarDashboards">
@@ -81,18 +78,18 @@
 
                         <li class="nav-item">
                             <a class="nav-link menu-link collapsed" href="/app/students" aria-controls="sidebarLayouts">
-                                <i class="ti ti-school"></i> <span data-key="t-layouts">Student</span>
+                                <i class="ti ti-school"></i> <span data-key="t-layouts">Students</span>
                             </a>
                         </li>
 
                         <li class="nav-item">
                             <a href="/app/staffs" class="nav-link menu-link"> <i class="bi bi-people"></i>
-                                <span data-key="t-calendar">Staff</span> </a>
+                                <span data-key="t-calendar">Staffs</span> </a>
                         </li>
 
                         <li class="nav-item">
                             <a href="/app/classes" class="nav-link menu-link"> <i class="bi bi-book"></i> <span
-                                    data-key="t-chat">Class</span> </a>
+                                    data-key="t-chat">Classes</span> </a>
                         </li>
 
                         <li class="nav-item">
@@ -102,7 +99,7 @@
 
                         <li class="nav-item">
                             <a href="/app/assignments" class="nav-link menu-link"> <i class="bi bi-journal-richtext"></i>
-                                <span data-key="t-file-manager">Assignment</span> </a>
+                                <span data-key="t-file-manager">Assignments</span> </a>
                         </li>
 
                         <li class="nav-item">
@@ -117,7 +114,7 @@
 
                         <li class="nav-item">
                             <a href="/app/user" class="nav-link menu-link"> <i class="bi bi-person"></i>
-                                <span data-key="t-kanaban-board">User</span> </a>
+                                <span data-key="t-kanaban-board">Users</span> </a>
                         </li>
 
                         
@@ -143,7 +140,7 @@
                     <div class="d-flex align-items-center">
                         <!-- LOGO -->
                         <div class="navbar-brand-box horizontal-logo">
-                            <a href="index.html" class="logo logo-dark">
+                            <a href="#" class="logo logo-dark">
                                 <span class="logo-sm">
                                     <img src="{% static 'theme/images/logo-sm.png' %}" alt="" height="40">
                                 </span>
@@ -152,7 +149,7 @@
                                 </span>
                             </a>
 
-                            <a href="index.html" class="logo logo-light">
+                            <a href="#" class="logo logo-light">
                                 <span class="logo-sm">
                                     <img src="{% static 'theme/images/logo-sm.png' %}" alt="" height="40">
                                 </span>
@@ -174,7 +171,7 @@
 
                         <div>
 
-                            <h5>My Institute</h5>
+                            <h5>School of Excellence</h5>
                         </div>
                     </div>
 
@@ -182,10 +179,17 @@
 
                         <div class="dropdown topbar-head-dropdown ms-1 header-item">
                             
-                                <p>Your subscription is active</p>
+                                <p>Your subscription is Active</p>
                         </div>
 
-                     
+                        
+                        <div class="ms-1 header-item d-none d-sm-flex">
+                            <button type="button"
+                                class="btn btn-icon btn-topbar btn-ghost-light rounded-circle user-name-text"
+                                data-toggle="fullscreen">
+                                <i class='ti ti-arrows-maximize fs-3xl'></i>
+                            </button>
+                        </div>
 
 
                         <div class="dropdown topbar-head-dropdown ms-1 header-item">
@@ -407,22 +411,11 @@
                             </button>
                             <div class="dropdown-menu dropdown-menu-end">
                                 <!-- item-->
-                                <h6 class="dropdown-header">Welcome Alexandra!</h6>
-                                <a class="dropdown-item fs-sm" href="pages-profile.html"><i
+                                <h6 class="dropdown-header">Welcome User!</h6>
+                                <a class="dropdown-item fs-sm" href="#"><i
                                         class="bi bi-person-circle text-muted align-middle me-1"></i> <span
                                         class="align-middle">Profile</span></a>
-                                <a class="dropdown-item fs-sm" href="apps-calendar.html"><i
-                                        class="bi bi-cart4 text-muted align-middle me-1"></i> <span
-                                        class="align-middle">Order Track</span></a>
-                                <a class="dropdown-item fs-sm" href="apps-chat.html"><i
-                                        class="bi bi-box-seam text-muted align-middle me-1"></i> <span
-                                        class="align-middle">Chat</span></a>
-                                <a class="dropdown-item fs-sm" href="apps-to-do.html"><span
-                                        class="badge bg-success-subtle text-success float-end ms-2">New</span><i
-                                        class="bi bi-cassette text-muted align-middle me-1"></i> <span
-                                        class="align-middle">To Do</span></a>
-                                <div class="dropdown-divider"></div>
-                                <a class="dropdown-item fs-sm" href="pages-profile-settings.html"><i
+                                <a class="dropdown-item fs-sm" href="#"><i
                                         class="bi bi-gear text-muted align-middle me-1"></i> <span
                                         class="align-middle">Settings</span></a>
                                 <a class="dropdown-item fs-sm" href="{% url 'logout' %}"><i

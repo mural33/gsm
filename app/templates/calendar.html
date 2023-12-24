@@ -1,0 +1,213 @@
+{% extends '_layout.html' %}
+{% load static %}
+{% block title %} Staff Management {% endblock %}
+
+{% block content %}
+<link href="{% static 'app-css/calendar.css' %}" rel="stylesheet"/> 
+
+   
+<div class="row" id="heading-row">
+    <div class="col-sm-12 col-md-5 col-xl-8" style="padding:1rem;">
+        <h2>Calendar</h2>
+        <div class="fields">
+          <div class="input-field">
+          <!--<label class="labels"><b>Select Class</b></label> -->
+            <select class="gender-list" name="class" id="class" style="width: 8rem; height: 2.3rem; border-radius: 18px; text-align: center" >
+                <option selected>Select Class</option>
+                <option value="1">Class 1</option>
+                <option value="2">Class 2</option>
+                <option value="3">Class 3</option>
+                <option value="4">Class 4</option>
+                <option value="5">Class 5</option>
+                <option value="6">Class 6</option>
+                <option value="7">Class 7</option>
+                <option value="8">Class 8</option>
+                <option value="9">Class 9</option>
+                <option value="10">Class 10</option>
+            </select>
+        </div>
+        <div class="input-field">
+          <!-- <label class="labels"><b>Select Section</b></label> -->
+          <select class="section-list" name="Section" id="Section"  style="width: 8rem; height: 2.3rem; border-radius: 18px; text-align: center; ">
+              <option selected>Select Section</option>
+              <option value="A">Section A</option>
+              <option value="B">Section B</option>
+              <option value="C">Section C</option>
+          </select>
+        </div>
+          <button class="btn btn-secondary rounded-pill btn-block">Show</button><br>
+      </div>
+    </div>
+    <div class="col-sm-12 col-md-7 col-xl-4" style="margin-top: 4rem;">
+      <div class="row">
+        
+          <div class="text-end">
+              <a href="#" class="btn btn-success rounded-pill btn-block studentAddForm">Create TimeTable</a>
+              
+          </div>
+      </div>
+  </div>
+<section class="form_section bg-grey" id="userForm" >
+  <article class="container-fluid">
+      <div class="row">
+          <div class="col-xl-8"></div>
+          <div class="col-xl-4 form_div" style="margin-right: 0%;">
+            <!-- <header style="height: 100px; position: fixed; top: 0; width: 100%;"> -->
+              <div class="row">
+                  <div class="col-xl-6" style="margin-top: 4%;">
+                      <center><h4>Add Time Table</h4></center>
+                  </div>
+                  <div class="col-xl-6 text-end">
+                      <a href="" class="studentCloseForm">&times;</a>
+                  </div>
+              </div>&nbsp;
+            <!-- </header> -->
+                  <form class="row g-2" id="user-form"  method="POST" enctype="multipart/form-data" style="margin-left: 5%;">
+                      <div class="col-md-12">
+                        <label>Day <span style="color: red;">*</span></label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        <select class="list" name="day">
+                            <option value="" selected disabled>Choose Day</option>
+                            <option value="Monday">Monday</option>
+                            <option value="Tuesday">Tuesday</option>
+                            <option value="Wednesday">Wednesday</option>
+                            <option value="Thursday">Thursday</option>
+                            <option value="Friday">Friday</option>
+                            <option value="Saturday">Saturday</option>
+                            <option value="Sunday">Sunday</option>
+                        </select>
+                      </div>&nbsp;
+                      <div class="col-md-12">
+                        <label>Start Time <span style="color: red;">*</span></label>&nbsp;&nbsp;&nbsp;&nbsp;
+                        <input type="time" name="time_start">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        <label>End Time <span style="color: red;">*</span></label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        <input type="time" name="time_end">
+                      </div>
+                      <div class="col-md-12">
+                        <label>Class <span style="color: red;">*</span></label>&nbsp;&nbsp;&nbsp;&nbsp;
+                        <select class="list" name="class_name" id="selectClass">
+                            <option value="" selected disabled>Select Class</option>
+                             <option value="class">class 10</option>   
+                        </select>
+                      </div>
+                      <div class="col-md-12">
+                        <label>Section <span style="color: red;">*</span></label>
+                        <select class="list" name="section_name" >
+                          <option value="" selected disabled>Select Section</option>
+                          <option>Section-A</option>
+                          <option>Section-B</option>
+                          <option>Section-C</option>
+                          <option>Section-D</option>
+                        </select>
+                    </div>
+                    <div class="col-md-12">
+                      <label>Subject <span style="color: red;">*</span></label>
+                      <select class="list" name="subject_name" id="selectSubject">
+                        <option value="" selected disabled>Select Subject</option>
+                        <option>English</option>     
+                      </select>
+                    </div>
+
+                    <div class="col-md-12">
+                      <label>Teacher <span style="color: red;">*</span></label>
+                      <select class="list" name="Teacher_name" id="selectTeacher">
+                        <option value="" selected disabled>Select Teacher</option>
+                        <option>English</option>     
+                      </select>
+                    </div>
+
+                  <!-- <footer style="height: 100px; position: fixed; bottom: 0; width: 100%;"> -->
+                      <div class="col-12" style="margin-left: 50%; margin-top: 45%;">
+                          <a class="btn btn-light studentCloseForm" onclick="closeNav()">Cancel</a>                            
+                          <button type="submit" class="btn btn-primary">Save</button>
+                      </div>
+                  <!-- </footer> -->
+                  </form>
+          </div>
+      </div>
+  </article>
+</section> 
+    <div class="container">
+      <table class="styled-table">
+            <tr>
+              <td colspan="7" class="col"><center><b>Class 10 Section A</b></center></td>
+            </tr>
+            <tr class="col">
+              <th >Time</th>
+              <th>Monday</th>
+              <th>Tuesday</th>
+              <th>Wednesday</th>
+              <th>Thursday</th>
+              <th>Friday</th>
+              <th>Saturday</th>
+
+            </tr>
+            <tr>
+              <td class="mod">9:30 AM-10:15 AM</td>
+              <td>English<br>(Mr.Rizwan)</td>
+              <td>Math<br>(Ms.Rupa)</td>
+              <td>Chemistry<br>(Ms.Lipi)</td>
+              <td>Computer<br>(Mr.Murli)</td>
+              <td>biology<br>(Ms.sandhya)</td>
+              <td>Physics<br>(Ms.Haritha)</td>
+            </tr>
+            <tr>
+              <td class="mod">10:15 AM-11:00 AM</td>
+              <td>English<br>(Mr.Rizwan)</td>
+              <td>Math<br>(Ms.Jeshi)</td>
+              <td>Chemistry<br>(Ms.Lipi)</td>
+              <td>Computer<br>(Mr.Murli)</td>
+              <td>biology<br>(Ms.sandhya)</td>
+              <td>Physics<br>(Ms.Haritha)</td>
+            </tr>
+            <tr>
+              <td class="mod">11:15 AM-12:00 PM</td>
+              <td>English<br>(Mr.Rizwan)</td>
+              <td>Math<br>(Mr.Abhishek)</td>
+              <td>Chemistry<br>(Ms.Lipi)</td>
+              <td>Computer<br>(Mr.Murli)</td>
+              <td>biology<br>(Ms.janvi)</td>
+              <td>Physics<br>(Mr.Fasi)</td>
+            </tr>
+            <tr>
+              <td class="mod">12:00 PM-12:45 PM</td>
+              <td>English<br>(Mr.Rizwan)</td>
+              <td>Math<br>(Ms.Jeshi)</td>
+              <td>Chemistry<br>(Ms.Lipi)</td>
+              <td>Computer<br>(Mr.Murli)</td>
+              <td>biology<br>(Ms.sandhya)</td>
+              <td>Physics<br>(Ms.Haritha)</td>
+            </tr>
+            <tr>
+              <td class="mod">01:30 PM-02:15 PM</td>
+              <td>English<br>(Mr.Abhishek)</td>
+              <td>Math<br>(Ms.sandhya)</td>
+              <td>Chemistry<br>(Mr.Murli)</td>
+              <td>Computer<br>(Mr.Rizwan)</td>
+              <td>biology<br>(Ms.jeshi)</td>
+              <td>Physics<br>(Ms.Haritha)</td>
+            </tr>
+            <tr>
+              <td class="mod">02:15 PM-03:00 PM</td>
+              <td>English<br>(Mr.Rizwan)</td>
+              <td>Math<br>(Ms.Jeshi)</td>
+              <td>Chemistry<br>(Ms.Lipi)</td>
+              <td>Computer<br>(Mr.Murli)</td>
+              <td>biology<br>(Ms.sandhya)</td>
+              <td>Physics<br>(Ms.Haritha)</td>
+            </tr>
+            <tr>
+              <td class="mod">3:00 PM-03:30 PM</td>
+              <td>English<br>(Mr.Rizwan)</td>
+              <td>Math<br>(Mr.Abhishek)</td>
+              <td>Chemistry<br>(Ms.Lipi)</td>
+              <td>Computer<br>(Mr.Murli)</td>
+              <td>biology<br>(Ms.janvi)</td>
+              <td>Physics<br>(Mr.Fasi)</td>
+            </tr>
+          </table>
+
+    </div>
+    
+</div><!--end row-->
+
+{% endblock %}
