@@ -1,6 +1,6 @@
 {% extends '_layout.html' %}
 {% load static %}
-{% block title %} Assigment Management {% endblock %}
+{% block title %} Assignment Management {% endblock %}
 
 {% block content %}
 <link href="{% static 'app-css/assignments.css' %}" rel="stylesheet">
@@ -12,13 +12,13 @@
 <div class="row" id="heading-row">
     <div class="col-sm-12 col-md-5 col-xl-8" style="padding: 1rem">
         <div>
-        <h2>Assignments</h2>
+        <h5>Assignments</h5>
         </div>
     </div>
     <div class="col-sm-12 col-md-7 col-xl-4" style="padding: 1rem">
         <div class="row">
             <div class="col text-end">
-                <a class="btn btn-success rounded-pill" onclick="openForm()"><i class="bi bi-plus-circle me-2"></i> Create Assignments</a>
+                <a class="btn btn-success rounded-pill" onclick="openForm()"><i class="bi bi-plus-circle me-2"></i> Create Assignment</a>
             </div>
         </div>
     </div>
@@ -31,7 +31,7 @@
             <div class="col-xl-4 form_div">
                 <div class="row">
                     <div class="col-xl-6">
-                        <h4>Create Assigment</h4>
+                        <h4>Create Assignment</h4>
                     </div>
                     <div class="col-xl-6 text-end">
                         <a class="btn-close" onclick="closeForm()" aria-label="Close"></a>
@@ -95,7 +95,7 @@
             <thead class="thead-dark">
                 <tr>
                     <th>S.NO</th>
-                    <th>Assigment title</th>
+                    <th>Assigment Title</th>
                     <th>Assigned To</th>
                     <th>Assignment Date</th>
                     <th>Assignment Due Date</th>

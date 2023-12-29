@@ -24,14 +24,30 @@
     <link href="{% static 'theme/css/custom.min.css' %}" rel="stylesheet" type="text/css">
 
 
+    
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <link rel="stylesheet" href="{% static 'app-css/common.css' %}">
     <script src="{% static 'app-js/common.js' %}"></script>
-     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
 
 </head>
 
 <body class="dashboard-topbar-wrapper">
+
+    <div id="spinner-element-lg">
+        <div class="spinner-element-lg-overlay">
+            <img src="{% static 'img/loader.gif' %}" alt="">
+        </div>
+    </div>
+   
+    <div id="spinner-element-sm">
+        <div class="spinner-element-sm-overlay">
+            <img src="{% static 'img/loader.gif' %}" alt="">
+        </div>
+    </div>
+    <input type="hidden" name="" id="apiUrl" value='{{url}}'>
+    <input type="hidden" name="" id="jwtToken" value='{{jwt_token}}'>
+    <input type="hidden" name="" id="instituteId" value='{{institute_id}}'>
     <!-- Begin page -->
     <div id="layout-wrapper">
 
@@ -77,23 +93,44 @@
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link menu-link collapsed" href="/app/students" aria-controls="sidebarLayouts">
-                                <i class="ti ti-school"></i> <span data-key="t-layouts">Students</span>
+                            <a class="nav-link menu-link collapsed" href="#studentLayout" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="studentLayout">
+                                <i class="bi bi-person-badge"></i> <span data-key="t-layouts">Students</span>
                             </a>
+                            <div class="collapse menu-dropdown" id="studentLayout" style="background: var(--tb-vertical-menu-bg)">
+                                <ul class="nav nav-sm flex-column">
+                                    <li class="nav-item">
+                                        <a href="/app/register_student" class="nav-link" data-key="t-horizontal">New Student</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="/app/students" class="nav-link" data-key="t-detached">Student Records</a>
+                                    </li>
+                                </ul>
+                            </div>
                         </li>
 
                         <li class="nav-item">
-                            <a href="/app/staffs" class="nav-link menu-link"> <i class="bi bi-people"></i>
-                                <span data-key="t-calendar">Staffs</span> </a>
+                            <a class="nav-link menu-link collapsed" href="#staffLayout" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="staffLayout">
+                                <i class="bi bi-person-bounding-box"></i> <span data-key="t-layouts">Staffs</span>
+                            </a>
+                            <div class="collapse menu-dropdown" id="staffLayout" style="background: var(--tb-vertical-menu-bg)">
+                                <ul class="nav nav-sm flex-column">
+                                    <li class="nav-item">
+                                        <a href="/app/register_staff" class="nav-link" data-key="t-horizontal">New Staff</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="/app/staffs" class="nav-link" data-key="t-detached">Staff Records</a>
+                                    </li>
+                                </ul>
+                            </div>
                         </li>
 
                         <li class="nav-item">
-                            <a href="/app/classes" class="nav-link menu-link"> <i class="bi bi-book"></i> <span
+                            <a href="/app/classes" class="nav-link menu-link"> <i class="bi bi-bookmark-check"></i> <span
                                     data-key="t-chat">Classes</span> </a>
                         </li>
 
                         <li class="nav-item">
-                            <a href="/app/calendar" class="nav-link menu-link"> <i class="bi bi-calendar-event"></i> <span
+                            <a href="/app/calendar" class="nav-link menu-link"> <i class="bi bi-calendar-week"></i> <span
                                     data-key="t-email">Calendar</span> </a>
                         </li>
 
@@ -103,7 +140,7 @@
                         </li>
 
                         <li class="nav-item">
-                            <a href="/app/notice" class="nav-link menu-link"> <i class="bi bi-exclamation-circle"></i> <span
+                            <a href="/app/notice" class="nav-link menu-link"> <i class="bi bi-broadcast-pin"></i> <span
                                     data-key="t-to-do">Notice</span> </a>
                         </li>
 
@@ -113,7 +150,7 @@
                         </li>
 
                         <li class="nav-item">
-                            <a href="/app/user" class="nav-link menu-link"> <i class="bi bi-person"></i>
+                            <a href="/app/user" class="nav-link menu-link"> <i class="ri-shield-user-line"></i>
                                 <span data-key="t-kanaban-board">Users</span> </a>
                         </li>
                     </ul>
@@ -162,8 +199,7 @@
                         </button>
 
                         <div>
-
-                            <h5>School of Excellence</h5>
+                           <h4 class="organization_name">{{ organization_name }}</h4>
                         </div>
                     </div>
 
@@ -171,7 +207,7 @@
 
                         <div class="dropdown topbar-head-dropdown ms-1 header-item">
                             
-                                <p>Your subscription is Active</p>
+                                <p>{{ message }}</p>
                         </div>
 
                         
@@ -495,7 +531,7 @@
 
             <!-- End Page-content -->
 
-            <footer class="footer">
+            <!-- <footer class="footer">
                 <div class="container-fluid">
                     <div class="row">
                         <div class="col-sm-6">
@@ -508,7 +544,7 @@
                         </div>
                     </div>
                 </div>
-            </footer>
+            </footer> -->
         </div>
         <!-- end main content-->
 
@@ -532,7 +568,7 @@
     <div class="customizer-setting d-none d-md-block">
         <div class="btn btn-info p-2 text-uppercase rounded-end-0 shadow-lg" data-bs-toggle="offcanvas"
             data-bs-target="#theme-settings-offcanvas" aria-controls="theme-settings-offcanvas">
-            <i class="bi bi-gear mb-1"></i> Customizer
+            <i class="bi bi-gear mb-1"></i>
         </div>
     </div>
 

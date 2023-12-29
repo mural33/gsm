@@ -14,11 +14,9 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10">
 </head>
 <body>
-   
-    
-    <div class="container" onload="noBack();" onpageshow="if (event.persisted) noBack();" onunload="">
+    <div class="container">
         <div class="signin-signup">
-            <form  method="POST" class="sign-in-form" >
+            <form  method="POST" class="sign-in-form" action="{% url 'login' %}">
                 {% csrf_token %}
                 <img src="{% static 'img/logo-dark.png' %}" alt="Logo" class="image">
                 <h6 class="title">Login to your Account</h6><br />

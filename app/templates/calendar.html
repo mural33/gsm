@@ -7,12 +7,13 @@
 
    
 <div class="row" id="heading-row">
-    <div class="col-sm-12 col-md-5 col-xl-8" style="padding:1rem;">
-        <h2>Calendar</h2>
+    <div class="col-sm-12 col-md-8 col-xl-8" style="padding:1rem;">
+        <h5>Calendar</h5>
+        <quote>The class timetable: a symphony of learning, where every subject has its moment and knowledge finds its rhythm.</quote>
         <div class="fields">
           <div class="input-field">
           <!--<label class="labels"><b>Select Class</b></label> -->
-            <select class="gender-list" name="class" id="class" style="width: 8rem; height: 2.3rem; border-radius: 18px; text-align: center" >
+            <select class="gender-list filter" name="class" id="class">
                 <option selected>Select Class</option>
                 <option value="1">Class 1</option>
                 <option value="2">Class 2</option>
@@ -28,22 +29,24 @@
         </div>
         <div class="input-field">
           <!-- <label class="labels"><b>Select Section</b></label> -->
-          <select class="section-list" name="Section" id="Section"  style="width: 8rem; height: 2.3rem; border-radius: 18px; text-align: center; ">
+          <select class="section-list filter" name="Section" id="Section">
               <option selected>Select Section</option>
               <option value="A">Section A</option>
               <option value="B">Section B</option>
               <option value="C">Section C</option>
           </select>
         </div>
-          <button class="btn btn-secondary rounded-pill btn-block">Show</button><br>
+          <button class="btn btn-primary rounded-pill btn-block filter-btn">Search</button>
       </div>
     </div>
-    <div class="col-sm-12 col-md-7 col-xl-4" style="margin-top: 4rem;">
+    <div class="col-sm-12 col-md-4 col-xl-4" style="margin-top: 5rem;">
       <div class="row">
-        
           <div class="text-end">
-              <a href="#" class="btn btn-success rounded-pill btn-block studentAddForm">Create TimeTable</a>
-              
+            <button type="button" onclick="openForm()" 
+                class="btn btn-success btn-label rounded-pill right">
+                <i class="bi bi-plus-circle label-icon align-middle fs-lg ms-2"></i>Add/Edit Time Table</button>
+            
+            <button type="button" class="btn btn-outline-primary rounded-pill btn-icon"><i class="bi bi-printer"></i></button>
           </div>
       </div>
   </div>

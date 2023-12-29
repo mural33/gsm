@@ -10,14 +10,16 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 
 <div class="row" id="heading-row">
-    <div class="col-sm-12 col-md-5 col-xl-8" style="padding: 1rem">
-        <h2>Notice Management</h2>
+    <div class="col-sm-12 col-md-8 col-xl-8" style="padding: 1rem">
+        <h5>Notice</h5>
+        <quote>A notice: a brief whisper that echoes the importance of information in the silence of awareness.</quote>
     </div>
-    <div class="col-sm-12 col-md-7 col-xl-4" style="padding: 1rem">
+    <div class="col-sm-12 col-md-4 col-xl-4" style="padding: 1rem">
         <div class="row">
             <div class="col text-end">
-                <a class="btn btn-success rounded-pill btn-block" onclick="showStudentForm()">
-                    <i class="bi bi-plus-circle me-2"></i>Create Notice</a>
+                <button type="button" onclick="showStudentForm()" 
+                        class="btn btn-success btn-label rounded-pill right">
+                        <i class="bi bi-plus-circle label-icon align-middle fs-lg ms-2"></i>Create Notice</button>
             </div>
         </div>
     </div>
@@ -57,7 +59,7 @@
                         </div>
                         <div class="col-md-12">
                             <label for="Recipient" class="form-label">Recipient</label>
-                            <select name="recipient" class="recipient" id="recipient" required>
+                            <select name="recipient" class="recipient" id="recipient" >
                                 <option value="" selected disabled>Select</option>
                                             <option value="All">All</option>
                                             <option value="All Staffs Only">All Staffs Only</option>

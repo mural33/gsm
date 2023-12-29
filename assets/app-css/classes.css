@@ -5,10 +5,9 @@
 }
 
 .card {
-    height: 9rem;
-    /* width: 30rem !important; */
     position: relative; 
     overflow: hidden; 
+    min-height: 90px;
 }
 
 .lframe-child1 {
@@ -36,13 +35,14 @@
 }
 
 .card-img-top {
-    height: 5rem;
-    width: 5rem;
-    margin-left: 9.5rem;
-    margin-top: -5rem;
+    height: 2rem;
+    width: 2rem;
+    right: 1rem;
+    position: absolute;
+    bottom: 1rem;
 }
 .card-text{
-font-size: 1.5rem;
+font-size: 1rem;
 }
 .card-text a{
     text-decoration: none;
@@ -50,8 +50,11 @@ font-size: 1.5rem;
 }
 
 .action-btn{
-    margin-left: 0.4rem;
-    font-size: 1.2rem;
+    font-size: 1rem;
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    cursor: pointer;
 }
 .form-show{
     right: 0%;

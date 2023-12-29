@@ -4,76 +4,95 @@
 {% block content %}
 {% load static %}
 
-<link href="{% static 'app-css/classes.css' %}" rel="stylesheet"/>
+<link href="{% static 'app-css/classes.css' %}" rel="stylesheet" />
 <script src="{% static 'app-js/class.js' %}"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <div class="row" id="heading-row">
-    <div class="col-sm-12 col-md-5 col-xl-8" style="padding: 1rem">
-        <h2>Classes</h2>
-        <p>Manage Classes here.</p>
+    <div class="col-sm-12 col-md-8 col-xl-8" style="padding: 1rem">
+        <h5>Classes</h5>
+        <quote>In the classroom, every moment is a stepping stone towards enlightenment.</quote>
     </div>
-    <div class="col-sm-12 col-md-7 col-xl-4" style="padding: 1rem">
+    <div class="col-sm-12 col-md-4 col-xl-4" style="padding: 1rem">
         <div class="row">
             <div class="col text-end">
-                <a class="btn btn-success rounded-pill" onclick="openForm()"><i class="bi bi-plus-circle me-2"></i>Add Class</a>
+                <button type="button" class="btn btn-success btn-label rounded-pill right" 
+                    data-bs-toggle="modal" data-bs-target="#class_creation_modal">
+                    <i class="bi bi-plus-circle label-icon align-middle fs-lg ms-2"></i>Create Class</button>
             </div>
         </div>
 
     </div>
 </div>
-<section class="form_section bg-grey" id="classForm">
-    <article class="container-fluid">
-        <div class="row">
-            <div class="col-xl-8"></div>
-            <div class="col-xl-4 form_div">
-                <div class="row bg-light">
-                    <div class="col-xl-6">
-                        <h3>Add Class</h3>
-                    </div>
-                    <div class="col-xl-6 text-end">
-                        <a type="button" class="btn-close" onclick="closeNav()" aria-label="Close"></a>                    
-                    </div>
-                </div>
-                <form class="row g-3 form-class" method="POST" enctype="multipart/form-data" id="AddClass">
-                    {% csrf_token %}
-                    <div class="col-md-12 form-content">
-                        <input type="hidden" name="class_id" id="class_id">
-                        <label for="class_name" class="form-label">Class Name</label>
-                        <input type="text" class="form-control" id="class_name" name="class_name" placeholder="Enter a Class Name">
-                    </div>
 
-                    <div class="col-md-12 btn-action">
-                        <div class="d-flex justify-content-end">
-                            <a class="btn btn-danger rounded-pill me-2" onclick="closeNav()">Cancel</a>
-                            <button type="submit" class="btn btn-success rounded-pill">Save</button>
+<!--  Small modal example -->
+<div class="modal fade bs-example-modal-sm" id="class_creation_modal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="mySmallModalLabel">Save Class</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                </button>
+            </div>
+            <form method="POST" enctype="multipart/form-data" id="AddClass">
+                <div class="modal-body">
+                    <div class="d-flex">
+                        <div class="flex-shrink-0">
+                            <i class="ri-checkbox-circle-fill text-success"></i>
+                        </div>
+                        <div class="flex-grow-1 ms-2">
+                            <p class="text-muted mb-0">A class in an educational institution is the dynamic canvas where
+                                curiosity is nurtured, knowledge is painted, and futures are crafted.</p>
                         </div>
                     </div>
-                </form>
-            </div>
-        </div>
-    </article>
-</section>
+                    <div class="d-flex mt-2">
+                        {% csrf_token %}
+                        <div class="col-md-12 form-content">
+                            <input type="hidden" name="class_id" id="class_id">
+                            <label for="class_name" class="form-label">Class Name</label>
+                            <input type="text" class="form-control" id="class_name" name="class_name"
+                                placeholder="Enter a Class Name">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <a href="javascript:void(0);" class="btn btn-link link-success fw-medium" data-bs-dismiss="modal"><i
+                            class="ri-close-line me-1 align-middle"></i> Close</a>
+                    <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">Save
+                        changes</button>
+                </div>
+            </form>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
 <section class="row" data-jwt-tokens="{{ jwt_tokens }}" id="jwt_card">
     <div class="class_group" id="TabClass">
         {% for data in class_data %}
-        <div class="card bg-gradient-danger card-img-holder text-white" id="class-id-{{data.class_id}}">
+        <div class="card bg-gradient-danger card-img-holder text-white" id="class-id-{{ data.class_id }}">
             <div class="card-body">
                 <div class="lframe-child1">
                 </div>
                 <div class="lframe-item1">
                 </div>
-                <p class="card-text"><a href="{% url 'classinfo' data.slug %}">{{data.class_name}}</a></p>
-                <img src="{% static 'img/open-book.png' %}" class="card-img-top" alt="...">
-                <div class="action-btn d-flex gap-3">
-                    <a onclick="EditClass(this)" data-class-id="{{data.class_id}}"><i class="bi bi-pencil-square text-primary"></i></a>
-                   <a onclick="DeleteClass(this)" data-class-id="{{data.class_id}}"><i class="bi bi-trash-fill text-danger"></i></a>                
-                </div> 
-            </div>   
-       </div>
-       {% endfor %}
-
+                {% if data.slug %}
+                <p class="card-text"><a href="{% url 'classinfo' slug=data.slug %}">{{ data.class_name }}</a></p>
+                {% else %}
+                <p class="card-text">{{ data.class_name }}</p>
+                {% endif %}
+                <img src="{% static 'img/class_thumb.png' %}" class="card-img-top" alt="...">
+                <div class="action-btn d-flex gap-1">
+                    <a data-bs-toggle="modal"
+                    data-bs-target="#class_creation_modal" onclick="EditClass(this)" data-class-id="{{ data.class_id }}"><i
+                            class="bi bi-pencil-square text-primary"></i></a>
+                    <a onclick="DeleteClass(this)" data-class-id="{{ data.class_id }}"><i
+                            class="bi bi-trash-fill text-danger"></i></a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
     </div>
-    
+
 </section>
 
 {% endblock %}

@@ -1,16 +1,3 @@
-function closeNav() {
-    console.log("done");
-    document.querySelector(".form_section").classList.remove("form-show");
-    // document.body.style.overflow = "auto"; 
-}
-
-// Function to open the form section
-function openForm() {
-    document.querySelector(".form_section").classList.add("form-show");
-    // document.body.style.overflow = "hidden"; 
-
-}
-
 
 // ____Add/Edit Class____
 var API_ENDPOINT = "https://gsm-fastapi.azurewebsites.net/";
@@ -149,11 +136,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // _____Get Class for Edit____
 function EditClass(element){
-    event.preventDefault();
+    document.getElementById("class_id").value = "";
+    document.getElementById("class_name").value = "";
+
     const jwtTokens = document.querySelector('#jwt_card').getAttribute('data-jwt-tokens');
-    console.log(jwtTokens,"fff");
     const classId = element.getAttribute('data-class-id');
-    console.log(" each id", classId)
     const url = `${API_ENDPOINT}Classes/class_id/?class_id=${classId}`;
 
     fetch(url, {
@@ -170,13 +157,9 @@ function EditClass(element){
         return response.json();
     })
     .then(data => {
-        console.log('Data received from API:', data);
-        openForm();
         response = data["response"]
-        
         document.getElementById("class_id").value = response.class_id;
         document.getElementById("class_name").value = response.class_name;
-
         isEditMode = true;
     })
     .catch(error => {

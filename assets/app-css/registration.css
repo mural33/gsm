@@ -44,6 +44,7 @@ body {
     z-index: 5;
 }
 form {
+    max-height:100vh;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -51,6 +52,7 @@ form {
     width: 40%;
     min-width: 238px;
     padding: 0 10px;
+    overflow: auto;
 }
 form.sign-in-form {
     opacity: 1;
@@ -61,6 +63,9 @@ form.sign-up-form {
     opacity: 0;
     transition: 0.5s ease-in-out;
     transition-delay: 1s;
+}
+.sign-up-form{
+    overflow:auto;
 }
 .title {
     margin: 0;
@@ -95,7 +100,7 @@ form.sign-up-form {
     color: #444;
 }
 .btn {
-    width: 369px;
+    width: 61%;
     height: 50px;
     border: none;
     border-radius: 50px;

@@ -1,464 +1,596 @@
+$(document).ready(() => {
+    bindGridButtonEvents();
+    $("#saveBtn").on("click", async (e) => {
+        $("#saveBtn").removeClass("btn-shake");
+        e.preventDefault();
+        if (validateForm() === false) {
+            $("#saveBtn").addClass("btn-shake");
+            return false;
+        } else {
+            addTransport()
+                .then(() => {
+                    $('#editModal').removeClass("show");
+                    $('.modal-backdrop').removeClass("show")
+                    $("body").css("overflow", "auto")
+                })
+                .catch((error) => {
+                    if (error && error.responseJSON && error.responseJSON.detail) {
+                        raiseErrorAlert(error.responseJSON.detail);
+                    } else {
+                        raiseErrorAlert("An unexpected error occurred");
+                    }
+                });
+        }
+    });
+});
 
-function closetransportForm(event) {
-    // event.preventDefault()
-    transportForm.style.display = "none";
-}
-
-function showtransportForm(event) {
-    transportForm.style.display = "block";
-}
-
-
-const URL = "https://gsm-fastapi.azurewebsites.net"
-// create and edit
-let isEditMode = false;
-
-document.addEventListener("DOMContentLoaded", () => {
-    let form = document.getElementById('transport-form')
-    form.addEventListener('submit', function (event) {
-        event.preventDefault();
-        const jwtToken = document.querySelector('#jwt_card').getAttribute('data-jwt-tokens');
-        console.log("inside");
-        const formData = new FormData(document.getElementById('transport-form'));
-        const data = {
-            "institute_id": 1010,
-            "id": formData.get("id"),
-            "vehicle_number": formData.get("vehicle_number"),
-            "vehicle_details": formData.get("vehicle_details"),
-            "register_date": formData.get('register_date'),
-            "transport_name": formData.get("transport_name"),
-        };
-
-        console.log("data from form:", data)
-        console.log('jwtToken',jwtToken);
-        console.log("created updated check id ", data.id)
-        const url = isEditMode ? `${URL}/Transport/update_transport/?transport_id=${data.id}` :
-            `${URL}/Transport/create_transport/`;
-        const method = isEditMode ? 'PUT' : 'POST'
-        fetch(url, {
-            method: method,
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${jwtToken}`
-            },
-            body: JSON.stringify(data),
-        })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error("Network response was not ok")
+function bindGridButtonEvents() {
+    $(".btnEdit").off("click");
+    $(".btnEdit").each(function () {
+        $(this).click(function () {
+            const transportId = $(this).attr("data-id");
+            if (transportId) {
+                const response = editTransport(transportId, jwtToken);
+            }
+        });
+    });
+    $('.btndelete').each(function () {
+        $(this).click(function () {
+            const transportId = $(this).attr("data-id");
+            try {
+                const response = deleteTransport(transportId, jwtToken);
+                if (response.success) {
+                    $(this).closest('tr').remove();
+                    raiseSuccessAlert("Transport Record Deleted Successfully");
                 }
-                return response.json();
-            })
-            .then(data => {
-                if (isEditMode) {
-                    console.log("inside")
-                    const updatedData = data['response']
-                    const tr = document.querySelector(`.tr-transport-${updatedData["transport_id"]}`)
-                    console.log(tr)
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'transport updated Successfully!',
-                        position: 'top-end',
-                        toast: true,
-                        showConfirmButton: false,
-                        timer: 3000,
-                        padding: '1rem',
-                        customClass: {
-                            title: 'small-title',
-                        },
-                    });
-                    for (const key in updatedData) {
-                        try {
-                            tr.querySelector(`.${key}`).textContent = updatedData[key]
-                            closetransportForm()
-                            form.reset();
-                            isEditMode = true;
-                        }
-                        catch {
+            } catch (error) {
+                raiseErrorAlert(error.responseJSON.detail);
+            }
+        });
 
+    });
+}
+let fields = [
+    'vehicle_number', 'vehicle_details', 'register_date', 'transport_name',
+];
+
+function validateForm() {
+    var isValid = true;
+    for (const field of fields) {
+        const element = $(`#${field}`);
+        const value = element.val().trim();
+        if (value === '') {
+            element.focus().addClass('is-invalid');
+            isValid = false;
+            raiseErrorAlert("Fill the all details");
+        }
+    }
+    return isValid;
+}
+
+function addTransport() {
+    let isUpdate = $("#id").val() !== "";
+    const transportId = $("#id").val();
+    const TransportData = {
+        "institute_id": instituteId,
+        "id": transportId,
+        "vehicle_number": $("#vehicle_number").val(),
+        "vehicle_details": $("#vehicle_details").val(),
+        "register_date": $("#register_date").val(),
+        "transport_name": $("#transport_name").val(),
+    };
+    const transportEndPoint = isUpdate ? `/Transports/update_transport/?transport_id=${transportId}` : "/Transports/create_transport/";
+    const transportUrl = `${apiUrl}${transportEndPoint}`;
+    const requestType = isUpdate ? 'PUT' : 'POST';
+    return $.ajax({
+        type: requestType,
+        url: transportUrl,
+        data: JSON.stringify(TransportData),
+        headers: {
+            "Authorization": `Bearer ${jwtToken}`,
+            "Content-Type": "application/json",
+        },
+        contentType: "application/json",
+        dataType: "json",
+        beforeSend: (e) => {
+            showLoader("transport", "lg");
+        },
+        success: function (data) {
+            if (data) {
+                const responseData = data["response"];
+                if (isUpdate) {
+                    const tr = document.querySelector(`.tr-transport-${responseData.transport_id}`);
+                    for (const key in responseData) {
+                        try {
+                            tr.querySelector(`.${key}`).textContent = responseData[key];
+                        } catch (error) {
+                            
                         }
                     }
-                }
-                else {
-                    const tableBody = document.querySelector('.tbl__bdy');
-
-                    const response = data.response;
-                    console.log("response", response)
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'transport added successfully!',
-                        position: 'top-end',
-                        toast: true,
-                        showConfirmButton: false,
-                        timer: 3000,
-                        padding: '1rem',
-                        customClass: {
-                            title: 'small-title',
-                        },
-                    });
-
+                    $('#editModal').addClass("model fade");
+                    raiseSuccessAlert("Transport Record Updated Successfully");
+                } else {
                     const newRow = `
-                            <tr class="tr-transport-${response.transport_id}">
-                                <td>${tableBody.children.length + 1}</td>
-                                <td class="vehicle_number">${response.vehicle_number}</td>
-                                <td class="vehicle_details">${response.vehicle_details}</td>
-                                <td class="register_date">${response.register_date}</td>
-                                <td class="transport_name">${response.transport_name}</td>
-                                <td>
-                                <button class="btn btn-sm btn-dark rounded-pill" onclick="openstopDetails('stopForm','${ response.transport_name }')" data-id="${response.transport_id}">View</button>
+                        <tr class="tr-transport-${responseData.transport_id}">
+                            <td>${$("#transport_details tr").length + 1}</td>
+                            <td class="vehicle_number">${responseData.vehicle_number}</td>
+                            <td class="vehicle_details">${responseData.vehicle_details}</td>
+                            <td class="register_date">${responseData.register_date}</td>
+                            <td class="transport_name">${responseData.transport_name}</td>
+                            <td>
+                                <button class="btn btn-sm btn-dark rounded-pill" onclick="openstopDetails('stopForm','${responseData.transport_name}','${responseData.transport_id}')" data-id="${responseData.transport_id}"  data-bs-toggle="modal"
+                                data-bs-target="#stopFormModal">View</button>
                             </td>
-                                <td>
-                                    <button class="btn btn-sm btn-dark rounded-pill openBtn" onclick="openstudentDetails('student')">View</button>
+                            <td>
+                            <button class="btn btn-sm btn-dark rounded-pill" data-bs-toggle="modal"  data-bs-target="#studentModal" onclick="showStudentDetails(this)" data-trans-id="${responseData.transport_id}">View</button>
+                            </td>
+                            <td>
+                                <button class="btn btn-sm btn-dark rounded-pill" data-bs-toggle="modal"  data-bs-target="#staffModal" onclick="showStaffDetails(this)" data-trans-id="${responseData.transport_id}">View</button>
                                 </td>
-                                <td>
-                                    <button class="btn btn-sm btn-dark rounded-pill openBtn" onclick="openstaffDetails('staff')">View</button>
-                                </td>
-                                <td>
-                                    <button type="button" class="btn btn-sm btn-info" onclick="EditButton(this)" data-id="${response.transport_id}">
-                                        <i class="bi bi-pencil-square"></i>
-                                        <button type="button" class="btn  btn-sm btn-danger" onclick="DeleteButton(this)" data-id="${response.transport_id}"><i class="bi bi-trash3"></i>
-                                </td>
-                            </tr>
-                            `;
-
-                    tableBody.innerHTML += newRow;
-                    closetransportForm(event)
-                    form.reset();
-                    isEditMode = false;
+                            <td>
+                            <button type="button" class="btn  btn-sm btn-info btnEdit" id="btnEdit" data-id="${responseData.transport_id}">
+                                <i class="bi bi-pencil-square"></i></button>
+                            <button type="button" class="btn btn-sm btn-danger btndelete" id="deleteButton" data-id="${responseData.transport_id}">
+                                <i class="bi bi-trash3"></i></button>
+                        </td>
+                        </tr>
+                    `;
+                    $("#transport_details").append(newRow)
+                    bindGridButtonEvents();
+                    raiseSuccessAlert("Transport Record Added Successfully");
                 }
-            })
-            .catch(error => {
-                console.log('Fetch error:', error);
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Oops ..',
-                    position: 'center',
-                    toast: true,
-                    showConfirmButton: false,
-                    timer: 3000,
-                    padding: '1rem',
-                    customClass: {
-                        title: 'small-title',
-                    },
-                });
-
-
-            });
-    });
-
-})
-
-
-
-function EditButton(element) {
-    event.preventDefault();
-    const jwtToken = document.querySelector('#jwt_card').getAttribute('data-jwt-tokens');
-
-    console.log("inside edit button");
-
-    const id = element.getAttribute('data-id');
-    console.log(" each id", id)
-    const url = `${URL}/Transport/get_transport_data_by_id/?transport_id=${id}`;
-
-    fetch(url, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${jwtToken}` // Include the JWT token here
-        }
-    })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok.');
             }
-            return response.json();
-        })
-        .then(data => {
-            console.log('Data received from API:', data);
-            showtransportForm()
-            response = data["response"]
+        },
+        error: function (xhr, status, error) {
+            raiseErrorAlert(error.responseJSON.detail);
+        },
+        complete: (e) => {
+            removeLoader("transport", "lg");
+            resetForm(fields)
+        }
+    });
+}
 
-            document.getElementById("id").value = response.transport_id;
-            document.getElementById("vehicle_number").value = response.vehicle_number;
-            document.getElementById("vehicle_details").value = response.vehicle_details;
-            document.getElementById("register_date").value = response.register_date;
-            document.getElementById("transport_name").value = response.transport_name;
-            isEditMode = true;
+async function deleteTransport(recordId, jwtToken) {
+    const deleteEndpoint = `/Transports/delete_transport/?transport_id=${recordId}`;
+    const deleteUrl = `${apiUrl}${deleteEndpoint}`;
+    try {
+        const confirmation = await Swal.fire({
+            title: 'Are you sure you want to delete this Transport?',
+            text: "This action cannot be undone.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Delete'
+        });
+        if (confirmation.isConfirmed) {
+            const response = await $.ajax({
+                type: "DELETE",
+                url: deleteUrl,
+                headers: {
+                    "Authorization": `Bearer ${jwtToken}`,
+                    "Content-Type": "application/json",
+                },
+                contentType: "application/json",
+                dataType: "json",
+                beforeSend: (e) => {
+                    showLoader("body", "lg");
+                },
+            });
 
+            const deleteRow = document.querySelector(`.tr-transport-${recordId}`);
+            if (deleteRow) {
+                deleteRow.remove();
+                removeLoader("body", "lg")
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Deleted!',
+                    text: 'Transport data deleted Successfully',
+                });
+            } return response;
+        } else {
+            throw new Error('Deletion cancelled');
+        }
+    } catch (error) {
+        throw error;
+    }
+
+}
+
+function editTransport(transportId) {
+    const fetchUrl = `${apiUrl}/Transports/get_transport_data_by_id/?transport_id=${transportId}`;
+    return $.ajax({
+        type: "GET",
+        url: fetchUrl,
+        headers: {
+            "Authorization": `Bearer ${jwtToken}`,
+            "Content-Type": "application/json",
+        },
+        contentType: "application/json",
+        dataType: "json"
+    })
+        .then((data) => {
+            if (data && data.response) {
+                var responseData = data.response;
+                $("#id").val(responseData.transport_id);
+                $("#vehicle_number").val(responseData.vehicle_number);
+                $("#vehicle_details").val(responseData.vehicle_details);
+                $("#register_date").val(responseData.register_date);
+                $("#transport_name").val(responseData.transport_name);
+                $('#editModal').modal('show');
+                return responseData;
+            }
         })
-        .catch(error => {
-            console.log('Fetch error:', error);
+        .catch((xhr, status, error) => {
+            raiseErrorAlert(error.responseJSON.detail);
+            throw error;
         });
 }
-
-
-
-// Define DeleteButton in the global scope
-
-function DeleteButton(element) {
-    event.preventDefault();
-    const jwtToken = document.querySelector('#jwt_card').getAttribute('data-jwt-tokens');
-    Swal.fire({
-        title: 'Are you sure you want to delete this transportation?',
-        text: "This action cannot be undone.",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#3085d6',
-        confirmButtonText: 'Delete'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            // User clicked the confirm button
-            const id = element.getAttribute('data-id');
-            console.log(" each id", id)
-            const url = `${URL}/Transport/delete_transport/?transport_id=${id}`;
-
-            fetch(url, {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${jwtToken}` // Include the JWT token here
-                }
-            })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok.');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    console.log('Data Deleted from API:', data);
-
-                    const DeleteRow = document.querySelector(`.tr-transport-${id}`);
-                    if (DeleteRow) {
-                        DeleteRow.remove();
-                    } else {
-                        console.log('Row not found in the table');
-                    }
-                    Swal.fire({
-                        position: 'top-end',
-                        icon: 'success',
-                        title: 'Transport Deleted Successfully',
-                        toast: true,
-                        showConfirmButton: false,
-                        timer: 4000,
-                        timerProgressBar: true,
-                        customClass: {
-                            popup: 'small-sweetalert',
-                            title: 'small-sweetalert-title',
-                            content: 'small-sweetalert-content'
-                        }
-                    });
-
-                    isEditMode = true;
-                })
-                .catch(error => {
-                    console.log('Fetch error:', error);
-                });
-        }
-    });
+function openstopDetails(formId, transportName, transport_id) {
+    $("#transportNameContent").html(`<h3>${transportName}</h3>`);
+    $("#" + formId).css("display", "block");
+    $("#add-stopage-btn").val(transport_id);
+    displayStopages(transport_id);
 }
-
-// stopages
-
-function openstopDetails(formId, transportName,transport_id) {
-
-    document.getElementById("transportNameContent").innerHTML = `<h3>${transportName}</h3>`;
-    document.getElementById(formId).style.display = "block";
-    document.querySelector("#add-stopage-btn").value = transport_id
-    displayStopages(transport_id)
-}
-
 function closestopDetails() {
-    document.getElementById('stopForm').style.display = "none";
+    $("#stopForm").css("display", "none");
 }
-
-
 function addMore(element) {
-    const stopageInput = document.getElementById('stopage');
-    const stopageName = stopageInput.value.trim();
-    const stop = document.getElementById('stopage');
-    const transport_id=document.querySelector('#add-stopage-btn').value
-    console.log("transport",transport_id)
-
+    const stopageInput = $('#stopage');
+    const stopageName = stopageInput.val().trim();
+    const transport_id = $('#add-stopage-btn').val();
     if (stopageName !== '') {
-        // const transport_id = 38;
         const requestBody = {
             'stop_name': stopageName,
             'transport_id': transport_id,
         };
-        
-         const url=`${URL}/Stops/create_stopage/`
-         const jwtToken = document.querySelector('#jwt_card').getAttribute('data-jwt-tokens');
-
-        fetch(url, {
-            method: 'POST',
+        const url = `${apiUrl}/Stops/create_stopage/`;
+        $.ajax({
+            type: 'POST',
+            url: url,
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${jwtToken}` // Include the JWT token here
+                'Authorization': `Bearer ${jwtToken}`
             },
-            body: JSON.stringify(requestBody),
-        })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error("Network response was not ok");
-                }
-                return response.json();
-            })
-            .then(data => {
-                let stopdata = data["response"]
-                const stoppageContainer = document.getElementById('stopagesList');
-                    console.log(stopdata);
-                    const stop = `<div class="col-md-12 d-flex align-items-center" id="stopage_id_${stopdata['stop_id']}">
+            data: JSON.stringify(requestBody),
+            beforeSend: (e) => {
+                showLoader("stopFormModalBody", "sm");
+            },
+            success: function (data) {
+                let stopdata = data["response"];
+                const stoppageContainer = $('#stopagesList');
+                const stop = `<div class="mt-2 d-flex align-items-center" id="stopage_id_${stopdata['stop_id']}">
                                 <input type="text" class="form-control" value="${stopdata["stop_name"]}">
-                                <a href="#" onclick="deleteStoppage(this)" data-stop-id="${stopdata['stop_id']}"><i class="bi bi-trash3" style="color: red;"></i></a>
-                    </div>`
-                    stoppageContainer.innerHTML += stop;
-                    stopageInput.value = ""
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
+                                <a href="#" onclick="deleteStoppage(this)" data-stop-id="${stopdata['stop_id']}">
+                                    <i class="bi bi-trash3" style="color: red; padding: 16px;"></i>
+                                </a>
+                            </div>`;
+                stoppageContainer.append(stop);
+                stopageInput.val('');
+                raiseSuccessAlert("Stop Added Successfully");
+            },
+            error: function (error) {
+            },
+            complete: (e) => {
+                removeLoader("stopFormModalBody", "sm");
+            }
+        });
     } else {
-        alert('Please enter a stoppage name.');
+        raiseErrorAlert(" Enter the stop name")
     }
 }
-
-
-
 function displayStopages(transport_id) {
-    const url=`${URL}/Stops/get_all_stopages_by_transport/?transport_id=${transport_id}`
-    const jwtToken = document.querySelector('#jwt_card').getAttribute('data-jwt-tokens');
-
-    fetch(url, {
-        method: 'GET',
+    const url = `${apiUrl}/Stops/get_all_stopages_by_transport/?transport_id=${transport_id}`;
+    $.ajax({
+        type: 'GET',
+        url: url,
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${jwtToken}` // Include the JWT token here
-        }
-    })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error("Network response was not ok");
-            }
-            return response.json();
-        })
-        .then(data => {
-            const stoppageContainer = document.getElementById('stopagesList');
-            stoppageContainer.innerHTML = '';
-
+            'Authorization': `Bearer ${jwtToken}`
+        },
+        beforeSend: (e) => {
+            showLoader("stopFormModalBody", "sm");
+        },
+        success: function (data) {
+            const stoppageContainer = $('#stopagesList');
+            stoppageContainer.empty();
             data.forEach(stopdata => {
-                console.log(stopdata);
-                const stop = `<div class="col-md-12 d-flex align-items-center" id="stopage_id_${stopdata['stop_id']}">
+                const stop = `<div class="mt-2 d-flex align-items-center" id="stopage_id_${stopdata['stop_id']}">
                             <input type="text" class="form-control" value="${stopdata["stop_name"]}">
-                            <a href="#" onclick="deleteStoppage(this)" data-stop-id="${stopdata['stop_id']}"><i class="bi bi-trash3" style="color: red;"></i></a>
-                </div>`
-                stoppageContainer.innerHTML += stop;
+                            <a href="#" onclick="deleteStoppage(this)" data-stop-id="${stopdata['stop_id']}">
+                                <i class="bi bi-trash3" style="color: red; padding: 16px;"></i>
+                            </a>
+                        </div>`;
+                stoppageContainer.append(stop);
             });
-        })
-        .catch(error => {
-            console.error('Error:', error);
-        });
+        },
+        error: function (error) {
+            raiseErrorAlert('Error:');
+        },
+        complete: (e) => {
+            removeLoader("stopFormModalBody", "sm");
+        }
+    });
 }
-
-// Call the function to display stoppages on page load
-displayStopages();
-
-
-
-
 function deleteStoppage(element) {
     event.preventDefault();
-    const jwtToken = document.querySelector('#jwt_card').getAttribute('data-jwt-tokens');
-    console.log("deleted");
-    const id = element.getAttribute('data-stop-id');
-    console.log("each id", id);
-    const url = `${URL}/Stops/delete_stop/?stop_id=${id}`;
-
-    fetch(url, {
-        method: 'DELETE',
+    const id = $(element).data('stop-id');
+    const url = `${apiUrl}/Stops/delete_stop/?stop_id=${id}`;
+    $.ajax({
+        type: 'DELETE',
+        url: url,
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${jwtToken}` // Include the JWT token here
+            'Authorization': `Bearer ${jwtToken}`
         },
-    })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error("Network response was not ok");
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log("Stoppage deleted successfully:", data);
-            const DeletedStopage = document.querySelector(`#stopage_id_${id}`);
-            console.log("id", DeletedStopage);
-            if (DeletedStopage) {
-                DeletedStopage.remove();
+        beforeSend: (e) => {
+            showLoader("stopFormModalBody", "sm");
+        },
+        success: function (data) {
+            const deletedStopage = $(`#stopage_id_${id}`);
+            if (deletedStopage.length) {
+                deletedStopage.remove();
+                raiseSuccessAlert("Stop deleted Successfully");
             } else {
-                console.log("Stoppage row not deleted");
+                raiseErrorAlert("Stoppage row not deleted");
             }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-        });
+        },
+        error: function (error) {
+        },
+        complete: (e) => {
+            removeLoader("stopFormModalBody", "sm");
+        }
+    });
 }
-
-// Function to fetch student details
-function fetchStudentDetails() {
-    var rollNumber = document.getElementById('roll_number').value;
-    var endpoint = `https://gsm-fastapi.azurewebsites.net/Students/get_students_by_field/roll_number/${rollNumber}/`;
-
-    // Use fetch to make the API call
-    fetch(endpoint)
-        .then(response => response.json())
-        .then(data => {
-            // Display the retrieved student details in the table
-            var tableBody = document.getElementById('assignedStudents');
-            tableBody.innerHTML = ""; // Clear previous data
-
-            if (data.length > 0) {
-                data.forEach(student => {
-                    var row = tableBody.insertRow();
-                    var cell1 = row.insertCell(0);
-                    var cell2 = row.insertCell(1);
-                    cell1.textContent = student.roll_number;
-                    cell2.textContent = student.student_name;
-                });
-
-                // Store the assigned students in local storage
-                var assignedStudents = data.map(student => ({ roll_number: student.roll_number, student_name: student.student_name }));
-                localStorage.setItem('assignedStudents', JSON.stringify(assignedStudents));
-            } else {
-                // Handle case when no student is found
-                // Display a message or take appropriate action
-                console.log('No student found with the given roll number.');
-            }
-        })
-        .catch(error => console.error('Error fetching student details:', error));
+function showStudentDetails(button) {
+    var assignButton = $('#trns-std-id');
+    var id = $(button).attr("data-trans-id");
+    assignButton.attr('data-transport-id', id);
+    $('#studentModal').css("display", "block");
+    displayAssignedStudents(id)
 }
-
-// Function to retrieve assigned students from local storage on page load
-window.onload = function () {
-    var storedStudents = localStorage.getItem('assignedStudents');
-    if (storedStudents) {
-        var parsedStudents = JSON.parse(storedStudents);
-        var tableBody = document.getElementById('assignedStudents');
-
-        parsedStudents.forEach(student => {
-            var row = tableBody.insertRow();
-            var cell1 = row.insertCell(0);
-            var cell2 = row.insertCell(1);
-            cell1.textContent = student.roll_number;
-            cell2.textContent = student.student_name;
-        });
-    }
-}
-
-// Function to open and close student details form
 function closeStudentDetails() {
-    document.getElementById('studentdetailsForm').style.display = "none";
+    $('#studentModal').css("display", "none");
+}
+function fetchStudentDetails() {
+    var rollNumber = $('#roll_number').val();
+    var transportId = $('#trns-std-id').attr('data-transport-id');
+    var endpoint = `${apiUrl}/Transports/assign_transport_to_student/?student_roll_number=${rollNumber}&transport_id=${transportId}`;
+    $.ajax({
+        url: endpoint,
+        type: 'PUT',
+        headers: {
+            'accept': 'application/json ',
+            'Authorization': `Bearer ${jwtToken}`
+        },
+        beforeSend: (e) => {
+            showLoader("studentformModal", "sm")
+        },
+        success: function (data) {
+            var tableBody = $('#assignedStudents');
+            if (data && data.status_code === 200 && data.response && data.response.roll_number && data.response.student_name) {
+                var row = $('<tr data-roll-number="' + data.response.roll_number + '">');
+                var cell1 = $('<td>').text(data.response.roll_number);
+                var cell2 = $('<td>').text(data.response.student_name);
+                var deleteButton = $('<td>').html('<button class="btn btn-danger btn-sm" onclick="deleteStudent(this)" data-student-id=" ' + data.response.roll_number + '">Delete</button>');
+                row.append(cell1, cell2, deleteButton);
+                tableBody.append(row);
+                localStorage.setItem('assignedStudents', JSON.stringify([{ roll_number: data.response.roll_number, student_name: data.response.student_name }]));
+                $('#roll_number').val('');
+                raiseSuccessAlert("Student Added Successfully");
+            } else {
+                raiseErrorAlert('No student found with the given roll number.');
+            }
+        },
+        error: function (error) {
+            raiseErrorAlert(" Enter the student roll number")
+        },
+        complete: (e) => {
+            removeLoader("studentformModal", "sm")
+            
+        }
+    });
+}
+function displayAssignedStudents(transportId) {
+    var url = `${apiUrl}/Transports/get_all_students_by_transport_id/?transport_id=${transportId}`;
+    var tableBody = $('#assignedStudents'); 
+    if (tableBody.length === 0) {
+        raiseErrorAlert('Table body not found.');
+        return;
+    }
+    $.ajax({
+        url: url,
+        type: 'GET',
+        headers: {
+            'accept': 'application/json',
+            'Authorization': `Bearer ${jwtToken}`
+        },
+        beforeSend: (e) => {
+            showLoader("studentformModal", "sm");
+        },
+        success: function (data) {
+            tableBody.empty(); 
+            if (data && data.status_code === 200 && data.response && data.response.length > 0) {
+                data.response.forEach(function (student) {
+                    var row = $('<tr data-roll-number="' + student.roll_number + '">');
+                    var cell1 = $('<td>').text(student.roll_number);
+                    var cell2 = $('<td>').text(student.student_name);
+                    var deleteButton = $('<td>').html('<button class="btn btn-danger btn-sm" onclick="deleteStudent(this)" data-student-id=" ' + student.roll_number + '" >Delete</button>');
+                    row.append(cell1, cell2, deleteButton);
+                    tableBody.append(row);
+                });
+                localStorage.setItem('assignedStudents', JSON.stringify(data.response));
+            } else {
+                raiseErrorAlert('No students found for the given transport ID.');
+            }
+        },
+        error: function (error) {
+            raiseErrorAlert('Error fetching assigned students:', error);
+        },
+        complete: (e) => {
+            removeLoader("studentformModal", "sm");
+        }
+    });
+}
+function deleteStudent(button) {
+    var roll_number = $(button).attr('data-student-id').trim();
+    var endpoint =`${apiUrl}/Transports/unassign_transport_to_student/?student_roll_number=${roll_number}`;
+    $.ajax({
+        url: endpoint,
+        type: 'PUT',
+        headers: {
+            'accept': 'application/json ',
+            'Authorization': `Bearer ${jwtToken}`
+        },
+        beforeSend: (e) => {
+            showLoader("studentformModal", "sm")
+        },
+        success: function (data) {
+            $('tr[data-roll-number="' + roll_number + '"]').remove();
+            raiseSuccessAlert("Student deleted Successfully");
+
+        },
+        error: function (error) {
+            raiseErrorAlert('Error deleting student:');
+        },
+        complete: (e) => {
+            removeLoader("studentformModal", "sm")
+        }
+    });
 }
 
-function showStudentDetails() {
-    document.getElementById('studentdetailsForm').style.display = "block";
+function showStaffDetails(button) {
+    var assignButton = $('#trns-staff-id');
+    var id = $(button).attr("data-trans-id");
+    assignButton.attr('data-transport-id', id);
+    $('#staffModal').css("display", "block");
+    displayAssignedStaff(id);
 }
+function closeStaffDetails() {
+    $('#staffModal').css("display", "none");
+}
+function fetchStaffDetails() {
+    var employee_id = $('#employee_id').val();
+    var transportId = $('#trns-staff-id').attr('data-transport-id');
+    var endpoint = `${apiUrl}/Transports/assign_transport_to_staff/?employee_id=${employee_id}&transport_id=${transportId}`;
+    $.ajax({
+        url: endpoint,
+        type: 'PUT',
+        headers: {
+            'accept': 'application/json ',
+            'Authorization': `Bearer ${jwtToken}`
+        },
+        beforeSend: (e) => {
+            showLoader("staffformModal", "sm");
+        },
+        success: function (data) {
+            var tableBody = $('#assignedStaff');
+            if (data && data.status_code === 200 && data.response && data.response.employee_id && data.response.staff_name) {
+                var row = $('<tr data-employee_id="' + data.response.employee_id + '">');
+                var cell1 = $('<td>').text(data.response.employee_id);
+                var cell2 = $('<td>').text(data.response.staff_name);
+                var deleteButton = $('<td>').html('<button class="btn btn-danger btn-sm" onclick="deleteStaff(this)" data-employee-id="' + data.response.employee_id + '">Delete</button>');
+                row.append(cell1, cell2, deleteButton);
+                tableBody.append(row);
+                localStorage.setItem('assignedStaff', JSON.stringify([{ employee_id: data.response.employee_id, staff_name: data.response.staff_name }]));
+                $('#employee_id').val('');
+                raiseSuccessAlert("Staff Added Successfully");
+            } else {
+                raiseErrorAlert('No staff found with the given employee number.');
+            }
+        },
+        error: function (error) {
+            raiseErrorAlert("Enter the Staff Id ")
+        },
+        complete: (e) => {
+            removeLoader("staffformModal", "sm");
+        }
+    });
+}
+
+function displayAssignedStaff(transportId) {
+    var url = `${apiUrl}/Transports/get_all_staffs_by_transport_id/?transport_id=${transportId}`;
+    var tableBody = $('#assignedStaff');
+    if(tableBody.length===0){
+        return;
+    }
+    $.ajax({
+        url: url,
+        type: 'GET',
+        headers: {
+            'accept': 'application/json',
+            'Authorization': `Bearer ${jwtToken}`
+        },
+        beforeSend: (e) => {
+            showLoader("staffformModal", "sm");
+        },
+        success: function (data) {
+            tableBody.empty()
+            if (data && data.status_code === 200 && data.response && data.response.length > 0) {
+                data.response.forEach(function (staff) {
+                    var row = $('<tr data-employee_id="' + staff.employee_id + '">');;
+                    var cell1 = $('<td>').text(staff.employee_id);
+                    var cell2 = $('<td>').text(staff.staff_name);
+                    var deleteButton = $('<td>').html('<button class="btn btn-danger btn-sm" onclick="deleteStaff(this)" data-employee-id="' + staff.employee_id + '">Delete</button>');
+                    row.append(cell1, cell2, deleteButton);
+                    tableBody.append(row);
+                });
+                localStorage.setItem('assignedStaff', JSON.stringify(data.response));
+            } else {
+                raiseErrorAlert('No staff found for the given transport ID.');
+            }
+        },
+        error: function (error) {
+            raiseErrorAlert('Error fetching assigned staff:', error);
+        },
+        complete: (e) => {
+            removeLoader("staffformModal", "sm");
+        }
+    });
+}
+function deleteStaff(button) {
+    var employee_id = $(button).attr('data-employee-id').trim();
+    var url =`${apiUrl}/Transports/unassign_transport_to_staff/?employee_id=${employee_id}`;
+    $.ajax({
+        url: url,
+        type: 'PUT',
+        headers: {
+            'accept': 'application/json ',
+            'Authorization': `Bearer ${jwtToken}`
+        },
+        beforeSend: (e) => {
+            showLoader("staffformModal", "sm");
+        },
+        success: function (data) {
+            $('tr[data-employee_id="' + employee_id + '"]').remove();
+            raiseSuccessAlert("Staff deleted Successfully");
+        },
+        error: function (error) {
+            raiseErrorAlert('Error deleting staff:');
+        },
+        complete: (e) => {
+            removeLoader("staffformModal", "sm")
+        }
+    });
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

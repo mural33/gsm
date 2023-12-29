@@ -1,0 +1,407 @@
+{% extends '_layout.html' %}
+{% block title %} Student Info {% endblock %}
+{% load static %}
+{% block content %}
+<link rel="stylesheet" href="{% static 'app-css/common.css' %}">
+<script src="{% static 'app-js/sweetalert.js' %}"></script>
+<script src="{% static 'app-js/studentInfo.js' %}"></script>
+
+<div class="row" id="heading-row">
+    <div class="col-sm-12 col-md-12 col-xl-7.5" style="padding: 1rem">
+        <h5>Student Information</h5>
+        <quote>Students are the architects of their own tomorrows, shaping futures with every lesson learned.</quote>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-3">
+        <div class="row">
+            <div class="card">
+                <div class="card-head text-center my-2">
+                    <img src="{% static 'img/students.jpg' %}" alt="" srcset="" class="card-img-top student_profile">
+                    <p class="card-title h2">{{student_data.student_name}}</p>
+                </div>
+                <hr class="my-3"> <!-- Added margin-top (my-3) to the hr -->
+                <div class="card-body row">
+                    <!-- Student information -->
+                    <p class="card-title col-md-5">
+                        <span class="d-block">
+                            Roll Number
+                        </span>
+                        <span class="d-block">
+                            {{student_data.roll_number}}
+                        </span>
+                    </p>
+                    <p class="card-title col-md-3">
+                        <span class="d-block">
+                            Gender
+                        </span>
+                        <span class="d-block">
+                            {{student_data.gender}}
+                        </span>
+                    </p>
+                    <p class="card-title col-md-2">
+                        <span class="d-block">
+                            Class
+                        </span>
+                        <span class="d-block">
+                            {{student_data.class_id}}
+                        </span>
+                    </p>
+                    <p class="card-title col-md-6">
+                        <span class="d-block">
+                            Section
+                        </span>
+                        <span class="d-block">
+                            {{student_data.section_id}}
+                        </span>
+                    </p>
+                </div>
+                <div class="card-footer">
+                    <table class="table table-borderless">
+                        <tr>
+                            <td><i class="bi bi-gift"></i>DOB</td>
+                            <td>{{student_data.date_of_birth}}</td>
+                        </tr>
+                        <tr>
+                            <td><i class="bi bi-telephone-fill"></i> Mobile</td>
+                            <td>{{student_data.phone_number}}</td>
+                        </tr>
+                        <tr>
+                            <td><i class="bi bi-envelope"></i> Email</td>
+                            <td>{{student_data.email}}</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <i class="bi bi-heart-pulse"></i> BloodGroup</td>
+                            <td>{{student_data.blood_group}}</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <i class="bi bi-geo-alt-fill"></i> Address</td>
+                            <td>{{student_data.address}}</td>
+                        </tr>
+                        
+                    </table>
+                </div>
+            </div>            
+        </div>
+    </div>
+    <div class="col-md-9">
+        <div class="card">
+            <div class="card-body">
+                <div>
+                    <!-- tablinks -->
+                    <ul class="nav nav-pills arrow-navtabs nav-success bg-light mb-3" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" data-bs-toggle="tab" href="#basic" role="tab">
+                                <span class="d-block d-sm-none"><i class="ti ti-home"></i></span>
+                                <span class="d-none d-sm-block">Basic</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-bs-toggle="tab" href="#attendance" role="tab">
+                                <span class="d-block d-sm-none"><i class="ti ti-user-circle"></i></span>
+                                <span class="d-none d-sm-block">Attendance</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-bs-toggle="tab" href="#calendar" role="tab">
+                                <span class="d-block d-sm-none"><i class="ti ti-mail"></i></span>
+                                <span class="d-none d-sm-block">Calendar</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-bs-toggle="tab" href="#examination" role="tab">
+                                <span class="d-block d-sm-none"><i class="ti ti-mail"></i></span>
+                                <span class="d-none d-sm-block">Examination</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-bs-toggle="tab" href="#transportation" role="tab">
+                                <span class="d-block d-sm-none"><i class="ti ti-mail"></i></span>
+                                <span class="d-none d-sm-block">Transportation</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-bs-toggle="tab" href="#fee" role="tab">
+                                <span class="d-block d-sm-none"><i class="ti ti-mail"></i></span>
+                                <span class="d-none d-sm-block">Fee</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-bs-toggle="tab" href="#activites" role="tab">
+                                <span class="d-block d-sm-none"><i class="ti ti-mail"></i></span>
+                                <span class="d-none d-sm-block">Activites</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-bs-toggle="tab" href="#assignments" role="tab">
+                                <span class="d-block d-sm-none"><i class="ti ti-mail"></i></span>
+                                <span class="d-none d-sm-block">Assignments</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-bs-toggle="tab" href="#documents" role="tab">
+                                <span class="d-block d-sm-none"><i class="ti ti-mail"></i></span>
+                                <span class="d-none d-sm-block">Documents</span>
+                            </a>
+                        </li>
+                    </ul>
+                    <!-- Tab panes -->
+                    <div class="tab-content text-muted">
+                        <div class="tab-pane active" id="basic" role="tabpanel">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h5 class="my-2">Parents Details</h5>
+                                </div>
+                                <div class="col-md-6">
+                                    <button type="button" onclick="openForm(event,'userForm')" data-bs-toggle="modal"
+                                        data-bs-target="#parent_form" class="btn btn-success btn-label rounded-pill right float-end">
+                                        <i class="bi bi-plus-circle label-icon align-middle fs-lg ms-2"></i>Add Parent</button>
+                                </div>
+                                <div class="row mx-0 my-2" id="parentRow">
+                                    {% if parent_data %}
+                                        {% for data in parent_data %}
+                                        <div class="card col-md-4 mx-2" id="parent-card-{{data.parent_id}}">
+                                            <div class="card-heade text-center my-2">
+                                                <img src="{% static 'img/men.jpg' %}" alt="" srcset="" class="card-img-top parent_profile">
+                                            </div>
+                                            <div class="card-body row">
+                                                <p class="card-title col-md-6">
+                                                    Name: <span class="parent-{{data.parent_id}}-parent_name">{{data.parent_name}}</span>
+                                                </p>
+                                                <p class="card-title col-md-6 ">
+                                                    Gender: <span class="parent-{{data.parent_id}}-parent_gender">{{data.parent_gender}}</span>
+                                                </p>
+                                                <p class="card-title col-md-6">
+                                                    Relation: <span
+                                                        class="parent-{{data.parent_id}}-relation_with_student">{{data.relation_with_student}}</span>
+                                                </p>
+                                                <p class="card-title col-md-6 ">
+                                                    Age: <span class="parent-{{data.parent_id}}-parent_age">{{data.parent_age}}</span>
+                                                </p>
+                                            </div>
+                                            <div class="card-footer">
+                                                <button onclick="openParentForm(this)" class="btn btn-md btn-info" data-parent_id="{{data.parent_id}}">
+                                                    <i class="bi bi-pencil-square"></i>
+                                                </button>
+                                                <button onclick="deleteParent(this)" data-parent_id="{{data.parent_id}}"
+                                                    class="btn btn-md btn-danger float-end">
+                                                    <i class="bi bi-trash3"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                    {% else %}
+                                    <div class="row mx-0 my-2" id="no_data_found">
+                                        <img src="{% static 'img/no_data_found.png' %}" alt="No Image" class="no_data_found">
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane" id="attendance" role="tabpanel">
+                            <h6>List of Attendance</h6>
+                            <div class="mb-0">
+                                dynamic code goes here
+                                <div class="row">
+                                <div class="col-md-12">
+                                    {% if transport_data %}
+                                    {% else %}
+                                        <img src="{% static 'img/no_data_found.png' %}" alt="No Image" class="no_data_found">
+                                    {% endif %}
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane" id="calendar" role="tabpanel">
+                            <h6>Calendar/Time Table of this class</h6>
+                            <div class="mb-0">
+                                dynamic code goes here
+                                <div class="row">
+                                <div class="col-md-12">
+                                    {% if transport_data %}
+                                    {% else %}
+                                        <img src="{% static 'img/no_data_found.png' %}" alt="No Image" class="no_data_found">
+                                    {% endif %}
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane" id="examination" role="tabpanel">
+                            <h6>List of examination</h6>
+                            <div class="mb-0">
+                                dynamic code goes here
+                                <div class="row">
+                                <div class="col-md-12">
+                                    {% if transport_data %}
+                                    {% else %}
+                                        <img src="{% static 'img/no_data_found.png' %}" alt="No Image" class="no_data_found">
+                                    {% endif %}
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane" id="transportation" role="tabpanel">
+                            <h6>Transportation details of this class</h6>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    {% if transport_data %}
+                                    {% else %}
+                                        <img src="{% static 'img/no_data_found.png' %}" alt="No Image" class="no_data_found">
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane" id="fee" role="tabpanel">
+                            <h6>Fees structure configuration of this class</h6>
+                            <div class="mb-0">
+                                dynamic code goes here
+                                <div class="row">
+                                <div class="col-md-12">
+                                    {% if transport_data %}
+                                    {% else %}
+                                        <img src="{% static 'img/no_data_found.png' %}" alt="No Image" class="no_data_found">
+                                    {% endif %}
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane" id="activites" role="tabpanel">
+                            <h6>Activites</h6>
+                            <div class="mb-0">
+                                dynamic code goes here
+                                <div class="row">
+                                <div class="col-md-12">
+                                    {% if transport_data %}
+                                    {% else %}
+                                        <img src="{% static 'img/no_data_found.png' %}" alt="No Image" class="no_data_found">
+                                    {% endif %}
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane" id="assignments" role="tabpanel">
+                            <h6>assignments of this class</h6>
+                            <div class="mb-0">
+                                dynamic code goes here
+                                <div class="row">
+                                <div class="col-md-12">
+                                    {% if transport_data %}
+                                    {% else %}
+                                        <img src="{% static 'img/no_data_found.png' %}" alt="No Image" class="no_data_found">
+                                    {% endif %}
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane" id="documents" role="tabpanel">
+                            <h6>documents of this class</h6>
+                            <div class="mb-0">
+                                dynamic code goes here
+                                <div class="row">
+                                <div class="col-md-12">
+                                    {% if transport_data %}
+                                    {% else %}
+                                        <img src="{% static 'img/no_data_found.png' %}" alt="No Image" class="no_data_found">
+                                    {% endif %}
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+                    </div>
+                </div><!-- end card-body -->
+            </div><!-- end card -->
+        </div>
+    </div>
+</div>
+
+<!-- modelform form parent start -->
+<div class="modal fade bs-example-modal-md" id="parent_form" tabindex="-1" role="dialog" aria-labelledby="myMediumModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="myMediumModalLabel">
+                    Save Parent</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <input type="hidden" name="student_id" id="student_id" value="{{student_data.student_id}}">
+                    <input type="hidden" name="parent_id" id="parent_id" value="">
+                    <div class="col-md-12 flex-grow-1 ms-2">
+                        <p class="text-muted mb-0">
+                            <label class="form-label">Name</label>
+                            <input type="text" class="form-control" id="parent_name" name="parent_name"
+                                placeholder=" Enter Full Name">
+                        </p>
+                    </div>
+                    <div class="col-md-2 flex-grow-1 ms-2">
+                        <p class="text-muted mb-0">
+                            <label for="parent_age" class="form-label">Age</label>
+                            <input type="text" class="form-control" id="parent_age" name="parent_age"
+                                placeholder="Age">
+                        </p>
+                    </div>
+                    <div class=" col-md-4 flex-grow-1 ">
+                        <p class="text-muted mb-0">
+                            <label class="form-label">Gender</label>
+                            <select id="parent_gender" class="form-select" name="gender">
+                                <option selected value="">Choose...</option>
+                                <option value="Male">Male</option>
+                                <option value="FeMale">Female</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </p>
+                    </div>
+                    <div class="col-md-4 flex-grow-1 ms-2">
+                        <p class="text-muted mb-0">
+                            <label for="relation_with_student" class="form-label">Relation with
+                                student</label>
+                            <select id="relation_with_student" class="form-select"
+                                name="relation_with_student" >
+                                <option selected value="">Choose...</option>
+                                <option value="Father">Father</option>
+                                <option value="Mother">Mother</option>
+                                <option value="Guardian">Guardian</option>
+                            </select>
+                        </p>
+                    </div>
+                    <div class="col-md-12 flex-grow-1 ms-2">
+                        <p class="text-muted mb-0">
+                            <label class="form-label" for="parent_email">Email</label>
+                            <input type="text" class="form-control" id="parent_email" name="parent_email" placeholder=" Enter Email" >
+                        </p>
+                    </div>
+                    <div class="col-md-12 flex-grow-1 ms-2">
+                        <p class="text-muted mb-0">
+                            <label class="form-label">Phone Number</label>
+                            <input type="text" class="form-control" id="parent_phone" name="parent_phone"
+                                placeholder=" Enter Phone Number">
+                    </div>
+                    
+                    <div class="col-md-12 flex-grow-1 ms-2">
+                        <p class="text-muted mb-0">
+                            <label for="parent_profession" class="form-label">Occupation</label>
+                            <input type="text" class="form-control" id="parent_profession" name="parent_profession"
+                                placeholder=" Enter Occupation">
+                        </p>
+                    </div>
+
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a href="javascript:void(0);" class="btn btn-link link-success fw-medium" data-bs-dismiss="modal"><i
+                        class="ri-close-line me-1 align-middle"></i> Close</a>
+                <button type="submit" class="btn btn-primary"  id="btnParentForm">Save
+                    changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- modelform form parent end -->
+
+{% endblock %}
+

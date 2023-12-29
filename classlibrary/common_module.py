@@ -13,7 +13,7 @@ class Data:
         self.api_link = api_link
 
     def get_data_by_institute_id(self, url="", jwt="", params={}):
-        self.headers = {  # Fix typo in variable name (change 'heared' to 'headers')
+        self.headers = {
             'accept': 'application/json',
             "Authorization": f"Bearer {jwt}"
         }
@@ -24,6 +24,18 @@ class Data:
             return self.response.json()
         else:
             return HttpResponse("Something went wrong", status=self.response.status_code)
+    
+    def get_class_data(self,end_point="", jwt = "" ,params={}):
+        self.headers = { 
+            'accept': 'application/json',
+            "Authorization": f"Bearer {jwt}"
+        }
+        self.total_url = f"{self.api_link}{end_point}"
+        self.response = requests.get(url=self.total_url, params=params, headers=self.headers)
+        if self.response.status_code == 200:
+            return {"data": self.response.json(), "status": self.response.status_code}
+        else:
+            return {"data": self.response.json(), "status": self.response.status_code}
 
 
 

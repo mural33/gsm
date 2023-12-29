@@ -1,5 +1,6 @@
 @charset "UTF-8";
 @import url(https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&amp;display=swap);
+@import url('https://fonts.googleapis.com/css2?family=Afacad&family=Montserrat+Alternates:wght@500&display=swap');
 
 #page-topbar {
     position: fixed;
@@ -1435,7 +1436,8 @@
 }
 
 [data-layout=horizontal] .navbar-menu {
-    background: var(--tb-topnav-bg);
+    /* background: var(--tb-topnav-bg); */
+    background: var(--tb-vertical-menu-bg);
     border-right-color: transparent;
     padding: 0 calc(var(--tb-grid-gutter-width) * .5);
     -webkit-box-shadow: 0 2px 4px rgba(15, 34, 58, .12);
@@ -1480,7 +1482,7 @@
 }
 
 [data-layout=horizontal] .navbar-menu .navbar-nav .nav-link {
-    color: var(--tb-topnav-item-color);
+    color: var(--tb-vertical-menu-item-color);
     padding: .75rem 1.2rem;
     margin: 0
 }
@@ -2550,7 +2552,7 @@
 
 .customizer-setting {
     position: fixed;
-    bottom: 50%;
+    bottom: 0%;
     right: 0;
     z-index: 1000
 }
@@ -2558,7 +2560,8 @@
 .customizer-setting .btn {
     -webkit-writing-mode: vertical-rl;
     -ms-writing-mode: tb-rl;
-    writing-mode: vertical-rl
+    writing-mode: vertical-rl;
+    border-radius:0px;
 }
 
 code {
@@ -3379,8 +3382,8 @@ code {
 :root {
     --tb-card-logo-dark: block;
     --tb-card-logo-light: none;
-    --tb-font-sans-serif: "Public Sans", sans-serif;
-    --tb-font-monospace: "Public Sans", sans-serif;
+    --tb-font-sans-serif: "Afacad", sans-serif;
+    --tb-font-monospace: "Afacad", sans-serif;
     --tb-shadow: rgba(0, 0, 0, 0.06) 0px 2px 4px -1px;
     --tb-shadow-sm: 0 .125rem .25rem rgba(#000, .075);
     --tb-shadow-lg: 0 5px 10px rgba(30, 32, 37, 0.12);
@@ -3475,7 +3478,7 @@ code {
 [data-sidebar=light] {
     --tb-vertical-menu-bg: #fff;
     --tb-vertical-menu-border: #cddcea;
-    --tb-vertical-menu-item-color: #4f5b6d;
+    --tb-vertical-menu-item-color: #fff;
     --tb-vertical-menu-item-hover-color: var(--tb-primary);
     --tb-vertical-menu-item-hover-bg: var(--tb-primary);
     --tb-vertical-menu-item-active-color: var(--tb-primary);
@@ -3490,7 +3493,7 @@ code {
 [data-sidebar=dark] {
     --tb-vertical-menu-bg: #332757;
     --tb-vertical-menu-border: #332757;
-    --tb-vertical-menu-item-color: #b2a6d6;
+    --tb-vertical-menu-item-color: #fff;
     --tb-vertical-menu-item-hover-color: #f7f6fb;
     --tb-vertical-menu-item-hover-bg: #2d234e;
     --tb-vertical-menu-item-active-color: #f7f6fb;
@@ -4408,8 +4411,8 @@ strong {
 }
 
 .btn-label.right {
-    padding-left: 1.125rem;
-    padding-right: 4.1625rem
+    padding-left: 1rem;
+    padding-right: 3rem
 }
 
 .btn-label.right .label-icon {
@@ -5674,7 +5677,8 @@ strong {
 }
 
 .table>thead {
-    border-color: var(--tb-table-border-color)
+    border-color: var(--tb-table-border-color);
+    background-color: #f1f5f9;
 }
 
 .table>:not(:first-child) {

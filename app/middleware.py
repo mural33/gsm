@@ -22,7 +22,7 @@ class AuthenticateUserMiddleware:
 
     def __call__(self, request):
         access_token = request.COOKIES.get('access_token')
-        allowed_paths = ['/registration/',reverse('login'),'/']
+        allowed_paths = ['/registration/',reverse('login'),'/',reverse("registration")]
         if not access_token and request.path in allowed_paths:
             response = self.get_response(request)
             return response

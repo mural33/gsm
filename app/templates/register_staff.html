@@ -1,0 +1,239 @@
+{% extends '_layout.html' %}
+{% load static %}
+{% block title %} Staff Registration{% endblock %}
+
+{% block content %}
+<script src="{% static 'app-js/register_staff.js' %}"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+<div class="row" id="heading-row">
+    <div class="col-md-3"></div>
+    <div class="col-sm-12 col-md-6 col-xl-7.5" style="padding: 1rem" id="staffFormArea">
+        <div class="card">
+            <div class="card-header">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">
+                        {% if is_edit %}
+                            Staff Updation
+                        {% else %}
+                            Staff Registration
+                        {% endif %}
+                    </h4>
+                    
+                   
+                </div><!-- end card header -->
+                <div class="card-body" style="padding-bottom: 0px;">
+                    <div class="row">
+                        <div class="col-6">
+                            <p>
+                                <code
+                                class="text-primary">Staffs: Teachers illuminate the path to knowledge, guiding minds to brilliance with each lesson they share.</code>
+                            </p>
+                        </div>
+                        <div class="col-6">
+                            <button type="submit" class="btn btn-primary" data-bs-dismiss="modal" style="float:right" id="btnSave">
+                                <i class="bi bi-save"></i>&nbsp;Save changes</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <input type="hidden" name="staff_id" id="staff_id" value="{{staff_id}}">
+                    <input type="hidden" name="is_edit" id="is_edit" value="{{is_edit}}">
+                    <div class="accordion custom-accordionwithicon custom-accordion-border accordion-border-box accordion-primary"
+                        id="accordionBordered">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="accordionborderedExample1">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                                    data-bs-target="#accor_borderedExamplecollapse1" aria-expanded="true"
+                                    aria-controls="accor_borderedExamplecollapse1">
+                                    Staff Basic Details
+                                </button>
+                            </h2>
+                            <div id="accor_borderedExamplecollapse1" class="accordion-collapse collapse show"
+                                aria-labelledby="accordionborderedExample1" data-bs-parent="#accordionBordered">
+                                <div class="accordion-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <label for="joining_date" class="form-label">Joining Date</label>
+                                            <input type="date" class="form-control" id="joining_date"
+                                                name="joining_date" value="{{staff_data.joining_date}}">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="photo" class="form-label">Photo</label>
+                                            <input type="file" accept=".pdf,.jpg,.jpeg" placeholder="Seletct File"
+                                                class="form-control" id="photo" name="photo">
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <label for="staff_name" class="form-label">Name</label>
+                                            <input type="text" class="form-control" id="staff_name" name="staff_name" value="{{staff_data.staff_name}}"
+                                                >
+                                        </div>
+                                            <div class="col-md-6">
+                                            <label for="role" class="form-label">Designation</label>
+                                            <input type="text" class="form-control" id="role" name="role" value="{{staff_data.role}}">
+                                        </div>
+
+                                    </div>
+                                    <div class="row">
+
+                                        <div class="col-md-5">
+                                            <label for="date_of_birth" class="form-label">Date of Birth</label>
+                                            <input type="date" class="form-control" id="date_of_birth"
+                                                name="date_of_birth" value="{{staff_data.date_of_birth}}">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label for="blood_group" class="form-label">Blood Group</label>
+                                            <select id="blood_group" class="form-select" name="blood_group" value="{{staff_data.blood_group}}">
+                                                <option value="">Choose...</option>
+                                                <option value="A+" {% if staff_data.blood_group == 'A+'%} selected {% endif %}>A+</option>
+                                                <option value="A-" {% if staff_data.blood_group == 'A-'%} selected {% endif %}>A-</option>
+                                                <option value="B+" {% if staff_data.blood_group == 'B+'%} selected {% endif %}>B+</option>
+                                                <option value="B-" {% if staff_data.blood_group == 'B-'%} selected {% endif %}>B-</option>
+                                                <option value="AB+" {% if staff_data.blood_group == 'AB+'%} selected {% endif %}>AB+</option>
+                                                <option value="O+" {% if staff_data.blood_group == 'O+'%} selected {% endif %}>O+</option>
+                                                <option value="O-" {% if staff_data.blood_group == 'O-'%} selected {% endif %}>O-</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label for="gender" class="form-label">Gender</label>
+                                            <select id="gender" class="form-select" name="gender">
+                                                <option value="" selected >Choose...</option>
+                                                <option value="Male" {% if staff_data.gender == 'Male'%} selected {% endif %}>Male</option>
+                                                <option value="FeMale"{% if staff_data.gender == 'FeMale'%} selected {% endif %}>Female</option>
+                                                <option value="Other" {% if staff_data.gender == 'Other'%} selected {% endif %}>Other</option>                                                
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="accordionborderedExample2">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                    data-bs-target="#accor_borderedExamplecollapse2" aria-expanded="false"
+                                    aria-controls="accor_borderedExamplecollapse2">
+                                    Contact Details
+                                </button>
+                            </h2>
+                            <div id="accor_borderedExamplecollapse2" class="accordion-collapse collapse"
+                                aria-labelledby="accordionborderedExample2" data-bs-parent="#accordionBordered">
+                                <div class="accordion-body">
+                                    <div class="col-md-12">
+                                        <label for="email" class="form-label">Email</label>
+                                        <input type="text" class="form-control" id="email" name="email" value="{{staff_data.email}}">
+                                    </div>
+                                    <div class="col-md-12">
+                                        <label for="phone_number" class="form-label">Phone</label>
+                                        <input type="text" class="form-control" id="phone_number" name="phone_number" value="{{staff_data.phone_number}}"
+                                            minlength="10" maxlength="10" >
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="accordionborderedExample3">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                    data-bs-target="#accor_borderedExamplecollapse3" aria-expanded="false"
+                                    aria-controls="accor_borderedExamplecollapse3">
+                                    Professional Details
+                                </button>
+                            </h2>
+                            <div id="accor_borderedExamplecollapse3" class="accordion-collapse collapse"
+                                aria-labelledby="accordionborderedExample3" data-bs-parent="#accordionBordered">
+                                <div class="accordion-body">
+                                    <div class="col-md-12">
+                                        <label for="specialization" class="form-label">Specialization</label>
+                                        <input type="text" class="form-control" id="specialization" name="specialization" value="{{staff_data.specialization}}"
+                                            >
+                                    </div>
+                                    <div class="col-md-12">
+                                        <label for="experience" class="form-label">Experience</label>
+                                        <input type="text" class="form-control" id="experience" name="experience" value="{{staff_data.experience}}"
+                                            >
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="accordionborderedExample4">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                    data-bs-target="#accor_borderedExamplecollapse4" aria-expanded="false"
+                                    aria-controls="accor_borderedExamplecollapse4">
+                                    Payroll Details
+                                </button>
+                            </h2>
+                            <div id="accor_borderedExamplecollapse4" class="accordion-collapse collapse"
+                                aria-labelledby="accordionborderedExample4" data-bs-parent="#accordionBordered">
+                                <div class="accordion-body">
+                                    <div class="col-md-12">
+                                        <label for="employee_type" class="form-label">Employee Type</label>
+                                        <select id="employee_type" class="form-select" name="employee_type">
+                                                <option value="" selected>Choose...</option>
+                                                <option value="Full Time" {% if staff_payroll_data.payroll_type == 'Full Time'%} selected {% endif %}>Full Time</option>
+                                                <option value="Part Time" {% if staff_payroll_data.payroll_type == 'Part Time'%} selected {% endif %}>Part Time</option>
+                                                <option value="Contract" {% if staff_payroll_data.payroll_type == 'Contract'%} selected {% endif %}>Contract</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <label for="salary" class="form-label">Salary Amount</label>
+                                        <input type="text" class="form-control" id="salary" name="salary" value="{{staff_data.salary}}"
+                                            >
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="accordionborderedExample5">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                    data-bs-target="#accor_borderedExamplecollapse5" aria-expanded="false"
+                                    aria-controls="accor_borderedExamplecollapse5">
+                                    Address
+                                </button>
+                            </h2>
+                            <div id="accor_borderedExamplecollapse5" class="accordion-collapse collapse"
+                                aria-labelledby="accordionborderedExample5" data-bs-parent="#accordionBordered">
+                                <div class="accordion-body">
+                                    <div class="col-md-12">
+                                        <label for="Address" class="form-label">Address Line</label>
+                                        <textarea class="form-control" id="address" rows="3" name="address" value="{{staff_data.address.0}}"
+                                            ></textarea>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <label for="city" class="form-label">City</label>
+                                            <input type="text" class="form-control" id="city" name="city" value="{{staff_data.address.1}}">
+                                        </div>
+                                        <!-- state -->
+                                        <div class="col-md-6">
+                                            <label for="state" class="form-label">State</label>
+                                            <input type="text" class="form-control" id="state" name="state" value="{{staff_data.address.2}}">
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <!-- country -->
+                                        <div class="col-md-6">
+                                            <label for="country" class="form-label">Country</label>
+                                            <input type="text" class="form-control" id="country" name="country" value="{{staff_data.address.3}}">
+                                        </div>
+                                        <!-- pincode -->
+                                        <div class="col-md-6">
+                                            <label for="pincode" class="form-label">Pincode</label>
+                                            <input type="text" class="form-control" id="pincode" name="pincode" value="{{staff_data.address.4}}">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div><!-- end card-body -->
+            </div>
+        </div><!-- end card -->
+    </div>
+    <div class="col-md-3"></div>
+</div>
+
+{% endblock %}

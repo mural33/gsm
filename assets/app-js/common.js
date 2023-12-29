@@ -1,25 +1,64 @@
-// document.addEventListener("DOMContentLoaded", () => {
-//     const studentForm = document.getElementById("userForm");
-//     document.body.addEventListener("click", (e) => {
-//         const target = e.target;
-//         if (target.classList.contains("studentCloseForm")) {
-//             closeStudentForm(e);
-//         } else if (target.classList.contains("studentAddForm")) {
-//             showStudentForm(e);
-//         }
-//     });
-   
-//     function closeStudentForm(e) {
-//         e.preventDefault();
-//         studentForm.style.display = "none";
-//     }
- 
-//     function showStudentForm(e) {
-//         e.preventDefault();
-//         studentForm.style.display = "block";
-//     }
-// });
+let apiUrl = ""
+let jwtToken = ""
+let instituteId = 0
+$(document).ready(()=>{
+    apiUrl = $("#apiUrl").val()
+    jwtToken = $("#jwtToken").val()
+    instituteId = $("#instituteId").val()    
+})
+function raiseErrorAlert(msg) {
+    Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: msg,
+    });
+}
+function raiseSuccessAlert(msg) {
+    Swal.fire({
+        icon: "success",
+        title: "Success",
+        text: msg,
+    });
+}
+
+// form reset
+function resetForm(fields) {
+    for (const field of fields) {
+        const element = $(`#${field}`);
+        const value = element.val(""); 
+    }
+}
+// form validation
+function validateForm(fields) {
+    var isValid = true;
+    for (const field of fields) {
+        const element = $(`#${field}`);
+        const value = element.val().trim();
+        if (value === '') {
+            element.focus().addClass('is-invalid');
+            isValid = false;
+        }
+    }
+    return isValid;
+}
 
 
-
+// loader start
+function showLoader(loaderContainerElementId, size) {
+    if(loaderContainerElementId == "body"){
+        $("#spinner-element-"+size).show();
+    }
+    else{
+        $("#"+loaderContainerElementId).append($("#spinner-element-"+size).html());
+    }
+}
+// loader stop
+function removeLoader(loaderContainerElementId, size) {
+    if(loaderContainerElementId == "body"){
+        $("#spinner-element-"+size).hide();
+    }
+    else{
+        $("#"+loaderContainerElementId).find(".spinner-element-"+size+'-overlay').remove();
+    }
+}
 

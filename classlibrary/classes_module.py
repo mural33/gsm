@@ -4,7 +4,7 @@ class ClassData:
         self.api_url = api_url
         self.class_slug = class_slug
         self.header = {
-        "accepet":'application/json',
+        "accept":'application/json',
         'Authorization':f"Bearer {jwt}"
     }
         

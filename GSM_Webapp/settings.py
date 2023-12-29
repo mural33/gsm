@@ -157,7 +157,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 API_ENDPOINT="https://gsm-fastapi.azurewebsites.net"
-SWAGGER_URL = "https://subscription-management-api.azurewebsites.net/"
+SUBSCRIPTION_URL = "https://subscription-management-api.azurewebsites.net/"
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
