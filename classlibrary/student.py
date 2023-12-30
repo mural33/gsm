@@ -1,6 +1,5 @@
 import requests
 import asyncio
-import httpx
 class Student:
     def __init__(self,api_url = "",slug = "",jwt = ""):
         self.api_url = api_url
