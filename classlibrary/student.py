@@ -58,13 +58,15 @@ class StudentInfo:
             return []
     
     async def get_transport_data(self,transport_id):
+        if transport_id == None:
+            return []
         self.end_point = self.student_transport_url+f"?transport_id={transport_id}"
         self.total_url = self.api_url + self.end_point
         print(self.total_url)
         response = requests.get(url=self.total_url,headers=self.headers)
         print(response)
         if response.status_code == 200:
-            data = response.json()
+            data = response.json()["response"]
             return data
         else:
             return []

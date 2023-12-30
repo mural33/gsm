@@ -1,0 +1,28 @@
+.form_section{
+    display: none;
+    position:absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1000;
+    background-color: #f3eeee70 !important;
+}
+.form_div{
+    background-color: #ffff;
+    height: 100vh;
+    /* width: 80vh;
+    text-align: left;
+    position:relative;
+    */
+}
+.col-xl-8{
+    text-align: left;
+}
+.btn-light{
+    margin-left: 60%;
+}
+.form-label{
+    margin-right: 80%;
+}

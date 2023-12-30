@@ -304,14 +304,22 @@ def student_info(request, student_slug):
     access_token = request.COOKIES.get("access_token")
     if student_slug:
         student = StudentInfo(api_url=API_URL, slug=student_slug, jwt=access_token)
-        student_data = asyncio.run(student.get_all_data(student_slug))
+        data = asyncio.run(student.get_all_data(student_slug))
+        try:
+            student_data = data["student_data"]
+            parent_data = data["parent_data"]
+            transport_data = data["transport_data"]
+        except:
+            student_data = []
+            parent_data = []
+            transport_data = []
         payload = {
             "url": API_URL,
             "jwt_token": access_token,
             "institute_id": institute_id,
-            "student_data": student_data["student_data"],
-            "parent_data": student_data["parent_data"],
-            "transport_data": student_data["transport_data"]
+            "student_data":student_data,
+            "parent_data": parent_data,
+            "transport_data": transport_data
         }
     return render(request, "student_info.html", payload)
 
