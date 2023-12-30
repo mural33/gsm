@@ -1,6 +1,6 @@
 import requests
 import asyncio
-
+import httpx
 class Student:
     def __init__(self,api_url = "",slug = "",jwt = ""):
         self.api_url = api_url
@@ -28,7 +28,6 @@ class Student:
             self.get_student_data(f"/Students/get_students_by_field/slug/{self.slug}/"),
             self.get_class_data(f"/Classes/get_classes_by_institute/?institite_id={int(institute_id)}")
             )
-        print(self.student_data,self.class_data)
         return {"student_data":self.student_data,"class_data":self.class_data}
         
 
@@ -38,6 +37,7 @@ class StudentInfo:
     student_transport_url = "student/transport/"
     student_attendance_url = "student/attendance/"
     student_academic_url = "student/academic/"
+    student_transport_url = "/Transports/get_transport_data_by_id/"
 
     def __init__(self, api_url="", slug="", jwt=""):
         self.api_url = api_url
@@ -50,18 +50,29 @@ class StudentInfo:
     async def get_student_data(self,student_slug):
         self.end_point = f"/Students/get_students_by_field/slug/{student_slug}/"
         self.total_url = self.api_url + self.end_point
-        print(self.total_url)
         response = requests.get(url=self.total_url,headers=self.headers)
         if response.status_code == 200:
             data = response.json()
             return data[0]
         else:
             return []
+    
+    async def get_transport_data(self,transport_id):
+        self.end_point = self.student_transport_url+f"?transport_id={transport_id}"
+        self.total_url = self.api_url + self.end_point
+        print(self.total_url)
+        response = requests.get(url=self.total_url,headers=self.headers)
+        print(response)
+        if response.status_code == 200:
+            data = response.json()
+            return data
+        else:
+            return []
 
     async def get_student_parents_data(self, student_id=0):
         self.total_url = self.api_url +self.student_parent_url+f"student_id?student_id={student_id}"
-        print(self.total_url)
         response = requests.get(url=self.total_url,headers=self.headers)
+        print(response)
         if response.status_code == 200:
             data = response.json()["response"]
             return data
@@ -69,10 +80,10 @@ class StudentInfo:
             return []
         
     async def get_all_data(self,student_slug):
-        print("hi im get_all_data start")
         student_data= await asyncio.gather(
             self.get_student_data(student_slug))
-        student_parents_data = await asyncio.gather(
-            self.get_student_parents_data(student_data[0]["student_id"])
+        student_parents_data,transport_data = await asyncio.gather(
+            self.get_student_parents_data(student_data[0]["student_id"]),
+            self.get_transport_data(student_data[0]["transport_id"])
             )
-        return {"student_data":student_data[0],"parent_data":student_parents_data[0]}
+        return {"student_data":student_data[0],"parent_data":student_parents_data,"transport_data":transport_data}

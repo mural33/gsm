@@ -3,7 +3,7 @@ from .settings import *
 from .settings import BASE_DIR
 
 # setting DEBUG = False
-DEBUG = True
+DEBUG = False
 SECRET_KEY = 'django-insecure-0%60if2d8bu&pm&84%&_%ud#j_bg@_5*=hjn74rrr(s6rsk8kx'
 
 # setting ALLOWED_HOSTS = ['*']
