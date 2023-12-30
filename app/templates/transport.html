@@ -40,7 +40,7 @@
                         <i class="ri-checkbox-circle-fill text-success"></i>
                     </div>
                     <div class="flex-grow-1 ms-2">
-                        <p class="text-muted mb-0">Efficient Journeys</p>
+                        <p class="text-muted mb-0">Ensuring that every student's journey to success is paved with accessibility and opportunity.</p>
                     </div>
                 </div>
                 <div class="d-flex mt-2">
@@ -97,7 +97,7 @@
                 <tr class="tr-transport-{{transport.transport_id}}">
                     <td>{{forloop.counter}}</td>
                     <td class="vehicle_number">{{transport.vehicle_number}}</td>
-                    <td class="vehicle_details">{{transport.vehicle_details}}</td>
+                    <td class="vehicle_details w-25">{{transport.vehicle_details}}</td>
                     <td class="register_date">{{transport.register_date}}</td>
                     <td class="transport_name">{{transport.transport_name}}</td>
                     <td>
@@ -185,8 +185,8 @@
                             <div class="d-flex gap-2">
                                 <input type="text" class="form-control" id="stopage" placeholder="Add stopage">
                                 <input type="hidden" value="" id="add-stopage-btn">
-                                <button type="button" class="add-stopage-btn btn btn-sm btn-success rounded-pill"
-                                    onclick="addMore(this)">Add</button>
+                                <button type="button" class="add-stopage-btn btn btn-success" style="height: 2rem;"
+                                onclick="addMore(this)"><i class="bi bi-plus-circle"></i></button>
                             </div>
                             <div id="stopagesList">
                                 <div class="row mt-2">

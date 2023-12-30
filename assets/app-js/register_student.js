@@ -89,7 +89,7 @@ async function submitStudentForm() {
             console.log(response);
             // caling addParent function
             addParent(response.id);
-            raiseSuccessAlert(response.detail);
+            
             if(isEdit === "1"){
                 window.location.href = `/app/students/`;
             }
@@ -99,6 +99,7 @@ async function submitStudentForm() {
             raiseErrorAlert(error.responseJSON.detail);
         },
         complete:(e) => {
+            raiseSuccessAlert("Student Added Successfully");
             removeLoader("body", "lg")
             if(isEdit === "1"){
                 window.location.href = `/app/students/`;

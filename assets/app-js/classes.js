@@ -24,6 +24,7 @@ $(document).ready(function () {
       return false;
     } else {
      await addClass();
+     $("#class_creation_modal .modal-title").text("Save Class");
     }
   });
 // _____Class Update____
@@ -52,6 +53,7 @@ $(document).ready(function () {
           $("#class_id").val(responseData.class_id);
           $("#class_name").val(responseData.class_name);
           $("#class_creation_modal").modal("show");
+          $("#class_creation_modal .modal-title").text("Edit Class");
         }
       },
       error: (xhr, status, error) => {
@@ -95,7 +97,9 @@ $(document).ready(function () {
           },
           success: (response) => {
             $("#class_list option[value='" + classId + "']").remove();
+
             $("#class_list").val("Select Class");
+
             $("#selected_class_name").text("None");
             $("#tabContent").hide();
             raiseSuccessAlert("Class Deleted Successfully.");
@@ -119,6 +123,7 @@ $(document).ready(function () {
       return false;
     } else {
      await addSection();
+     $("#section_creation_modal .modal-title").text("Save Section");
     }
   });
   // _____Add/Edit SubjectbuttonTrigger_____
@@ -129,6 +134,7 @@ $(document).ready(function () {
       return false;
     } else {
      await addSubject();
+     $("#subject_creation_modal .modal-title").text("Save Subject");
     }
   });
   $("#btnGradeSave").click(async function (e) {
@@ -139,6 +145,7 @@ $(document).ready(function () {
       return false;
     } else {
      await addGrade();
+     $("#grade_creation_modal .modal-title").text("Save Grading");
     }
   });
 });
@@ -241,6 +248,7 @@ function validateClassModuleForm(formType) {
   }
   var isValid = true;
   const fields = [`${formType}_name`];
+
   for (const field of fields) {
     const element = $(`.form-control.${field}`);
     if (element.length === 0) {
@@ -279,6 +287,7 @@ function resetFormFields(formType) {
 async function loadSectionDetails(selectedClassId) {
   var loadSectionUrl =
     apiUrl + "/Sections/get_sections_by_class/?class_id=" + selectedClassId;
+
   try {
     showLoader("body", "sm");
     const sectionData = await $.ajax({
@@ -290,9 +299,14 @@ async function loadSectionDetails(selectedClassId) {
         "Content-Type": "application/json",
         Authorization: `Bearer ${jwtToken}`,
       },
+      
     });
+
     var sectionDetailsContainer = $("#tabSection");
-    sectionDetailsContainer.empty();
+    if (sectionData.length === 0) {
+      sectionDetailsContainer.html('<img src="/assets/img/no_data_found.png" class="no_data_found">');
+  } else {
+      sectionDetailsContainer.find('.no_data_found').remove();  
     for (var i = 0; i < sectionData.length; i++) {
       var section = sectionData[i];
       var sectionHtml =
@@ -321,12 +335,14 @@ async function loadSectionDetails(selectedClassId) {
         "</div>";
       sectionDetailsContainer.append(sectionHtml);
     }
+  }
   } catch (error) {
     console.error(error.detail);
   } finally {
     removeLoader("body", "sm");
   }
 }
+
 
 // _______ADD/EDIT Section_______
 async function addSection() {
@@ -402,6 +418,7 @@ async function editSection(element) {
         $("#section_id").val(responseData.section_id);
         $("#section_name").val(responseData.section_name);
         $("#section_creation_modal").modal("show");
+        $("#section_creation_modal .modal-title").text("Edit Section");
       }
     },
     error: (xhr, status, error) => {
@@ -418,6 +435,7 @@ async function deleteSection(element) {
   event.preventDefault();
   var sectionId = element.getAttribute("data-section-id");
   const deleteSectionUrl = apiUrl + "/Sections/delete_section_id/" + sectionId;
+  const class_Id=$("#classes_id").val();
   Swal.fire({
     title: "Are you sure you want to delete this Section?",
     text: "This action cannot be undone.",
@@ -440,10 +458,11 @@ async function deleteSection(element) {
         beforeSend: (e)=> {
           showLoader("body", "sm");
         },
-        success: (data) => {
+        success: async function (data) {
           var parentDiv = $(element).closest(`#section-${sectionId}`);
           parentDiv.remove();
           raiseSuccessAlert("Section Deleted Successfully.");
+         await loadSectionDetails(class_Id);
         },
         error: (xhr, status, error) => {
           raiseErrorAlert(error.detail);
@@ -460,8 +479,10 @@ async function deleteSection(element) {
 async function loadSubjectDetails(selectedClassId) {
   var loadSubUrl =
     apiUrl + "/Subjects/get_subjects_by_class/?class_id=" + selectedClassId;
+
   try {
     showLoader("body", "sm");
+
     const subjectData = await $.ajax({
       type: "GET",
       url: loadSubUrl,
@@ -472,8 +493,12 @@ async function loadSubjectDetails(selectedClassId) {
         Authorization: `Bearer ${jwtToken}`,
       },
     });
+
     var subjectContainer = $("#tabSubject");
-    subjectContainer.empty();
+    if (subjectData.length === 0) {
+      subjectContainer.html('<img src="/assets/img/no_data_found.png" class="no_data_found">');
+  } else {
+    subjectContainer.find('.no_data_found').remove();   
     for (var i = 0; i < subjectData.length; i++) {
       var subject = subjectData[i];
       var subHtml =
@@ -502,6 +527,7 @@ async function loadSubjectDetails(selectedClassId) {
         "</div>";
       subjectContainer.append(subHtml);
     }
+  }
   } catch (error) {
     console.error(error.detail);
   } finally {
@@ -583,6 +609,7 @@ async function editSubject(element) {
         $("#subject_id").val(responseData.subject_id);
         $("#subject_name").val(responseData.subject_name);
         $("#subject_creation_modal").modal("show");
+        $("#subject_creation_modal .modal-title").text("Edit Subject");
       }
     },
     error: (xhr, status, error) => {
@@ -599,6 +626,7 @@ async function deleteSubject(element) {
   event.preventDefault();
   var subjectId = element.getAttribute("data-subject-id");
   const deleteSubUrl = apiUrl + "/Subjects/delete_subject_id/" + subjectId;
+  const classsId=$("#classes_id").val();
   Swal.fire({
     title: "Are you sure you want to delete this Subject?",
     text: "This action cannot be undone.",
@@ -621,10 +649,11 @@ async function deleteSubject(element) {
         beforeSend: (e) => {
           showLoader("body", "sm");
         },
-        success: (data) => {
+        success: async function (data) {
           var parentDiv = $(element).closest(`#subject-${subjectId}`);
           parentDiv.remove();
           raiseSuccessAlert("Subject Deleted Successfully.");
+         await loadSubjectDetails(classsId);
         },
         error: (xhr, status, error) => {
           raiseErrorAlert(error.detail);
@@ -644,8 +673,10 @@ async function loadStudentDetails(selectedClassId) {
     "/Students/get_students_by_field/class_id/" +
     selectedClassId +
     "/";
+
   try {
     showLoader("body", "sm");
+
     const studentData = await $.ajax({
       type: "GET",
       url: loadStudentUrl,
@@ -656,8 +687,10 @@ async function loadStudentDetails(selectedClassId) {
         Authorization: `Bearer ${jwtToken}`,
       },
     });
+
     var studentDetailsContainer = $("#tabStudent").find("#classStudentTable");
     studentDetailsContainer.empty();
+
     for (var i = 0; i < studentData.length; i++) {
       var student = studentData[i];
       var studentHtml =
@@ -700,8 +733,10 @@ async function loadStudentDetails(selectedClassId) {
 async function loadGradeDetails(selectedClassId) {
   var loadGradeUrl =
     apiUrl + "/Grades/get_grade_by_field/class_id/" + selectedClassId + "/";
+
   try {
     showLoader("body", "sm");
+
     const gradeData = await $.ajax({
       type: "GET",
       url: loadGradeUrl,
@@ -712,8 +747,12 @@ async function loadGradeDetails(selectedClassId) {
         Authorization: `Bearer ${jwtToken}`,
       },
     });
+
     var gradingDetailsContainer = $("#tabGrading");
-    gradingDetailsContainer.empty();
+    if (gradeData.length === 0) {
+      gradingDetailsContainer.html('<img src="/assets/img/no_data_found.png" class="no_data_found">');
+  } else {
+    gradingDetailsContainer.find('.no_data_found').remove(); 
     for (var i = 0; i < gradeData.length; i++) {
       var grade = gradeData[i];
       var gradingHtml = `
@@ -736,9 +775,11 @@ async function loadGradeDetails(selectedClassId) {
             </div>
           </div>
         </div>`;
+
       // Append the HTML to the container
       gradingDetailsContainer.append(gradingHtml);
     }
+  }
   } catch (error) {
     console.error(error.detail);
   } finally {
@@ -851,6 +892,7 @@ async function editGrading(element) {
         $("#percent_upto").val(responseData.percent_upto);
         $("#grade_name").val(responseData.grade_name);
         $("#grade_creation_modal").modal("show");
+        $("#grade_creation_modal .modal-title").text("Edit Grading");
       }
     },
     error: (xhr, status, error) => {
@@ -867,6 +909,7 @@ async function deleteGrading(element) {
   event.preventDefault();
   var gradeId = element.getAttribute("data-grade-id");
   const deleteGrdUrl = apiUrl + "/Grades/delete_grade/?grade_id=" + gradeId;
+  const classsesId=$("#classes_id").val();
   Swal.fire({
     title: "Are you sure you want to delete this Grade?",
     text: "This action cannot be undone.",
@@ -889,10 +932,11 @@ async function deleteGrading(element) {
         beforeSend: (e) => {
           showLoader("body", "sm");
         },
-        success: (data) => {
+        success: async function (data) {
           var parentDiv = $(element).closest(`#grade-${gradeId}`);
           parentDiv.remove();
           raiseSuccessAlert("Grade Deleted Successfully.");
+          await loadGradeDetails(classsesId);
         },
         error: (xhr, status, error) => {
           raiseErrorAlert(error.detail);
