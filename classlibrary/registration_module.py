@@ -1,57 +1,60 @@
 from datetime import datetime
 import requests
 from django.conf import settings
+
 Subscription_URL = settings.SUBSCRIPTION_URL
 api_url = settings.API_ENDPOINT
 
-class Institute:
-    Subscription_URL = f'{Subscription_URL}api/Subscribers'
-    api_url = f'{api_url}/Institute/'
-    print("api_url",api_url) #TBD
 
-    def __init__(self,fasapi_url) -> None:
+class Institute:
+    Subscription_URL = f"{Subscription_URL}api/Subscribers"
+    api_url = f"{api_url}/Institute/"
+
+    def __init__(self, fasapi_url) -> None:
         self.api_url = fasapi_url
 
     def create_user(self, data={}, end_point=""):
-        headers = {'accept': 'application/json', 'Content-Type': 'application/json'}
+        headers = {"accept": "application/json", "Content-Type": "application/json"}
         response = requests.post(self.api_url + end_point, json=data, headers=headers)
 
         if response.status_code == 200:
             return {"status": True, "data": response.json()}
         else:
-            return {"status": False, "error": response.json(), "status_code": response.status_code}
+            return {
+                "status": False,
+                "error": response.json(),
+                "status_code": response.status_code,
+            }
 
-    def  create_institute(self,end_point="",data={}):
+    def create_institute(self, end_point="", data={}):
         self.user = {
             "user_name": data.get("point_of_contact"),
-            "user_password":data.get("password"),
+            "user_password": data.get("password"),
             "user_email": data.get("institute_email"),
-            "user_phone_number":data.get("institute_phone"),
+            "user_phone_number": data.get("institute_phone"),
             "is_deleted": False,
             "user_role": "Admin",
             "institute_id": data.get("id"),
-            "user_photo_url": "https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png"
+            "user_photo_url": "https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png",
         }
-        
-        print("user detailsss",self.user)
+
         self.headers = {
-            'accept': 'application/json',
-            'Content-Type': 'application/json'
+            "accept": "application/json",
+            "Content-Type": "application/json",
         }
-        print("inside fast api function")
-        print("api_url",self.api_url+end_point)
-        self.responce = requests.post(self.api_url + end_point,json=data,headers=self.headers)
+        self.responce = requests.post(
+            self.api_url + end_point, json=data, headers=self.headers
+        )
         if self.responce.status_code == 200:
-            user = self.create_user(end_point="/Users/create_user/",data=self.user)
-            print("user",user)
+            user = self.create_user(end_point="/Users/create_user/", data=self.user)
 
             if user["status"]:
-                return {"status":True,"data":self.responce.json()}
-            return {"status":False,"data":user["data"]}
+                return {"status": True, "data": self.responce.json()}
+            return {"status": False, "data": user["data"]}
         else:
-            return {"status":False,"data":self.responce.json()}
-        
-    def create_institute_in_subscription(self,data = {},fast_api_end_point=""):
+            return {"status": False, "data": self.responce.json()}
+
+    def create_institute_in_subscription(self, data={}, fast_api_end_point=""):
         self.subscription_data = {
             "subscribers_id": 0,
             "product_id": 2,
@@ -73,15 +76,15 @@ class Institute:
             "city": "string",
             "state": "string",
             "country": "string",
-            "pincode": "string"
+            "pincode": "string",
         }
-        
 
-        print("subscription_data",self.subscription_data)
         try:
-            self.responce = requests.post(self.Subscription_URL,data=self.subscription_data)
+            self.responce = requests.post(
+                self.Subscription_URL, data=self.subscription_data
+            )
             self.responcce_data = self.responce.json()
-            if  self.responcce_data["status"]:
+            if self.responcce_data["status"]:
                 self.fastapi_data = {
                     "id": data.get("institution_id"),
                     "subscribers_id": self.responce.json()["id"],
@@ -98,15 +101,12 @@ class Institute:
                     "institute_tag_line": "string",
                     "institute_website": "string",
                     "point_of_contact": "string",
-                    "date_of_registration":datetime.today().date().isoformat(),
-                    "is_deleted": False
+                    "date_of_registration": datetime.today().date().isoformat(),
+                    "is_deleted": False,
                 }
-                print("fastapi_data",self.fastapi_data)
                 self.fastapi_data["password"] = data.get("institute_password")
-                return {"status":True,"data":self.fastapi_data}
+                return {"status": True, "data": self.fastapi_data}
             else:
-                return {"status":False,"error":self.responcce_data["message"]}
+                return {"status": False, "error": self.responcce_data["message"]}
         except Exception as e:
-            return {"error":str(e)}
-
-
+            return {"error": str(e)}

@@ -144,11 +144,11 @@ USE_TZ = True
 
 
 STATIC_URL = os.environ.get("DJANGO_STATIC_URL", "/assets/")
-STATIC_ROOT = os.path.join(BASE_DIR, 'assetsdyc')
+STATIC_ROOT = os.path.join(BASE_DIR, 'assets_dy')
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'assets'),
 ]
-# STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field

@@ -58,7 +58,6 @@ def register_student(request):
         jwt=access_token,
         params=params,
     )
-    print("class_data", class_data)
     payload = {
         "class_data": class_data["data"],
         "url": API_URL,
@@ -253,7 +252,6 @@ def transportation(request):
     transport_url = f"{API_URL}/Transports/get_all_transports/"
     header = {"accept": "application/json", "Authorization": f"Bearer {access_token}"}
     transport_data = requests.get(url=transport_url, headers=header)
-    print(transport_data.status_code)
     if transport_data.status_code == 200:
         payload = {
             "transportation": transport_data.json(),
@@ -261,7 +259,6 @@ def transportation(request):
             "jwt_token": access_token,
             "institute_id": request.COOKIES.get("institute_id"),
         }
-        print(API_URL)
         return render(request, "transport.html", payload)
     else:
         return HttpResponseRedirect(reverse("transportation"))
@@ -336,8 +333,6 @@ def edit_staff(request, staff_slug):
         staff_payroll_data = staff.get_staff_payroll_data(
             staff_data["data"]["staff_id"]
         )
-        print("staff_payroll_data", staff_payroll_data)
-        print("staff_data", staff_data)
         payload = {
             "staff_data": staff_data["data"],
             "staff_payroll_data": staff_payroll_data,

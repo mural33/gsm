@@ -59,26 +59,26 @@
                 <div class="card-footer">
                     <table class="table table-borderless">
                         <tr>
-                            <td><i class="bi bi-gift mx-1"></i>DOB</td>
-                            <td>{{student_data.date_of_birth}}</td>
+                            <td class="w-50"><i class="bi bi-gift mx-1"></i>DOB</td>
+                            <td class="w-50">{{student_data.date_of_birth}}</td>
                         </tr>
                         <tr>
-                            <td><i class="bi bi-telephone-fill mx-1"></i> Mobile</td>
-                            <td>{{student_data.phone_number}}</td>
+                            <td class="w-50"><i class="bi bi-telephone-fill mx-1"></i> Mobile</td>
+                            <td class="w-50">{{student_data.phone_number}}</td>
                         </tr>
                         <tr>
-                            <td><i class="bi bi-envelope mx-1"></i> Email</td>
-                            <td>{{student_data.email}}</td>
+                            <td class="w-50"><i class="bi bi-envelope mx-1"></i> Email</td>
+                            <td class="w-50">{{student_data.email}}</td>
                         </tr>
                         <tr>
-                            <td>
+                            <td class="w-50">
                                 <i class="bi bi-heart-pulse mx-1"></i> BloodGroup</td>
-                            <td>{{student_data.blood_group}}</td>
+                            <td class="w-50">{{student_data.blood_group}}</td>
                         </tr>
                         <tr>
-                            <td>
+                            <td class="w-50">
                                 <i class="bi bi-geo-alt-fill mx-1"></i> Address</td>
-                            <td>{{student_data.address}}</td>
+                            <td class="w-50">{{student_data.address}}</td>
                         </tr>
                         
                     </table>
@@ -243,18 +243,18 @@
                             </div>
                         </div>
                         <div class="tab-pane" id="transportation" role="tabpanel">
-                            <h6>Transportation details of this class</h6>
+                            <h6 class="text-center">Transportation details of this class</h6>
                             <div class="row">
-                                <div class="col-md-12">
+                                <div class="col-md-12 text-center">
                                     {% if transport_data %}
-                                        <div class="transport-data">
+                                        <div class="">
                                             <div>
                                                 <img src="{% static 'img/school-bus.png' %}" alt="Profile Image" class="bus-vehicle">
                                             </div>
-                                            <div class="transport-details">
-                                                <p>Vehicle Number: {{ transport_data.vehicle_number }}</p>
-                                                <p>Route Name: {{ transport_data.transport_name }}</p>
-                                                <p>Vehicle Details: {{ transport_data.vehicle_details }}</p> 
+                                            <div class="text-left">
+                                                <p class="text-dark text-right">Vehicle Number: {{ transport_data.vehicle_number }}</p>
+                                                <p class="text-dark text-right">Route Name: {{ transport_data.transport_name }}</p>
+                                                <p class="text-dark text-right">Vehicle Details: {{ transport_data.vehicle_details }}</p> 
                                             </div>
                                         </div>
                                     {% else %}

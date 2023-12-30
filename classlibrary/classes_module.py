@@ -14,7 +14,7 @@ class ClassData:
         if self.response.status_code == 200:
             return self.response.json()
         else:
-            print(self.response)
+            return []
         
     def get_subject(self,url:str = "",params:dict={}):
         self.subject_url=self.api_url + url
@@ -22,7 +22,7 @@ class ClassData:
         if self.response.status_code == 200:
             return self.response.json()
         else:
-            print(self.response)
+            return []
     
     def get_students(self,url:str = "",params:dict={}):
         self.students_url=self.api_url + url
@@ -30,15 +30,14 @@ class ClassData:
         if self.response.status_code == 200:
             return self.response.json()
         else:
-            print(self.response)
+            return []
                 
     def get_class_data(self,url = "",params:dict={}):
         self.total_url = self.api_url + url
-        print(self.total_url)
         self.response = requests.get(url=self.total_url,params=params,headers=self.header)
         if self.response.status_code == 200:
             return self.response.json()
         else:
-            return False
+            return []
     
         
