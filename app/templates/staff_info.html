@@ -1,261 +1,227 @@
-{% extends '_layout.html' %}
-{% block title %} Staff Info {% endblock %}
-{% load static %}
-{% block content %}
-<link rel="stylesheet" href="{% static 'app-css/common.css' %}">
+{% extends '_layout.html' %} {% block title %} Staff Info {% endblock %} {% load
+static %} {% block content %}
+<link rel="stylesheet" href="{% static 'app-css/common.css' %}" />
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-
 <div class="row" id="heading-row">
-    <div class="col-sm-12 col-md-12 col-xl-12" style="padding: 1rem">
-        <h5>Staff Information</h5>
-        <quote>Teachers illuminate the path to knowledge, guiding minds to brilliance with each lesson they share.
-        </quote>
-    </div>
-    <div class="col-md-3">
-        <div class="row">
-            <div class="card">
-                <div class="card-head text-center">
-                    <img src="{% static 'img/teacher.png' %}" alt="" srcset="" class="card-img-top student_profile">
-                    <p class="card-title h2">{{staff_data.staff_name}}</p>
-                </div>
-                <hr class="my-3"> 
-                <div class="card-body row">
-                    <!-- Staff information -->
-                    <p class="card-title col-md-5">
-                        <span class="d-block">
-                            Employee ID
-                        </span>
-                        <span class="d-block">
-                            {{staff_data.employee_id}}
-                        </span>
-                    </p>
-                    <p class="card-title col-md-3">
-                        <span class="d-block">
-                            Gender
-                        </span>
-                        <span class="d-block">
-                            {{staff_data.gender}}
-                        </span>
-                    </p>
-                    
-                </div>
-                <div class="card-footer">
-                    <table class="table table-borderless table-wrap w-100">
-                        <tr>
-                            <td class="w-50"><i class="bi bi-gift mx-1"></i> DOB</td>
-                            <td class="w-50">{{staff_data.date_of_birth}}</td>
-                        </tr>
-                        <tr>
-                            <td class="w-50"><i class="bi bi-telephone-fill mx-1"></i> Mobile</td>
-                            <td class="w-50">{{staff_data.phone_number}}</td>
-                        </tr>
-                        <tr>
-                            <td class="w-50"><i class="bi bi-envelope mx-1"></i> Email</td>
-                            <td class="w-50">{{staff_data.email}}</td>
-                        </tr>
-                        <tr>
-                            <td class="w-50">
-                                <i class="bi bi-heart-pulse mx-1"></i> BloodGroup</td>
-                            <td class="w-50">{{staff_data.blood_group}}</td>
-                        </tr>
-                        <tr>
-                            <td class="w-50">
-                                <i class="bi bi-geo-alt-fill mx-1"></i> Address</td>
-                            <td  class="w-50">{{staff_data.address}}</td>
-                        </tr>
-                        
-                    </table>
-                </div>
-            </div>            
+  <div class="col-sm-12 col-md-12 col-xl-12" style="padding: 1rem">
+    <h5>Staff Information</h5>
+    <quote
+      >Teachers illuminate the path to knowledge, guiding minds to brilliance
+      with each lesson they share.
+    </quote>
+  </div>
+  <div class="col-md-3">
+    <div class="row">
+      <div class="card">
+        <div class="card-head text-center">
+          <img
+            src="{% static 'img/teacher.png' %}"
+            alt=""
+            srcset=""
+            class="card-img-top student_profile"
+          />
+          <p class="card-title h2">{{staff_data.staff_name}}</p>
         </div>
-    </div>
-    <div class="col-md-9">
-        
-        <div class="card">
-            <div class="card-body">
-                <div>
-                    <!-- tablinks -->
-                    <ul class="nav nav-pills arrow-navtabs nav-success bg-light mb-3" role="tablist">
-                        <li class="nav-item">
-                            <a class="nav-link active" data-bs-toggle="tab" href="#Basic" role="tab">
-                                <span class="d-block d-sm-none"><i class="ti ti-home"></i></span>
-                                <span class="d-none d-sm-block">Calendar</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" data-bs-toggle="tab" href="#Exam" role="tab">
-                                <span class="d-block d-sm-none"><i class="ti ti-user-circle"></i></span>
-                                <span class="d-none d-sm-block">Attendace</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" data-bs-toggle="tab" href="#calendar" role="tab">
-                                <span class="d-block d-sm-none"><i class="ti ti-mail"></i></span>
-                                <span class="d-none d-sm-block">Payroll</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" data-bs-toggle="tab" href="#students" role="tab">
-                                <span class="d-block d-sm-none"><i class="ti ti-mail"></i></span>
-                                <span class="d-none d-sm-block">Transportation</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" data-bs-toggle="tab" href="#examinations" role="tab">
-                                <span class="d-block d-sm-none"><i class="ti ti-mail"></i></span>
-                                <span class="d-none d-sm-block">Documents</span>
-                            </a>
-                        </li>
-                    </ul>
-                    <!-- Tab panes -->
-                    <div class="tab-content text-muted">
-                        <div class="tab-pane active" id="Basic" role="tabpanel">
-                            <h6>List of Subjects of this class</h6>
-                            <div class="mb-0">
-                                <div class="container">
-      <table class="styled-table">
+        <hr class="my-3" />
+        <div class="card-body row">
+          <!-- Staff information -->
+          <p class="card-title col-md-5">
+            <span class="d-block"> Employee ID </span>
+            <span class="d-block"> {{staff_data.employee_id}} </span>
+          </p>
+          <p class="card-title col-md-3">
+            <span class="d-block"> Gender </span>
+            <span class="d-block"> {{staff_data.gender}} </span>
+          </p>
+        </div>
+        <div class="card-footer">
+          <table class="table table-borderless table-wrap w-100">
             <tr>
-              <td colspan="7" class="col"><center><b>Class 10 Section A</b></center></td>
-            </tr>
-            <tr class="col">
-              <th >Time</th>
-              <th>Monday</th>
-              <th>Tuesday</th>
-              <th>Wednesday</th>
-              <th>Thursday</th>
-              <th>Friday</th>
-              <th>Saturday</th>
-
+              <td class="w-50"><i class="bi bi-gift mx-1"></i> DOB</td>
+              <td class="w-50">{{staff_data.date_of_birth}}</td>
             </tr>
             <tr>
-              <td class="mod">9:30 AM-10:15 AM</td>
-              <td>English<br>(Mr.Rizwan)</td>
-              <td>Math<br>(Ms.Rupa)</td>
-              <td>Chemistry<br>(Ms.Lipi)</td>
-              <td>Computer<br>(Mr.Murli)</td>
-              <td>biology<br>(Ms.sandhya)</td>
-              <td>Physics<br>(Ms.Haritha)</td>
+              <td class="w-50">
+                <i class="bi bi-telephone-fill mx-1"></i> Mobile
+              </td>
+              <td class="w-50">{{staff_data.phone_number}}</td>
             </tr>
             <tr>
-              <td class="mod">10:15 AM-11:00 AM</td>
-              <td>English<br>(Mr.Rizwan)</td>
-              <td>Math<br>(Ms.Jeshi)</td>
-              <td>Chemistry<br>(Ms.Lipi)</td>
-              <td>Computer<br>(Mr.Murli)</td>
-              <td>biology<br>(Ms.sandhya)</td>
-              <td>Physics<br>(Ms.Haritha)</td>
+              <td class="w-50"><i class="bi bi-envelope mx-1"></i> Email</td>
+              <td class="w-50">{{staff_data.email}}</td>
             </tr>
             <tr>
-              <td class="mod">11:15 AM-12:00 PM</td>
-              <td>English<br>(Mr.Rizwan)</td>
-              <td>Math<br>(Mr.Abhishek)</td>
-              <td>Chemistry<br>(Ms.Lipi)</td>
-              <td>Computer<br>(Mr.Murli)</td>
-              <td>biology<br>(Ms.janvi)</td>
-              <td>Physics<br>(Mr.Fasi)</td>
+              <td class="w-50">
+                <i class="bi bi-heart-pulse mx-1"></i> BloodGroup
+              </td>
+              <td class="w-50">{{staff_data.blood_group}}</td>
             </tr>
             <tr>
-              <td class="mod">12:00 PM-12:45 PM</td>
-              <td>English<br>(Mr.Rizwan)</td>
-              <td>Math<br>(Ms.Jeshi)</td>
-              <td>Chemistry<br>(Ms.Lipi)</td>
-              <td>Computer<br>(Mr.Murli)</td>
-              <td>biology<br>(Ms.sandhya)</td>
-              <td>Physics<br>(Ms.Haritha)</td>
-            </tr>
-            <tr>
-              <td class="mod">01:30 PM-02:15 PM</td>
-              <td>English<br>(Mr.Abhishek)</td>
-              <td>Math<br>(Ms.sandhya)</td>
-              <td>Chemistry<br>(Mr.Murli)</td>
-              <td>Computer<br>(Mr.Rizwan)</td>
-              <td>biology<br>(Ms.jeshi)</td>
-              <td>Physics<br>(Ms.Haritha)</td>
-            </tr>
-            <tr>
-              <td class="mod">02:15 PM-03:00 PM</td>
-              <td>English<br>(Mr.Rizwan)</td>
-              <td>Math<br>(Ms.Jeshi)</td>
-              <td>Chemistry<br>(Ms.Lipi)</td>
-              <td>Computer<br>(Mr.Murli)</td>
-              <td>biology<br>(Ms.sandhya)</td>
-              <td>Physics<br>(Ms.Haritha)</td>
-            </tr>
-            <tr>
-              <td class="mod">3:00 PM-03:30 PM</td>
-              <td>English<br>(Mr.Rizwan)</td>
-              <td>Math<br>(Mr.Abhishek)</td>
-              <td>Chemistry<br>(Ms.Lipi)</td>
-              <td>Computer<br>(Mr.Murli)</td>
-              <td>biology<br>(Ms.janvi)</td>
-              <td>Physics<br>(Mr.Fasi)</td>
+              <td class="w-50">
+                <i class="bi bi-geo-alt-fill mx-1"></i> Address
+              </td>
+              <td class="w-50">{{staff_data.address}}</td>
             </tr>
           </table>
-
-    </div>
-                            </div>
-                        </div>
-                        <div class="tab-pane" id="Exam" role="tabpanel">
-                            <h6>List of Subjects of this class</h6>
-                            <div class="mb-0">
-                                dynamic code goes here
-                            </div>
-                        </div>
-                        <div class="tab-pane" id="calendar" role="tabpanel">
-                            <h6>Calendar/Time Table of this class</h6>
-                            <div class="mb-0">
-                                dynamic code goes here
-                            </div>
-                        </div>
-                        <div class="tab-pane" id="students" role="tabpanel">
-                            <h6 class="info-header">Transportation details here</h6>
-                             <div class="mb-0">
-                                <div class="row">
-                                    <div class="col-md-12 text-center">
-                                        {% if transport_data %}
-                                            <div class="">
-                                                <div>
-                                                    <img src="{% static 'img/school-bus.png' %}" alt="Profile Image" class="bus-vehicle">
-                                                </div>
-                                                <div class="text-left">
-                                                    <p class="text-dark text-right">Vehicle Number: {{ transport_data.vehicle_number }}</p>
-                                                    <p class="text-dark text-right">Route Name: {{ transport_data.transport_name }}</p>
-                                                    <p class="text-dark text-right">Vehicle Details: {{ transport_data.vehicle_details }}</p> 
-                                                </div>
-                                            </div>
-                                        {% else %}
-                                            <img src="{% static 'img/no_data_found.png' %}" alt="No Image" class="no_data_found">
-                                        {% endif %}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="tab-pane" id="examinations" role="tabpanel">
-                            <h6>Past and Upcoming Examinations of this class</h6>
-                            <div class="mb-0">
-                                dynamic code goes here
-                            </div>
-                        </div>
-                        <div class="tab-pane" id="gradings" role="tabpanel">
-                            <h6>Grading configuration of this class</h6>
-                            <div class="mb-0">
-                                dynamic code goes here
-                            </div>
-                        </div>
-                        <div class="tab-pane" id="fees" role="tabpanel">
-                            <h6>Fees structure configuration of this class</h6>
-                            <div class="mb-0">
-                                dynamic code goes here
-                            </div>
-                        </div>
-                    </div>
-                </div><!-- end card-body -->
-            </div><!-- end card -->
         </div>
+      </div>
     </div>
+  </div>
+  <div class="col-md-9">
+    <div class="card">
+      <div class="card-body">
+        <div>
+          <!-- tablinks -->
+          <ul
+            class="nav nav-pills arrow-navtabs nav-success bg-light mb-3"
+            role="tablist"
+          >
+            <li class="nav-item">
+              <a
+                class="nav-link active"
+                data-bs-toggle="tab"
+                href="#Basic"
+                role="tab"
+              >
+                <span class="d-block d-sm-none"
+                  ><i class="ti ti-home"></i
+                ></span>
+                <span class="d-none d-sm-block">Calendar</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" data-bs-toggle="tab" href="#Exam" role="tab">
+                <span class="d-block d-sm-none"
+                  ><i class="ti ti-user-circle"></i
+                ></span>
+                <span class="d-none d-sm-block">Attendace</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link"
+                data-bs-toggle="tab"
+                href="#calendar"
+                role="tab"
+              >
+                <span class="d-block d-sm-none"
+                  ><i class="ti ti-mail"></i
+                ></span>
+                <span class="d-none d-sm-block">Payroll</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link"
+                data-bs-toggle="tab"
+                href="#students"
+                role="tab"
+              >
+                <span class="d-block d-sm-none"
+                  ><i class="ti ti-mail"></i
+                ></span>
+                <span class="d-none d-sm-block">Transportation</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link"
+                data-bs-toggle="tab"
+                href="#examinations"
+                role="tab"
+              >
+                <span class="d-block d-sm-none"
+                  ><i class="ti ti-mail"></i
+                ></span>
+                <span class="d-none d-sm-block">Documents</span>
+              </a>
+            </li>
+          </ul>
+          <!-- Tab panes -->
+          <div class="tab-content text-muted">
+            <div class="tab-pane active" id="Basic" role="tabpanel">
+              <h6>List of Subjects of this class</h6>
+              <div class="mb-0">
+                <div class="container">
+                    <img src="{% static 'img/no_data_found.png' %}" alt="No Image" class="no_data_found">
+                </div>
+              </div>
+            </div>
+            <div class="tab-pane" id="Exam" role="tabpanel">
+              <h6>List of Subjects of this class</h6>
+              <div class="mb-0">dynamic code goes here</div>
+              <div class="container">
+                <img src="{% static 'img/no_data_found.png' %}" alt="No Image" class="no_data_found">
+            </div>
+            </div>
+            <div class="tab-pane" id="calendar" role="tabpanel">
+              <h6>Calendar/Time Table of this class</h6>
+              <div class="mb-0">dynamic code goes here</div>
+              <div class="container">
+                <img src="{% static 'img/no_data_found.png' %}" alt="No Image" class="no_data_found">
+            </div>
+            </div>
+            <div class="tab-pane" id="students" role="tabpanel">
+              <h6 class="info-header">Transportation details here</h6>
+              <div class="mb-0">
+                <div class="row">
+                  <div class="col-md-12 text-center">
+                    {% if transport_data %}
+                    <div class="">
+                      <div>
+                        <img
+                          src="{% static 'img/school-bus.png' %}"
+                          alt="Profile Image"
+                          class="bus-vehicle"
+                        />
+                      </div>
+                      <div class="text-left">
+                        <p class="text-dark text-right">
+                          Vehicle Number: {{ transport_data.vehicle_number }}
+                        </p>
+                        <p class="text-dark text-right">
+                          Route Name: {{ transport_data.transport_name }}
+                        </p>
+                        <p class="text-dark text-right">
+                          Vehicle Details: {{ transport_data.vehicle_details }}
+                        </p>
+                      </div>
+                    </div>
+                    {% else %}
+                    <img
+                      src="{% static 'img/no_data_found.png' %}"
+                      alt="No Image"
+                      class="no_data_found"
+                    />
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="tab-pane" id="examinations" role="tabpanel">
+              <h6>Past and Upcoming Examinations of this class</h6>
+              <div class="mb-0">dynamic code goes here</div>
+              <div class="container">
+                <img src="{% static 'img/no_data_found.png' %}" alt="No Image" class="no_data_found">
+            </div>
+            <div class="tab-pane" id="gradings" role="tabpanel">
+              <h6>Grading configuration of this class</h6>
+              <div class="mb-0">dynamic code goes here</div>
+                <img src="{% static 'img/no_data_found.png' %}" alt="No Image" class="no_data_found">
+            </div>
+            <div class="tab-pane" id="fees" role="tabpanel">
+              <h6>Fees structure configuration of this class</h6>
+              <div class="mb-0">dynamic code goes here</div>
+                              </div>
+            </div>
+          </div>
+        </div>
+        <!-- end card-body -->
+      </div>
+      <!-- end card -->
+    </div>
+  </div>
 </div>
-
 {% endblock %}
-

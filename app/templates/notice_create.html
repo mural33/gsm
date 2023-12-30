@@ -1,0 +1,75 @@
+{% extends '_layout.html' %}
+{% load static %}
+{% block title %} Create Notice {% endblock %}
+{% block content %}
+<script src="{% static 'app-js/notice_create.js' %}"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.ckeditor.com/ckeditor5/38.0.1/classic/ckeditor.js"></script>
+<link rel="stylesheet" href="{% static 'app-css/notice_create.css' %}">
+
+<div class="row" id="heading-row">
+    <div class="col-md-2"></div>
+    <div class="col-sm-12 col-md-8 col-xl-7.5" style="padding: 1rem">
+        <div class="card" id="noticeFormArea">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">Create Notice</h4>
+                </div><!-- end card header -->
+                <input type="hidden" id="notice_id" name="notice_id" value={{notice_id}}>
+                <input type="hidden" id="is_edit" name="is_edit" value={{is_edit}}>
+                <div class="card-body" style="padding-bottom: 0px;">
+                    <div class="row">
+                        <div class="col-8">
+                            <p>
+                                <code
+                                class="text-primary">Notice: Announcements that Resonate, Information that Empowers </code>
+                            </p>
+                        </div>
+                        <div class="col-4">
+                            <button type="submit" id="btnSaveNotice" class="btn btn-primary" data-bs-dismiss="modal" style="float:right">
+                                <i class="bi bi-save"></i>&nbsp;Save changes</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                <div class="col-md-12">
+                    <label for="NoticeTitle" class="form-label">Notice Title</label>
+                    <input class="form-control" id="notice_title" name="notice_title" placeholder="Enter Notice Title" value="{{notice_data.notice_title}}"></input>
+                </div>
+                <div class="row my-2">
+                    <div class="col-md-4">
+                        <label for="NoticeDate" class="form-label">Notice Date</label>
+                        <input type="date" class="form-control" pattern="\d{2}-\d{2}-\d{4}" id="notice_date" name="notice_date" value="{{notice_data.notice_date}}">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="DueDate" class="form-label">Due Date</label>
+                        <input type="date" class="form-control" pattern="\d{2}-\d{2}-\d{4}" id="due_date" name="due_date" value="{{notice_data.due_date}}">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="Recipient" class="form-label">Recipient</label>
+                        <select name="recipient" class="form-select recipient" id="recipient">
+                            <option value="" selected disabled>Select</option>
+                                        <option value="All" {% if notice_data.recipient == 'All'%} selected {% endif %}>All</option>
+                                        <option value="All Staffs Only" {% if notice_data.recipient == 'All Staffs Only'%} selected {% endif %}>All Staffs Only</option>
+                                        <option value="All Students Only" {% if notice_data.recipient == 'All Students Only'%} selected {% endif %}>All Students Only</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-12 my-2">
+                    <label for="NoticeDescription" class="form-label">Notice Description</label>
+                    <textarea class="form-control" id="editor" name="notice_description" placeholder="Enter Notice Description">{{ notice_data.notice_description }}</textarea>
+                </div>
+                <div class="row my-2">
+                    <div class="col-md-12">
+                        <label for="Announcedby	" class="form-label">Announced By</label>
+                        <input class="form-control" id="notice_announced_by" name="notice_announced_by" placeholder="Enter Notice Announcer" value="{{notice_data.notice_announced_by}}"></input>
+                    </div>
+                    <div class="col-md-12">
+                    <code>Scroll up <i class="bi bi-arrow-up-short"></i> to Save changes.</code>
+                    </div>
+                </div>        
+        </div><!-- end card -->
+    </div>
+    <div class="col-md-2"></div>
+</div>
+
+{% endblock %}

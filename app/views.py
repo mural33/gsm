@@ -8,6 +8,7 @@ from classlibrary.registration_module import Institute
 from classlibrary.login_module import Login
 from classlibrary.student import Student, StudentInfo
 from classlibrary.Staff import Staff, StaffInfo
+from classlibrary.notice_module import Notice
 from django.contrib import messages
 from django.http import HttpResponseRedirect, HttpResponse
 import requests
@@ -176,7 +177,7 @@ def login(request):
 
 def logout(request):
     # Clear the tokens from the cookie
-    response = HttpResponseRedirect(reverse("login"))
+    response = HttpResponseRedirect(reverse("registration"))
     response.delete_cookie("access_token")
     response.delete_cookie("institute_id")
     messages.success(request, "You have been successfully logged out.")
@@ -249,7 +250,8 @@ def assignments(request):
 def transportation(request):
     #   params = {'institute_id': 1010}
     access_token = request.COOKIES.get("access_token")
-    transport_url = f"{API_URL}/Transports/get_all_transports/"
+    institute_id = request.COOKIES.get("institute_id")
+    transport_url = f"{API_URL}//Transports/get_all_transports_by_institute/?institute_id={institute_id}"
     header = {"accept": "application/json", "Authorization": f"Bearer {access_token}"}
     transport_data = requests.get(url=transport_url, headers=header)
     if transport_data.status_code == 200:
@@ -257,7 +259,7 @@ def transportation(request):
             "transportation": transport_data.json(),
             "url": API_URL,
             "jwt_token": access_token,
-            "institute_id": request.COOKIES.get("institute_id"),
+            "institute_id": institute_id,
         }
         return render(request, "transport.html", payload)
     else:
@@ -265,16 +267,48 @@ def transportation(request):
 
 
 def notice(request):
-    institute_id = request.COOKIES.get("institute_id")
-    url = f"https://gsm-fastapi.azurewebsites.net/Notice/get_notices_institute/?institute_id={institute_id}"
-    access_token = request.COOKIES.get("access_token")
-    header = {"accept": "application/json", "Authorization": f"Bearer {access_token}"}
-    notice_data = requests.get(url=url, headers=header)
-    if notice_data.status_code == 200:
-        payload = {"notices": notice_data.json(), "jwt_token": access_token}
-        return render(request, "notice.html", payload)
-    else:
-        return HttpResponse("Reload the page")
+    institute_id = request.COOKIES.get('institute_id')
+    url=f"https://gsm-fastapi.azurewebsites.net/Notice/get_notices_institute/?institute_id={institute_id}"
+    access_token = request.COOKIES.get('access_token')
+    header ={
+            'accept': 'application/json',
+            'Authorization': f'Bearer {access_token}'
+    }
+    notice_data=requests.get(url=url,headers=header)
+    if notice_data.status_code==200:
+        payload={
+            'notices':notice_data.json(),
+            'jwt_token':request.COOKIES.get('access_token'),
+            'institute_id':institute_id,
+            'url':API_URL,
+        }
+        return render(request,'notice.html', payload)
+    
+def notice_create(request):
+    access_token = request.COOKIES.get('access_token')
+    payload = {
+        'url': API_URL,
+        'jwt_token': request.COOKIES.get('access_token'),
+        'institute_id': request.COOKIES.get('institute_id')
+    }
+    return render(request, 'notice_create.html', payload)
+
+
+def notice_edit(request,notice_id):
+    access_token = request.COOKIES.get('access_token')
+    institute_id = request.COOKIES.get('institute_id')
+    if notice_id:
+        notice = Notice(api_url=API_URL, id=notice_id, jwt=access_token)
+        notice_data = notice.get_notice_data(f"/Notice/get_notice_by_id/?notice_id={notice_id}")
+        payload = {
+            'notice_data': notice_data['data'],
+            "is_edit":1,
+            "notice_id": notice_data['data']['notice_id'],
+            'url': API_URL,
+            'jwt_token': access_token,
+            'institute_id': institute_id
+        }
+    return render(request, 'notice_create.html', payload)
 
 
 def edit_student(request, student_slug):

@@ -140,8 +140,19 @@
                         </li>
 
                         <li class="nav-item">
-                            <a href="/app/notice" class="nav-link menu-link"> <i class="bi bi-broadcast-pin"></i> <span
-                                    data-key="t-to-do">Notice</span> </a>
+                            <a class="nav-link menu-link collapsed" href="#noticeLayout" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="noticeLayout">
+                                <i class="bi bi-broadcast-pin"></i> <span data-key="t-layouts">Notice</span>
+                            </a>
+                            <div class="collapse menu-dropdown" id="noticeLayout" style="background: var(--tb-vertical-menu-bg)">
+                                <ul class="nav nav-sm flex-column">
+                                    <li class="nav-item">
+                                        <a href="/app/notice_create" class="nav-link" data-key="t-horizontal">New Notice</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="/app/notice" class="nav-link" data-key="t-detached">Notice Records</a>
+                                    </li>
+                                </ul>
+                            </div>
                         </li>
 
                         <li class="nav-item">

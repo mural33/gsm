@@ -48,7 +48,6 @@ body{
     width: 100%;
     border-collapse: collapse;
     border: 1px solid #ddd;
-    height: 30vh !important;
     overflow:auto !important;
     background-color: #fff !important;
 }

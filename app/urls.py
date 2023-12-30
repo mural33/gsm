@@ -1,6 +1,6 @@
 from django.urls import path
 from .views import dashboard, students, register_student,\
-staffs, register_staff,staff_info, edit_staff, login, logout, registration, classes, user, assignments, transportation, notice, calendar,edit_student
+staffs, register_staff,staff_info, edit_staff, login, logout, registration, classes, user, assignments, transportation, notice, notice_create,notice_edit, calendar,edit_student
 from . import views
 
 urlpatterns = [
@@ -23,7 +23,9 @@ urlpatterns = [
     path('user/', user, name='user'),
     path('assignments/', assignments, name='assignments'),
     path('transportation/', transportation, name='transportation'),
-    path('notice/', notice, name='notice'), 
+    path('notice/', notice, name='notice'),
+    path('notice_create/', notice_create, name='notice_create'),
+    path('notice_edit/<int:notice_id>/', notice_edit, name='notice_edit'),
     path('calendar/', calendar, name='calendar'), 
 
 ]
