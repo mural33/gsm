@@ -42,6 +42,13 @@ function validateForm(fields) {
     return isValid;
 }
 
+// 
+function phoneNumber(fieldId) {
+    var input = $(`#${fieldId}`);
+    if (isNaN(input.val())) {
+        input.val(input.val().replace(/[^0-9]/g, ''));
+    }
+}
 
 // loader start
 function showLoader(loaderContainerElementId, size) {

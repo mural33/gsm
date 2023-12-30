@@ -4,7 +4,12 @@ $(document).ready(e => {
             addParent();
         }
     })
+
+    $("#parent_phone").on('input', function () {
+        phoneNumber($(this).attr('id'));
+    });
 })
+
 let parentFieldNames = [
     'parent_name','parent_age','parent_email','parent_phone',
     'parent_gender','relation_with_student','parent_profession',

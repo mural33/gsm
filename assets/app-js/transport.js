@@ -1,39 +1,27 @@
 $(document).ready(() => {
-    bindGridButtonEvents();
     $("#saveBtn").on("click", async (e) => {
         $("#saveBtn").removeClass("btn-shake");
-        e.preventDefault();
         if (validateForm() === false) {
             $("#saveBtn").addClass("btn-shake");
             return false;
         } else {
-            addTransport()
-                .then(() => {
-                    $('#editModal').removeClass("show");
-                    $('.modal-backdrop').removeClass("show")
-                    $("body").css("overflow", "auto")
-                })
-                .catch((error) => {
-                    if (error && error.responseJSON && error.responseJSON.detail) {
-                        raiseErrorAlert(error.responseJSON.detail);
-                    } else {
-                        raiseErrorAlert("An unexpected error occurred");
-                    }
-                });
+            addTransport();
         }
     });
+    bindGridButtonEvents();
 });
 
 function bindGridButtonEvents() {
     $(".btnEdit").off("click");
-    $(".btnEdit").each(function () {
-        $(this).click(function () {
+    $(".btnEdit").each(function() {
+        $(this).click(function() {
             const transportId = $(this).attr("data-id");
             if (transportId) {
                 const response = editTransport(transportId, jwtToken);
             }
         });
     });
+    $(".btndelete").off("click");
     $('.btndelete').each(function () {
         $(this).click(function () {
             const transportId = $(this).attr("data-id");
@@ -47,7 +35,6 @@ function bindGridButtonEvents() {
                 raiseErrorAlert(error.responseJSON.detail);
             }
         });
-
     });
 }
 let fields = [
@@ -96,6 +83,7 @@ function addTransport() {
             showLoader("transport", "lg");
         },
         success: function (data) {
+            $("#editModal").modal("hide")
             if (data) {
                 const responseData = data["response"];
                 if (isUpdate) {
@@ -104,7 +92,7 @@ function addTransport() {
                         try {
                             tr.querySelector(`.${key}`).textContent = responseData[key];
                         } catch (error) {
-                            
+                            raiseErrorAlert("error")
                         }
                     }
                     $('#editModal').addClass("model fade");
@@ -178,7 +166,6 @@ async function deleteTransport(recordId, jwtToken) {
                     showLoader("body", "lg");
                 },
             });
-
             const deleteRow = document.querySelector(`.tr-transport-${recordId}`);
             if (deleteRow) {
                 deleteRow.remove();
@@ -190,10 +177,10 @@ async function deleteTransport(recordId, jwtToken) {
                 });
             } return response;
         } else {
-            throw new Error('Deletion cancelled');
+           raiseErrorAlert("Deleted Cancelled")
         }
     } catch (error) {
-        throw error;
+        raiseErrorAlert("error")
     }
 
 }
@@ -271,6 +258,7 @@ function addMore(element) {
                 raiseSuccessAlert("Stop Added Successfully");
             },
             error: function (error) {
+                raiseErrorAlert("error")
             },
             complete: (e) => {
                 removeLoader("stopFormModalBody", "sm");
@@ -337,6 +325,7 @@ function deleteStoppage(element) {
             }
         },
         error: function (error) {
+            raiseErrorAlert("error")
         },
         complete: (e) => {
             removeLoader("stopFormModalBody", "sm");
@@ -387,8 +376,7 @@ function fetchStudentDetails() {
             raiseErrorAlert(" Enter the student roll number")
         },
         complete: (e) => {
-            removeLoader("studentformModal", "sm")
-            
+            removeLoader("studentformModal", "sm")  
         }
     });
 }

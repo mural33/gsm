@@ -19,6 +19,7 @@ $(document).ready(() => {
         const classId = $("#class_id").val();
         await getSectionsByClass(classId);
     })
+    
     // phoneNumber validation
     $("#phone_number, #parent_phone").on("input", function () {
         phoneNumber($(this).attr('id'));
@@ -36,13 +37,6 @@ let fields = [
     // class Details
     'class_id', 'section_id'
 ];
-
-function phoneNumber(fieldId) {
-    var input = $(`#${fieldId}`);
-    if (isNaN(input.val())) {
-        input.val(input.val().replace(/[^0-9]/g, ''));
-    }
-}
 
 async function resetForm() {
     for (const field of fields) {
