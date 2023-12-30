@@ -171,7 +171,7 @@ def login(request):
                 return response
         else:
             messages.error(request, "Invalid credentials")
-            return render(request, "login.html")
+            return render(request, "registration.html")
     return render(request, "registration.html")
 
 
