@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.urls import reverse
 from django.conf import settings
+from django.http import JsonResponse
 from classlibrary.classes_module import ClassData
 from classlibrary.common_module import Data
 from classlibrary.registration_module import Institute
@@ -12,9 +13,26 @@ from django.contrib import messages
 from django.http import HttpResponseRedirect, HttpResponse
 import requests
 import asyncio
+from .azure_blob import upload_to_blob
 
 API_URL = settings.API_ENDPOINT
 Subscription_URL = settings.SUBSCRIPTION_URL
+
+def azure_upload(request):
+    if request.method == "POST":
+        file = request.FILES.get("file")
+        location = request.POST.get("location")
+        file_name =request.POST.get("file_name")
+        if file:
+            file_name = file.name
+            file_url = upload_to_blob(azure_file=file, location=location, file_name=file_name)
+            if file_url:
+                return JsonResponse({"file_url": file_url})
+            else:
+                return JsonResponse({"file_url": ""})
+        else:
+            return JsonResponse({"file_url": "http"})
+
 
 def calendar(request):
     calender_obj = Data(API_URL)

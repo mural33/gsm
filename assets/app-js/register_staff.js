@@ -66,7 +66,7 @@ async function staffSubmitForm() {
     "#state"
   ).val()}, ${$("#country").val()}, ${$("#pincode").val()}`;
   const staffData = {
-    photo: await uploadFile("staffPhoto","staff-profile-pictures"),
+    photo: await uploadFile("staffPhoto","staff_profile"),
     institute_id: instituteId,
     staff_name: $("#staff_name").val(),
     role: $("#role").val(),
@@ -84,8 +84,6 @@ async function staffSubmitForm() {
     is_deleted: false,
     employee_id: 0,
   };
-  staffData["photo"] ="http://satff.jpg";
-  raiseErrorAlert("Blob not working")
   var isEdit = $("#is_edit").val();
   var method = isEdit === "1" ? "PUT" : "POST";
   var staffId = $("#staff_id").val();

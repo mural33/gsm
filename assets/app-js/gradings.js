@@ -145,7 +145,6 @@ async function gradeSubmitForm() {
             $("#addeditGradeModal").modal("hide");
             if (isEdit) {
                 var gradeData = data.response;
-                console.log(data);
                 const tr = $(`.tr-grade-${gradeData.grade_id}`);
                 tr.find(".grade_name").text(gradeData.grade_name);
                 tr.find(".percentage").text(`${gradeData.percent_from}% - ${gradeData.percent_upto}%`);

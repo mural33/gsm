@@ -120,36 +120,36 @@ function removeLoader(loaderContainerElementId, size) {
 
 // azure blob upload
 async function uploadFile(fieldId,location) {
+    var defaultBlob = "https://gsmstore.blob.core.windows.net/student-profile-pictures/students.jpg";
+    var url = window.location.origin;
     try{
-        var endPoint = "/AzureBlobs/upload_file"
-        var totalUrl = apiUrl + endPoint;
         const fileInput = document.getElementById(fieldId);
         const file = fileInput.files[0];
         const formData = new FormData();
+        var csrfmiddlewaretoken = $('input[name=csrfmiddlewaretoken]').val()
         formData.append('file', file);
         formData.append('location', location);
+        formData.append('csrfmiddlewaretoken', csrfmiddlewaretoken);
+        formData.append('file_name', file.name);
         try {
             const response = await $.ajax({
                 type: "POST",
-                url:totalUrl,
+                url: `${url}/app/azure_upload/`,
                 data: formData,
                 processData: false,
                 contentType: false,
-                mode: "cors",
-                crossDomain: true,
-                headers: {
-                    "Authorization": `Bearer ${jwtToken}`,
-                },
             });
-            return response.url;
+            if(response.file_url){
+                return response.file_url;
+            }
+            return defaultBlob;
         } catch (error) {
             // Handle the error
-            console.error(error);
-            return "https://gsmstore.blob.core.windows.net/student-profile-pictures/students.jpg";
+            return defaultBlob;
         }
     }
     catch(e){
-        return "https://gsmstore.blob.core.windows.net/student-profile-pictures/students.jpg";
+        return defaultBlob;
     }
 }
 

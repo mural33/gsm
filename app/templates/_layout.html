@@ -46,6 +46,7 @@
     <input type="hidden" name="" id="apiUrl" value='{{url}}'>
     <input type="hidden" name="" id="jwtToken" value='{{jwt_token}}'>
     <input type="hidden" name="" id="instituteId" value='{{institute_id}}'>
+    {% csrf_token %}
     <!-- Begin page -->
     <div id="layout-wrapper">
 

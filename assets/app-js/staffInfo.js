@@ -171,12 +171,10 @@ async function deletePayroll(payrollId){
 async function addDocuments() {
     var documentData = {
         "document_name": $("#document_name").val(),
-        "document_file": await uploadFile("document_file", "staff-documents"),
+        "document_file": await uploadFile("document_file", "staff_documents"),
         "staff_id": $("#staff_id").val(),
         "is_deleted": false,
     }
-    documentData["document_file"] = "http//staff-document.jpg"
-    raiseErrorAlert("Blob Not Working")
     var documentId = $("#document_id").val();
     var method = isUpdate ? "PUT" : "POST";
     var endPoint = isUpdate ? `/StaffDocuments/update_staff_documents/?document_id=${documentId}` : "/StaffDocuments/add_staff_documents/";
@@ -185,8 +183,7 @@ async function addDocuments() {
     var documentFile = documentData.document_file;
     var splitFile = documentFile.split('/');
     var fileName = splitFile[splitFile.length - 1];
-
-    await   (method, totalUrl, documentData, "documentFormId", "lg", (response) => {
+    await ajaxRequest(method, totalUrl, documentData, "documentFormId", "lg", (response) => {
         $("#documentForm").modal('hide');
         var documentData = response.response;
         raiseSuccessAlert(response.msg);
@@ -195,7 +192,7 @@ async function addDocuments() {
             updatedRow.find('.card-title').text(documentData.document_name);
             updatedRow.find('.card-text').text(fileName); 
         } else {
-            displayNewDocument({ ...documentData, document_file: fileName });
+            displayNewDocument(documentData);
         }
         resetForm(documentFields);
     });
@@ -203,12 +200,13 @@ async function addDocuments() {
 
 
 async function displayNewDocument(response) {
+    var documentFile = response.document_file.split('/').pop();
     var newDocumentHTML = `
         <div class="col-md-4 card-staff-${response.document_id}">
             <div class="card mb-3">
                 <div class="card-body">
                     <p class="card-title">Document Name: ${response.document_name}</p>
-                    <p class="card-text">Document type: ${response.document_file}</p>
+                    <p class="card-text">Document type: ${documentFile}</p>
                 </div>
                 <div class="card-footer d-flex justify-content-evenly">
                     <button data-document-id="${response.document_id}" class="btn btn-sm btn-info" onclick="openDocumentForm(this)">

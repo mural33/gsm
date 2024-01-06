@@ -9,8 +9,8 @@ $(document).ready(() => {
             return false;
         } else {
             await submitStudentForm();
+            await resetForm()
         }
-        // submitStudentForm()
     });
 
 
@@ -48,7 +48,7 @@ async function resetForm() {
 async function submitStudentForm() {
     const totalAddress = `${$("#address").val()}, ${$("#city").val()}, ${$("#state").val()}, ${$("#country").val()}, ${$("#pincode").val()}`
     const studentData = {
-        "photo":await uploadFile("studentPhoto","student-profile-pictures"),
+        "photo":await uploadFile("studentPhoto","student_profile"),
         "institute_id": instituteId,
         "student_name": $("#student_name").val(),
         "gender": $("#gender").val(),
@@ -62,10 +62,6 @@ async function submitStudentForm() {
         "class_id": $("#class_id").val(),
         "section_id": $("#section_id").val(),
     };
-    if(studentData["photo"] === undefined){
-        studentData["photo"] = "https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png"
-        raiseErrorAlert("Blob Not Found, Using Default Imag")
-    }
     var isEdit = $("#isEdit").val();
     var method = isEdit === "1" ? "PUT" : "POST";
     var studentId = $("#studentId").val();  // Make sure studentId is defined
@@ -99,6 +95,7 @@ async function submitStudentForm() {
             if(isEdit === "1"){
                 window.location.href = `/app/students/`;
             }
+            resetForm()
         }
     });
 }

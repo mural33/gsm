@@ -1302,6 +1302,7 @@ async function addExam() {
             },
             data: JSON.stringify(subject_data),
             success: (examData) => {
+              console.log(examData);
             },
             complete: (e) => {
               removeLoader("exam-form-area", "sm");

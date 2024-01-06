@@ -1,18 +1,18 @@
 $(document).ready(function () {
-
+ 
     $("#applyFilterBtn").on("click", function () {
         applyFilter();
     });
-
+ 
     function fetchLastNetBalance() {
         const lastNetBalance = parseFloat($("#accountsTable tbody tr:last-child .net_balance").text()) || 0;
         $("#net_balance").val(lastNetBalance.toFixed(2));
     }
-
+ 
     $('#addAccountsModal').on('shown.bs.modal', function () {
         fetchLastNetBalance();
     });
-
+ 
     $("#transaction_type").on("change", function () {
         const transactionType = $(this).val();
         let netBalance = parseFloat($("#accountsTable tbody tr:last-child .net_balance").text()) || 0;
@@ -24,7 +24,7 @@ $(document).ready(function () {
         }
         $("#net_balance").val(netBalance.toFixed(2));
     });
-
+ 
     $("#btnSaveAccounts").on("click", async (e) => {
         $("#btnSaveAccounts").removeClass("btn-shake")
         e.preventDefault();
@@ -32,45 +32,38 @@ $(document).ready(function () {
             $("#btnSaveAccounts").addClass("btn-shake");
             return false;
         } else {
-        await accountsSubmitForm();
+            await accountsSubmitForm();
         }
     });
 });
-
+ 
 let fields = [
     'transaction_type', 'payment_type', 'transaction_date', 'transaction_id', 'description', 'net_balance', 'transaction_amount', 'payment_mode', 'particular_name', 'transaction_reference',
 ];
-
+ 
 //validate grade form
 async function validateAccountsForm() {
     var isValid = true;
     for (const field of fields) {
         const element = $(`#${field}`);
-        if (element.length === 0) {
-            continue;
+        const value = element.val().trim();
+        if (value === "") {
+            element.addClass("is-invalid");
+            isValid = false;
         }
-        try{
-            const value = element.val();
-            if (value === '') {
-                element.focus().addClass('is-invalid');
-                isValid = false;
+        else{
+                // Remove "is-invalid" class if the field is not empty
+                element.removeClass("is-invalid");
             }
-        }
-        catch(e){
-        }
-    }
-    var content = $(".ck-content").html();
-    if (content === '') {
-        isValid = false;
-    }
+    }    
     return isValid;
 }
-
+ 
 async function accountsSubmitForm() {
     const accountsId = $("#account_id").val();  
     const accountsData = {
         "institution_id": instituteId,
-        "account_id": accountsId, 
+        "account_id": accountsId,
         "transaction_type": $('#transaction_type').val(),
         "payment_type": $('#payment_type').val(),
         "transaction_date": $('#transaction_date').val(),
@@ -97,7 +90,7 @@ async function accountsSubmitForm() {
             beforeSend: (e) => {
                 showLoader("accountsFormArea", "sm");
         },
-        
+       
         success: function (data) {
             $("#addAccountsModal").modal("hide");
             const responseData = data.response;
@@ -121,6 +114,7 @@ async function accountsSubmitForm() {
         complete: function (e) {
             removeLoader("accountsFormArea", "sm");
             resetForm(fields);
+            $("#accounts_details").find(".no_data_found-tr").remove();
         }    
     });
 }
@@ -128,17 +122,17 @@ function applyFilter() {
     const paymentType = $("#paymentTypeFilter").val();
     const fromDate = $("#fromDateFilter").val();
     const toDate = $("#toDateFilter").val();
-
+ 
     // Loop through table rows and show/hide based on the filter criteria
     $("#accountsTable tbody tr").each(function () {
         const row = $(this);
         const rowPaymentType = row.find(".payment_type").text();
         const rowTransactionDate = row.find(".transaction_date").text();
-
+ 
         const showRow = (paymentType === '' || rowPaymentType === paymentType) &&
             (!fromDate || new Date(rowTransactionDate) >= new Date(fromDate)) &&
             (!toDate || new Date(rowTransactionDate) <= new Date(toDate));
-
+ 
         row.toggle(showRow);
     });
 }

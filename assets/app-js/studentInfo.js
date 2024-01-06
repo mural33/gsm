@@ -260,7 +260,7 @@ class StudentData {
         var endPoint = `/AssignmentSubmission/submit_assignment/`;
         var totalUrl = apiUrl + endPoint;
         var payload = {
-            "assignment_file":await uploadFile("assignment_file", "student-assignment-documents"),
+            "assignment_file":await uploadFile("assignment_file", "student_assignment_document"),
             "assignment_id": assignmentId,
             "student_id":parseInt(studentId),
             "submission_date": "2024-01-04",
@@ -290,13 +290,10 @@ class StudentData {
         var documentId = $("#document_id").val();
         var payload = {
             "document_name": $("#document_name").val(),
-            "document_file": uploadFile("document_file", "student-documents"),
+            "document_file":await uploadFile("document_file", "student_documents"),
             "student_id": student_id,
             "is_deleted": false
         }
-        payload["document_file"] = "hpp//"
-        raiseErrorAlert("Blob not working");
-
         var method = documentId ? "PUT" : "POST";
         var postEndPoint = `/StudentsDocuments/add_student_documents/`;
         var updateEndPoint = `/StudentsDocuments/update_student_documents/?document_id=${documentId}`;
@@ -337,8 +334,8 @@ class StudentData {
                 raiseSuccessAlert("Document Added Successfully")
             }
             else{
-                $(`.card-student-${docs.document_id}`).find(".card-title").text(document_name)
-                $(`.card-student-${docs.document_id}`).find(".card-text").text(docsName)
+                $(`.card-student-${docs.document_id}`).find(".card-title").text(`Document Name:${document_name}`)
+                $(`.card-student-${docs.document_id}`).find(".card-text").text(`Document type:${docsName}`)
                 raiseSuccessAlert("Document Updated Successfully")
             }
         });

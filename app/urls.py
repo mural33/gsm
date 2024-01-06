@@ -29,4 +29,5 @@ urlpatterns = [
     path('calendar/', calendar, name='calendar'), 
     path('gradings/', views.gradings, name='gradings'),
     path('accounts/', views.accounts, name='accounts'),
+    path('azure_upload/', views.azure_upload, name='azure_upload'),
 ]
