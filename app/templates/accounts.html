@@ -1,0 +1,255 @@
+{% extends '_layout.html' %}
+{% load static %}
+{% block title %} Accounts {% endblock %}
+{% block content %}
+<link href="{% static 'app-css/accounts.css' %}" rel="stylesheet">
+<script src="{% static 'app-js/accounts.js' %}"></script>
+
+<div class="row" id="heading-row">
+    <div class="col-sm-12 col-md-8 col-xl-8">
+        <h5>Accounts</h5>
+        <quote>Unlocking Financial Flourish: Where Accuracy Meets Accountability in Your Accounts.</quote>
+    </div>
+</div>
+<div class="row d-flex mt-2" id="">
+    <h6>Summary</h6>
+    <div class="resdiv" style="background-color: #7d5fff;">
+        <div>
+            75000.00
+        </div>
+        <div>
+            Balance
+        </div>
+    </div>
+    <div class="resdiv" style="background-color: #cd84f1;">
+        <div>
+            55000.00
+        </div>
+        <div>
+            Fees Collection
+            <span id=""></span>
+        </div>
+    </div>
+
+    <div class="resdiv" style="background-color: #1dd1a1;">
+        <div>
+            45000.00
+        </div>
+        <div style="padding-top: 6px;">
+            Salary
+        </div>
+    </div>
+
+    <div class="resdiv" style="background-color: #227093;">
+        <div>
+            25000.00
+        </div>
+        <div>
+            Expenditure
+        </div>
+    </div>
+
+    <div class="resdiv" style="background-color: #ff793f;">
+        <div>
+            30000.00
+        </div>
+        <div>
+            Other Credit
+        </div>
+    </div>
+
+    <div class="resdiv" style="background-color: #ff5252;">
+        <div>
+            15000.00
+        </div>
+        <div style="padding-top: 6px;">
+            Other Debit
+        </div>
+    </div>
+</div>
+<section>
+    <div class="row d-flex mt-2 ">
+        <h6>Filter</h6>
+        <div class="col-md-2">
+            <select class="form-select" name="paymentTypeFilter" id="paymentTypeFilter">
+                <option value="" selected disabled>All Type</option>
+                <option value="Fee Collections">Fee Collections</option>
+                <option value="Salary">Salary</option>
+                <option value="Expenditure">Expenditure</option>
+                <option value="Other Credits">Other Credits</option>
+                <option value="Other Debits">Other Debits</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <input type="date" class="form-control" id="fromDateFilter" name="fromDateFilter">
+        </div>
+        <div class="col-md-2">
+            <input type="date" class="form-control" id="toDateFilter" name="toDateFilter">
+        </div>
+        <div class="col-md-2">
+            <button type="button" class="btn btn-md btn-dark rounded-pill openBtn" id="applyFilterBtn">
+                <i class="bi bi-filter"></i>Apply
+            </button>
+        </div>
+        <div class="col text-end">
+            <button type="button" class="btn btn-success btn-label rounded-pill right" data-bs-toggle="modal"
+                data-bs-target="#addAccountsModal"><i
+                    class="bi bi-plus-circle label-icon align-middle fs-lg ms-2"></i>Add Transaction</button>
+        </div>
+    </div>
+</section>
+
+<div class="modal fade bs-example-modal-md" id="addAccountsModal" tabindex="-1" role="dialog"
+    aria-labelledby="mySmallModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-centered">
+        <div class="modal-content" id="accountsFormArea">
+            <div class="modal-header">
+                <h5 class="modal-title" id="mysmallModalLabel">Add Transaction</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <input type="hidden" name="account_id" id="account_id">
+            <div class="modal-body">
+                <div class="d-flex">
+                    <div class="flex-shrink-0">
+                        <i class="ri-checkbox-circle-fill text-success"></i>
+                    </div>
+                    <div class="flex-grow-1 ms-2">
+                        <p class="text-muted mb-0">Empowering Finances, Ensuring Precision: Your Numbers, Our Expertise.
+                        </p>
+                    </div>
+                </div>
+                <div class="d-flex mt-2">
+                    <div class="col-md-12">
+                        <label class="form-label">Transaction Date</label>
+                        <input type="date" class="form-control" id="transaction_date" name="transaction_date">
+                    </div>
+                </div>
+                <div class="d-flex mt-2">
+                    <div class="col-md-12">
+                        <label class="form-label">Payment Type</label>
+                        <select class="form-select" name="payment_type" id="payment_type">
+                            <option value="" selected disabled>Select Type</option>
+                            <option value="Fee Collections">Fee Collections</option>
+                            <option value="Salary">Salary</option>
+                            <option value="Expenditure">Expenditure</option>
+                            <option value="Other Credits">Other Credits</option>
+                            <option value="Other Debits">Other Debits</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="d-flex mt-2">
+                    <div class="col-md-12">
+                        <label class="form-label">Particular</label>
+                        <input type="text" class="form-control" id="particular_name" name="particular_name"
+                            placeholder="Enter Particular Name" maxlength="100" minlength="1">
+                    </div>
+                </div>
+                <div class="d-flex mt-2">
+                    <div class="col-md-12">
+                        <label class="form-label">Description</label>
+                        <textarea class="form-control" id="description" name="description"
+                            placeholder="Enter Description" maxlength="100" minlength="1"></textarea>
+                    </div>
+                </div>
+                <div class="d-flex mt-2 row">
+                    <div class="col-md-6 form-content">
+                        <label for="transaction_amount" class="form-label">Transaction Amount</label>
+                        <input type="number" class="form-control transaction_amount" id="transaction_amount"
+                            name="transaction_amount" placeholder="Enter Amount">
+                    </div>
+                    <div class="col-md-6 form-content">
+                        <label class="form-label">Transaction Type</label>
+                        <select class="form-select" name="transaction_type" id="transaction_type">
+                            <option value="" selected disabled>Select Debit/Credit</option>
+                            <option value="Debit">Debit</option>
+                            <option value="Credit">Credit</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="d-flex mt-2 row">
+                    <div class="col-md-6 form-content">
+                        <label for="net_balance" class="form-label">Net Balance</label>
+                        <input type="number" class="form-control net_balance" id="net_balance" name="net_balance"
+                            placeholder="Net Balance" readonly>
+                    </div>
+                    <div class="col-md-6 form-content">
+                        <label class="form-label">Payment Mode</label>
+                        <select class="form-select" name="payment_mode" id="payment_mode">
+                            <option selected value="" selected disabled>Select Mode of Payment</option>
+                            <option value="Cash">Cash</option>
+                            <option value="UPI">UPI</option>
+                            <option value="Net Banking-NEFT">Net Banking-NEFT</option>
+                            <option value="Net Banking-IMPS">Net Banking-IMPS</option>
+                            <option value="Net Banking-RTGS">Net Banking-RTGS</option>
+                            <option value="Cheque">Cheque</option>
+                            <option value="Demand Draft">Demand Draft</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="d-flex mt-2 row">
+                    <div class="col-md-6 form-content">
+                        <label for="transaction_id" class="form-label">Transaction Id</label>
+                        <input type="text" class="form-control transaction_id" id="transaction_id" name="transaction_id"
+                            placeholder="Enter Unique Transaction Id" maxlength="100" minlength="1">
+                    </div>
+                    <div class="col-md-6 form-content">
+                        <label for="transaction_reference" class="form-label">Transaction Reference</label>
+                        <input type="text" class="form-control transaction_reference" id="transaction_reference"
+                            name="transaction_reference" placeholder="Enter Reference Number" maxlength="100"
+                            minlength="1">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a href="javascript:void(0);" class="btn btn-link link-success fw-medium" data-bs-dismiss="modal">
+                    <i class="ri-close-line me-1 align-middle"></i>Close</a>
+                <button type="button" class="btn btn-primary" id="btnSaveAccounts" name="btnSaveAccounts">Save</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div>
+
+<section data-jwt-tokens="{{ jwt_token }}" id="jwt_card"></section>
+<div class="row mt-2">
+    <div class="col-xl-12">
+        <table class="table table-striped table-hover table-sticky table_students" id="accountsTable">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Transaction Date</th>
+                    <th>Payment Type</th>
+                    <th>Particular</th>
+                    <th>Description</th>
+                    <th>Transaction Id</th>
+                    <th>Transaction Details</th>
+                    <th>Transaction Type</th>
+                    <th>Balance</th>
+                </tr>
+            </thead>
+            <tbody class="tbl__bdy" id="accounts_details">
+            {% if accounts %}
+                {% for account in accounts %}
+                <tr class="tr-accounts-{{account.account_id}}">
+                    <td class="transaction_date">{{account.transaction_date}}</td>
+                    <td class="payment_type">{{account.payment_type}}</td>
+                    <td class="particular_name">{{account.particular_name}}</td>
+                    <td class="description">{{account.description}}</td>
+                    <td class="transaction_id">{{account.transaction_id}}</td>
+                    <td class="transaction_details">{{account.payment_mode}}<br>{{account.transaction_reference}}</td>
+                    <td Class="transaction_type">{{account.transaction_type}}</td>
+                    <td Class="net_balance">{{account.net_balance}}</td>
+                </tr>
+                {% endfor %}
+            {% else %}
+                <tr>
+                    <td colspan="8">
+                        <img src="{% static 'img/no_data_found.png' %}" alt="noImage" class="no_data_found" />
+                    </td>
+                </tr>
+            {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+</section>
+
+{% endblock %}

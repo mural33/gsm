@@ -3,7 +3,6 @@
 {% block title %} Create Notice {% endblock %}
 {% block content %}
 <script src="{% static 'app-js/notice_create.js' %}"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://cdn.ckeditor.com/ckeditor5/38.0.1/classic/ckeditor.js"></script>
 <link rel="stylesheet" href="{% static 'app-css/notice_create.css' %}">
 
@@ -33,7 +32,7 @@
                 <div class="card-body">
                 <div class="col-md-12">
                     <label for="NoticeTitle" class="form-label">Notice Title</label>
-                    <input class="form-control" id="notice_title" name="notice_title" placeholder="Enter Notice Title" value="{{notice_data.notice_title}}"></input>
+                    <input class="form-control" id="notice_title" name="notice_title" placeholder="Enter Notice Title" value="{{notice_data.notice_title}}" maxlength="1000"></input>
                 </div>
                 <div class="row my-2">
                     <div class="col-md-4">
@@ -47,7 +46,7 @@
                     <div class="col-md-4">
                         <label for="Recipient" class="form-label">Recipient</label>
                         <select name="recipient" class="form-select recipient" id="recipient">
-                            <option value="" selected disabled>Select</option>
+                            <option value="" selected >Select</option>
                                         <option value="All" {% if notice_data.recipient == 'All'%} selected {% endif %}>All</option>
                                         <option value="All Staffs Only" {% if notice_data.recipient == 'All Staffs Only'%} selected {% endif %}>All Staffs Only</option>
                                         <option value="All Students Only" {% if notice_data.recipient == 'All Students Only'%} selected {% endif %}>All Students Only</option>
@@ -56,12 +55,12 @@
                 </div>
                 <div class="col-md-12 my-2">
                     <label for="NoticeDescription" class="form-label">Notice Description</label>
-                    <textarea class="form-control" id="editor" name="notice_description" placeholder="Enter Notice Description">{{ notice_data.notice_description }}</textarea>
+                    <textarea class="form-control" id="editor" name="notice_description" placeholder="Enter Notice Description">{{ notice_data.notice_description }}</textarea maxlength="5000">
                 </div>
                 <div class="row my-2">
                     <div class="col-md-12">
                         <label for="Announcedby	" class="form-label">Announced By</label>
-                        <input class="form-control" id="notice_announced_by" name="notice_announced_by" placeholder="Enter Notice Announcer" value="{{notice_data.notice_announced_by}}"></input>
+                        <input class="form-control" id="notice_announced_by" name="notice_announced_by" placeholder="Enter Notice Announcer" value="{{notice_data.notice_announced_by}}" maxlength="1000"></input>
                     </div>
                     <div class="col-md-12">
                     <code>Scroll up <i class="bi bi-arrow-up-short"></i> to Save changes.</code>

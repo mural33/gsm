@@ -1,216 +1,138 @@
 {% extends '_layout.html' %}
 {% load static %}
-{% block title %} Staff Management {% endblock %}
+{% block title %} Calender {% endblock %}
 
 {% block content %}
-<link href="{% static 'app-css/calendar.css' %}" rel="stylesheet"/> 
+<link href="{% static 'app-css/calendar.css' %}" rel="stylesheet" />
+<script src="{% static 'app-js/calendar.js' %}"></script>
 
-   
 <div class="row" id="heading-row">
-    <div class="col-sm-12 col-md-8 col-xl-8" style="padding:1rem;">
-        <h5>Calendar</h5>
-        <quote>The class timetable: a symphony of learning, where every subject has its moment and knowledge finds its rhythm.</quote>
-        <div class="fields">
-          <div class="input-field">
-          <!--<label class="labels"><b>Select Class</b></label> -->
-            <select class="gender-list filter" name="class" id="class">
-                <option selected>Select Class</option>
-                <option value="1">Class 1</option>
-                <option value="2">Class 2</option>
-                <option value="3">Class 3</option>
-                <option value="4">Class 4</option>
-                <option value="5">Class 5</option>
-                <option value="6">Class 6</option>
-                <option value="7">Class 7</option>
-                <option value="8">Class 8</option>
-                <option value="9">Class 9</option>
-                <option value="10">Class 10</option>
-            </select>
-        </div>
-        <div class="input-field">
-          <!-- <label class="labels"><b>Select Section</b></label> -->
-          <select class="section-list filter" name="Section" id="Section">
-              <option selected>Select Section</option>
-              <option value="A">Section A</option>
-              <option value="B">Section B</option>
-              <option value="C">Section C</option>
+  <div class="col-sm-12 col-md-8 col-xl-7.5" style="padding:1rem;">
+    <h5>Calendar</h5>
+    <quote>The class timetable: a symphony of learning, where every subject has its moment and knowledge finds its
+      rhythm.</quote>
+  </div>
+  <div class="col-sm-12 col-md-4 col-xl-4.5" style="margin-top: 1rem;">
+    <div class="row" >
+      <div class="text-end">
+        <button type="button" class="btn btn-success btn-label rounded-pill right" data-bs-toggle="modal"
+          data-bs-target="#calendarmodal">
+          <i class="bi bi-plus-circle label-icon align-middle fs-lg ms-2"></i>Add Time Table</button>
+
+        <button type="button" class="btn btn-outline-primary rounded-pill btn-icon"><i
+            class="bi bi-printer"></i></button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="fields">
+    <div class="input-field">
+      <select id="class_id" class="form-select" name="class_id">
+        <option selected value="">Select Class</option>
+      </select>
+    </div>
+    <div class="input-field">
+      <select id="section_id" class="form-select" name="section_id">
+        <option selected value="">Select Section</option>
+      </select>
+    </div>
+    <button class="btn btn-primary btn-label rounded-pill right filter-btn" id="btnSearch">Search</button>
+  </div>
+</div>
+<div class="row">
+  <div class="container" id="alertContainer">
+    <table class="styled-table" id="calenderTable">
+        <tr>
+            <td colspan="7" class="col">
+                <center><b></b></center>
+            </td>
+        </tr>
+        <tr class="col">
+            <th>Time</th>
+            <th>Monday</th>
+            <th>Tuesday</th>
+            <th>Wednesday</th>
+            <th>Thursday</th>
+            <th>Friday</th>
+            <th>Saturday</th>
+        </tr>
+        <tbody id="calenderTableBody"></tbody>
+    </table>
+    <img src="{% static 'img/no_data_found.png' %}" alt="No Image" class="no_data_found" id="no_data_found">
+</div>
+</div>
+
+
+<div class="modal fade" id="calendarmodal" tabindex="-1" role="dialog" aria-hidden="true">
+<div class="modal-dialog modal-dialog-centered ">
+  <div class="modal-content" id="calender_details">
+    <div class="modal-header">
+      <h5 class="modal-title" id="mysmallModalLabel">Add Calender</h5>
+      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    </div>
+    <div class="modal-body">
+      <div class="row">
+        <div class="col-md-12">
+          <input type="hidden" id="calender_id" name="calender_id">
+          <label for="class_id" class="form-label">Class</label>
+          <select id="form_class_id" class="form-select" name="form_class_id">
+            <option selected value="">Select Class</option>
           </select>
         </div>
-          <button class="btn btn-primary rounded-pill btn-block filter-btn">Search</button>
+      </div>
+        <div class="row mt-3">
+        <div class="col-md-6">
+          <label for="section_id" class="form-label">Section Name</label>
+          <select id="form_section_id" class="form-select" name="form_section_id">
+            <option value="">Select Section </option>
+          </select>
+        </div>
+        <div class="col-md-6">
+          <label for="subject_id" class="form-label">Subject Name</label>
+          <select id="subject_id" class="form-select" name="subject_id">
+            <option value="">Select Subject</option>
+          </select>
+        </div>
+      </div>
+      <div class="row mt-3">
+        <div class="col-md-6">
+          <label for="staff_id" class="form-label">Staff Name</label>
+          <select id="staff_id" class="form-select" name="staff_id">
+            <option value="">Select Staff</option>
+          </select>
+        </div>
+        <div class="col-md-6">
+          <label for="day" class="form-label">Day</label>
+          <select id="day" class="form-select" name="day">
+            <option value="">Select Day</option>
+            <option value="Monday">Monday</option>
+            <option value="Tuesday">Tuesday</option>
+            <option value="Wednesday">Wednesday</option>
+            <option value="Thursday">Thursday</option>
+            <option value="Friday">Friday</option>
+            <option value="Saturday">Saturday</option>
+          </select>
+        </div>
+        </div>
+      <div class="row mt-3">
+        <div class="col-md-6">
+          <label for="start_time" class="form-label">Start Time</label>
+          <input type="time" class="form-control" id="start_time" name="start_time">
+        </div>
+        <div class="col-md-6">
+          <label for="end-time" class="form-label">End Time</label>
+          <input type="time" class="form-control" id="end_time" name="end_time">
+        </div>
       </div>
     </div>
-    <div class="col-sm-12 col-md-4 col-xl-4" style="margin-top: 5rem;">
-      <div class="row">
-          <div class="text-end">
-            <button type="button" onclick="openForm()" 
-                class="btn btn-success btn-label rounded-pill right">
-                <i class="bi bi-plus-circle label-icon align-middle fs-lg ms-2"></i>Add/Edit Time Table</button>
-            
-            <button type="button" class="btn btn-outline-primary rounded-pill btn-icon"><i class="bi bi-printer"></i></button>
-          </div>
-      </div>
+
+    <div class="modal-footer">
+      <a href="javascript:void(0);" class="btn btn-link link-success fw-medium" data-bs-dismiss="modal"><i
+          class="ri-close-line me-1 align-middle"></i>Close</a>
+      <button type="button" class="btn btn-primary" id="btnSave" name="btnSave">Save</button>
+    </div>
   </div>
-<section class="form_section bg-grey" id="userForm" >
-  <article class="container-fluid">
-      <div class="row">
-          <div class="col-xl-8"></div>
-          <div class="col-xl-4 form_div" style="margin-right: 0%;">
-            <!-- <header style="height: 100px; position: fixed; top: 0; width: 100%;"> -->
-              <div class="row">
-                  <div class="col-xl-6" style="margin-top: 4%;">
-                      <center><h4>Add Time Table</h4></center>
-                  </div>
-                  <div class="col-xl-6 text-end">
-                      <a href="" class="studentCloseForm">&times;</a>
-                  </div>
-              </div>&nbsp;
-            <!-- </header> -->
-                  <form class="row g-2" id="user-form"  method="POST" enctype="multipart/form-data" style="margin-left: 5%;">
-                      <div class="col-md-12">
-                        <label>Day <span style="color: red;">*</span></label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                        <select class="list" name="day">
-                            <option value="" selected disabled>Choose Day</option>
-                            <option value="Monday">Monday</option>
-                            <option value="Tuesday">Tuesday</option>
-                            <option value="Wednesday">Wednesday</option>
-                            <option value="Thursday">Thursday</option>
-                            <option value="Friday">Friday</option>
-                            <option value="Saturday">Saturday</option>
-                            <option value="Sunday">Sunday</option>
-                        </select>
-                      </div>&nbsp;
-                      <div class="col-md-12">
-                        <label>Start Time <span style="color: red;">*</span></label>&nbsp;&nbsp;&nbsp;&nbsp;
-                        <input type="time" name="time_start">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                        <label>End Time <span style="color: red;">*</span></label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                        <input type="time" name="time_end">
-                      </div>
-                      <div class="col-md-12">
-                        <label>Class <span style="color: red;">*</span></label>&nbsp;&nbsp;&nbsp;&nbsp;
-                        <select class="list" name="class_name" id="selectClass">
-                            <option value="" selected disabled>Select Class</option>
-                             <option value="class">class 10</option>   
-                        </select>
-                      </div>
-                      <div class="col-md-12">
-                        <label>Section <span style="color: red;">*</span></label>
-                        <select class="list" name="section_name" >
-                          <option value="" selected disabled>Select Section</option>
-                          <option>Section-A</option>
-                          <option>Section-B</option>
-                          <option>Section-C</option>
-                          <option>Section-D</option>
-                        </select>
-                    </div>
-                    <div class="col-md-12">
-                      <label>Subject <span style="color: red;">*</span></label>
-                      <select class="list" name="subject_name" id="selectSubject">
-                        <option value="" selected disabled>Select Subject</option>
-                        <option>English</option>     
-                      </select>
-                    </div>
-
-                    <div class="col-md-12">
-                      <label>Teacher <span style="color: red;">*</span></label>
-                      <select class="list" name="Teacher_name" id="selectTeacher">
-                        <option value="" selected disabled>Select Teacher</option>
-                        <option>English</option>     
-                      </select>
-                    </div>
-
-                  <!-- <footer style="height: 100px; position: fixed; bottom: 0; width: 100%;"> -->
-                      <div class="col-12" style="margin-left: 50%; margin-top: 45%;">
-                          <a class="btn btn-light studentCloseForm" onclick="closeNav()">Cancel</a>                            
-                          <button type="submit" class="btn btn-primary">Save</button>
-                      </div>
-                  <!-- </footer> -->
-                  </form>
-          </div>
-      </div>
-  </article>
-</section> 
-    <div class="container">
-      <table class="styled-table">
-            <tr>
-              <td colspan="7" class="col"><center><b>Class 10 Section A</b></center></td>
-            </tr>
-            <tr class="col">
-              <th >Time</th>
-              <th>Monday</th>
-              <th>Tuesday</th>
-              <th>Wednesday</th>
-              <th>Thursday</th>
-              <th>Friday</th>
-              <th>Saturday</th>
-
-            </tr>
-            <tr>
-              <td class="mod">9:30 AM-10:15 AM</td>
-              <td>English<br>(Mr.Rizwan)</td>
-              <td>Math<br>(Ms.Rupa)</td>
-              <td>Chemistry<br>(Ms.Lipi)</td>
-              <td>Computer<br>(Mr.Murli)</td>
-              <td>biology<br>(Ms.sandhya)</td>
-              <td>Physics<br>(Ms.Haritha)</td>
-            </tr>
-            <tr>
-              <td class="mod">10:15 AM-11:00 AM</td>
-              <td>English<br>(Mr.Rizwan)</td>
-              <td>Math<br>(Ms.Jeshi)</td>
-              <td>Chemistry<br>(Ms.Lipi)</td>
-              <td>Computer<br>(Mr.Murli)</td>
-              <td>biology<br>(Ms.sandhya)</td>
-              <td>Physics<br>(Ms.Haritha)</td>
-            </tr>
-            <tr>
-              <td class="mod">11:15 AM-12:00 PM</td>
-              <td>English<br>(Mr.Rizwan)</td>
-              <td>Math<br>(Mr.Abhishek)</td>
-              <td>Chemistry<br>(Ms.Lipi)</td>
-              <td>Computer<br>(Mr.Murli)</td>
-              <td>biology<br>(Ms.janvi)</td>
-              <td>Physics<br>(Mr.Fasi)</td>
-            </tr>
-            <tr>
-              <td class="mod">12:00 PM-12:45 PM</td>
-              <td>English<br>(Mr.Rizwan)</td>
-              <td>Math<br>(Ms.Jeshi)</td>
-              <td>Chemistry<br>(Ms.Lipi)</td>
-              <td>Computer<br>(Mr.Murli)</td>
-              <td>biology<br>(Ms.sandhya)</td>
-              <td>Physics<br>(Ms.Haritha)</td>
-            </tr>
-            <tr>
-              <td class="mod">01:30 PM-02:15 PM</td>
-              <td>English<br>(Mr.Abhishek)</td>
-              <td>Math<br>(Ms.sandhya)</td>
-              <td>Chemistry<br>(Mr.Murli)</td>
-              <td>Computer<br>(Mr.Rizwan)</td>
-              <td>biology<br>(Ms.jeshi)</td>
-              <td>Physics<br>(Ms.Haritha)</td>
-            </tr>
-            <tr>
-              <td class="mod">02:15 PM-03:00 PM</td>
-              <td>English<br>(Mr.Rizwan)</td>
-              <td>Math<br>(Ms.Jeshi)</td>
-              <td>Chemistry<br>(Ms.Lipi)</td>
-              <td>Computer<br>(Mr.Murli)</td>
-              <td>biology<br>(Ms.sandhya)</td>
-              <td>Physics<br>(Ms.Haritha)</td>
-            </tr>
-            <tr>
-              <td class="mod">3:00 PM-03:30 PM</td>
-              <td>English<br>(Mr.Rizwan)</td>
-              <td>Math<br>(Mr.Abhishek)</td>
-              <td>Chemistry<br>(Ms.Lipi)</td>
-              <td>Computer<br>(Mr.Murli)</td>
-              <td>biology<br>(Ms.janvi)</td>
-              <td>Physics<br>(Mr.Fasi)</td>
-            </tr>
-          </table>
-
-    </div>
-    
-</div><!--end row-->
-
+</div>
+</div>
 {% endblock %}

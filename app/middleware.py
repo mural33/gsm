@@ -3,7 +3,6 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect
 from django.urls import reverse
 import requests
-
 API_URL = settings.API_ENDPOINT
 token_checking_url = f'{API_URL}/Login/protected-data'
 

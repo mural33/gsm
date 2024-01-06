@@ -11,7 +11,6 @@
     <meta content="Themesbrand" name="author">
     <!-- App favicon -->
     <link rel="shortcut icon" href="{% static 'theme/images/favicon.ico' %}">
-
     <!-- Layout config Js -->
     <script src="{% static 'theme/js/layout.js' %}"></script>
     <!-- Bootstrap Css -->
@@ -22,24 +21,23 @@
     <link href="{% static 'theme/css/app.min.css' %}" rel="stylesheet" type="text/css">
     <!-- custom Css-->
     <link href="{% static 'theme/css/custom.min.css' %}" rel="stylesheet" type="text/css">
-
-
-    
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <!--Jqurey-->
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <link rel="stylesheet" href="{% static 'app-css/common.css' %}">
+    <!---comman css -->
     <script src="{% static 'app-js/common.js' %}"></script>
-
+    <!--Sweet Alert-->
+    <script src="{% static 'app-js/sweetalert.js' %}"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
 </head>
-
 <body class="dashboard-topbar-wrapper">
-
     <div id="spinner-element-lg">
         <div class="spinner-element-lg-overlay">
             <img src="{% static 'img/loader.gif' %}" alt="">
         </div>
     </div>
-   
     <div id="spinner-element-sm">
         <div class="spinner-element-sm-overlay">
             <img src="{% static 'img/loader.gif' %}" alt="">
@@ -93,6 +91,11 @@
                         </li>
 
                         <li class="nav-item">
+                            <a href="/app/classes" class="nav-link menu-link"> <i class="bi bi-bookmark-check"></i> <span
+                                    data-key="t-chat">Classes</span> </a>
+                        </li>
+
+                        <li class="nav-item">
                             <a class="nav-link menu-link collapsed" href="#studentLayout" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="studentLayout">
                                 <i class="bi bi-person-badge"></i> <span data-key="t-layouts">Students</span>
                             </a>
@@ -125,18 +128,33 @@
                         </li>
 
                         <li class="nav-item">
-                            <a href="/app/classes" class="nav-link menu-link"> <i class="bi bi-bookmark-check"></i> <span
-                                    data-key="t-chat">Classes</span> </a>
-                        </li>
-
-                        <li class="nav-item">
                             <a href="/app/calendar" class="nav-link menu-link"> <i class="bi bi-calendar-week"></i> <span
                                     data-key="t-email">Calendar</span> </a>
                         </li>
 
                         <li class="nav-item">
-                            <a href="/app/assignments" class="nav-link menu-link"> <i class="bi bi-journal-richtext"></i>
+                            <a href="#" class="nav-link menu-link"> <i class="bi bi-card-checklist"></i>
+                                <span data-key="t-file-manager">Attendance</span> </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a href="{% url 'assignments' %}" class="nav-link menu-link"> <i class="bi bi-journal-richtext"></i>
                                 <span data-key="t-file-manager">Assignments</span> </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a href="#" class="nav-link menu-link"> <i class="bi bi-card-heading"></i>
+                                <span data-key="t-file-manager">Examinations</span> </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a href="{% url "gradings" %}" class="nav-link menu-link"> <i class="bi bi-star-fill"></i>
+                                <span data-key="t-file-manager">Gradings</span> </a>
+                        </li>
+                        
+                        <li class="nav-item">
+                            <a href="#" class="nav-link menu-link"> <i class="bi bi-cash-coin"></i>
+                                <span data-key="t-file-manager">Fees</span> </a>
                         </li>
 
                         <li class="nav-item">
@@ -158,6 +176,11 @@
                         <li class="nav-item">
                             <a href="/app/transportation" class="nav-link menu-link"> <i class="bi bi-bus-front"></i>
                                 <span data-key="t-contacts">Transportation</span> </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a href="{% url 'accounts' %}" class="nav-link menu-link"> <i class="bi bi-cash-stack"></i>
+                                <span data-key="t-file-manager">Accounts</span> </a>
                         </li>
 
                         <li class="nav-item">

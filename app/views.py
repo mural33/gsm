@@ -1,4 +1,3 @@
-# myapp/views.py
 from django.shortcuts import render
 from django.urls import reverse
 from django.conf import settings
@@ -6,8 +5,8 @@ from classlibrary.classes_module import ClassData
 from classlibrary.common_module import Data
 from classlibrary.registration_module import Institute
 from classlibrary.login_module import Login
-from classlibrary.student import Student, StudentInfo
-from classlibrary.Staff import Staff, StaffInfo
+from classlibrary.student_module import Student, StudentInfo
+from classlibrary.staff_module import Staff, StaffInfo
 from classlibrary.notice_module import Notice
 from django.contrib import messages
 from django.http import HttpResponseRedirect, HttpResponse
@@ -17,30 +16,42 @@ import asyncio
 API_URL = settings.API_ENDPOINT
 Subscription_URL = settings.SUBSCRIPTION_URL
 
-
 def calendar(request):
-    return render(request, "calendar.html")
-
-
-def dashboard(request):
-    context = {
+    calender_obj = Data(API_URL)
+    institute_id = request.COOKIES.get('institute_id')
+    calendar_url = f"/Calender/get_calender_by_institute/?institute_id={institute_id}"
+    access_token = request.COOKIES.get('access_token')
+    calendar_data = calender_obj.get_data_by_institute_id(url=calendar_url, jwt=access_token)
+ 
+    payload = {
+        "calendar_data": calendar_data,
+        'url': API_URL,
+        'jwt_token': request.COOKIES.get('access_token'),
+        'institute_id':institute_id,
         "organization_name": request.COOKIES.get("organization_name"),
         "message": request.COOKIES.get("message"),
     }
-    return render(request, "dashboard.html", context)
+    return render(request, 'calendar.html', payload)
 
+def dashboard(request):
+    payload = {
+        "organization_name": request.COOKIES.get("organization_name"),
+        "message": request.COOKIES.get("message"),
+    }
+    return render(request, "dashboard.html", payload)
 
 def students(request):
     student_obj = Data(API_URL)
     institite_id = request.COOKIES.get("institute_id")
-    student_url = "/Students/get_students_by_intitute/"
+    student_url = f"/Students/get_students_by_intitute/?institute_id={institite_id}"
     params = {"institute_id": institite_id}
     access_token = request.COOKIES.get("access_token")
     student_data = student_obj.get_data_by_institute_id(
         url=student_url, params=params, jwt=access_token
     )
-
     payload = {
+        "organization_name": request.COOKIES.get("organization_name"),
+        "message": request.COOKIES.get("message"),
         "student_data": student_data,
         "url": API_URL,
         "jwt_token": access_token,
@@ -60,13 +71,14 @@ def register_student(request):
         params=params,
     )
     payload = {
+        "organization_name": request.COOKIES.get("organization_name"),
+        "message": request.COOKIES.get("message"),
         "class_data": class_data["data"],
         "url": API_URL,
         "jwt_token": request.COOKIES.get("access_token"),
         "institute_id": request.COOKIES.get("institute_id"),
     }
     return render(request, "register_student.html", payload)
-
 
 def staffs(request):
     staff_obj = Data(API_URL)
@@ -86,7 +98,6 @@ def staffs(request):
     }
     return render(request, "staffs.html", payload)
 
-
 def register_staff(request):
     access_token = request.COOKIES.get("access_token")
     payload = {
@@ -98,11 +109,9 @@ def register_staff(request):
     }
     return render(request, "register_staff.html", payload)
 
-
 def registration(request):
     if request.method == "POST":
         form_data = request.POST.dict()
-        # Check if passwords match
         if form_data["institute_password"] == form_data["confirm_password"]:
             institute_instance = Institute(API_URL)
             institute_result = institute_instance.create_institute_in_subscription(
@@ -129,7 +138,6 @@ def registration(request):
                 return render(request, "registration.html")
     return render(request, "registration.html")
 
-
 def login(request):
     if request.method == "POST":
         email = request.POST.get("phone_number")
@@ -151,7 +159,6 @@ def login(request):
             response.set_cookie(
                 key="institute_id", value=auth_response.json().get("institution_id", "")
             )
-            # Getting Subscriber Id from Institute
             institite_id = auth_response.json().get("institution_id")
             institite_url = (
                 f"{API_URL}/Institute/Institute/?institute_id={institite_id}"
@@ -174,15 +181,12 @@ def login(request):
             return render(request, "registration.html")
     return render(request, "registration.html")
 
-
 def logout(request):
-    # Clear the tokens from the cookie
     response = HttpResponseRedirect(reverse("registration"))
     response.delete_cookie("access_token")
     response.delete_cookie("institute_id")
     messages.success(request, "You have been successfully logged out.")
     return response
-
 
 def classes(request):
     class_obj = Data(API_URL)
@@ -197,7 +201,6 @@ def classes(request):
     class_id = None
     class_name = None
     if class_data and isinstance(class_data, list) and class_data:
-        # Assuming you want data from the first element of the list
         first_class_response = class_data[0]
         class_id = first_class_response.get("class_id", None)
         class_name = first_class_response.get("class_name", None)
@@ -208,9 +211,10 @@ def classes(request):
         "institute_id": institite_id,
         "class_name": class_name,
         "class_id": class_id,
+        "organization_name": request.COOKIES.get("organization_name"),
+        "message": request.COOKIES.get("message"),
     }
     return render(request, "classes.html", payload)
-
 
 def user(request):
     user_obj = Data(API_URL)
@@ -220,59 +224,68 @@ def user(request):
     user_data = user_obj.get_data_by_institute_id(
         url=user_url, params=params, jwt=access_token
     )
-    payload = {"user_data": user_data, "jwtToken": access_token}
+    payload = {
+        "user_data": user_data, 
+        "jwtToken": access_token,
+        "organization_name": request.COOKIES.get("organization_name"),
+        "message": request.COOKIES.get("message"),
+        }
     return render(request, "user.html", payload)
 
-
 def assignments(request):
-    institite_id = request.COOKIES.get("institute_id")
-    assignments_url = (
-        f"{API_URL}/Assignment/get_assignments_institute/?institution_id={institite_id}"
-    )
-    access_token = request.COOKIES.get("access_token")
-    header = {"accept": "application/json", "Authorization": f"Bearer {access_token}"}
-    assignment_data = requests.get(url=assignments_url, headers=header)
-
-    if assignment_data.status_code == 200:
-        # Filter out deleted assignments
-        assignments = [
-            assignment
-            for assignment in assignment_data.json()
-            if not assignment.get("is_deleted", False)
-        ]
-
-        payload = {"assignment": assignments, "URL": API_URL, "jwt_token": access_token}
-        return render(request, "assignments.html", payload)
-    else:
-        return HttpResponse("Reload the page")
-
-
-def transportation(request):
-    #   params = {'institute_id': 1010}
     access_token = request.COOKIES.get("access_token")
     institute_id = request.COOKIES.get("institute_id")
-    transport_url = f"{API_URL}//Transports/get_all_transports_by_institute/?institute_id={institute_id}"
+    assignment_obj = Data(API_URL)
+    assignment_url = f"/Assignments/get_assignments_institute/?institution_id={institute_id}"
+    params = {"institute_id": 1010}
+    assignment_data = assignment_obj.get_data_by_institute_id(
+        url=assignment_url, params=params, jwt=access_token
+    )
+    payload = {
+        "assignment_data": assignment_data,
+        "jwt_token": access_token,
+        "url": API_URL,
+        "organization_name": request.COOKIES.get("organization_name"),
+        "message": request.COOKIES.get("message"),
+        "institute_id": institute_id,
+    }
+    return render(request, "assignments.html", payload)
+
+def transportation(request):
+    access_token = request.COOKIES.get("access_token")
+    institute_id = request.COOKIES.get("institute_id")
+    transport_url =f"{API_URL}/Transports/get_all_transports_by_institute/?institute_id={institute_id}"
     header = {"accept": "application/json", "Authorization": f"Bearer {access_token}"}
     transport_data = requests.get(url=transport_url, headers=header)
+    print(transport_data)
     if transport_data.status_code == 200:
         payload = {
             "transportation": transport_data.json(),
             "url": API_URL,
             "jwt_token": access_token,
             "institute_id": institute_id,
+            "organization_name": request.COOKIES.get("organization_name"),
+            "message": request.COOKIES.get("message"),
         }
         return render(request, "transport.html", payload)
     else:
-        return HttpResponseRedirect(reverse("transportation"))
-
+        payload = {
+            "jwt_token": access_token,
+            "institute_id": institute_id,
+            "organization_name": request.COOKIES.get("organization_name"),
+            "message": request.COOKIES.get("message"), 
+        }
+        return render(request, "transport.html",payload)
 
 def notice(request):
     institute_id = request.COOKIES.get('institute_id')
-    url=f"https://gsm-fastapi.azurewebsites.net/Notice/get_notices_institute/?institute_id={institute_id}"
+    url=f"{API_URL}/Notice/get_notices_institute/?institute_id={institute_id}"
     access_token = request.COOKIES.get('access_token')
     header ={
             'accept': 'application/json',
-            'Authorization': f'Bearer {access_token}'
+            'Authorization': f'Bearer {access_token}',
+            "organization_name": request.COOKIES.get("organization_name"),
+            "message": request.COOKIES.get("message"),
     }
     notice_data=requests.get(url=url,headers=header)
     if notice_data.status_code==200:
@@ -281,6 +294,8 @@ def notice(request):
             'jwt_token':request.COOKIES.get('access_token'),
             'institute_id':institute_id,
             'url':API_URL,
+            "organization_name": request.COOKIES.get("organization_name"),
+            "message": request.COOKIES.get("message"),
         }
         return render(request,'notice.html', payload)
     
@@ -289,10 +304,11 @@ def notice_create(request):
     payload = {
         'url': API_URL,
         'jwt_token': request.COOKIES.get('access_token'),
-        'institute_id': request.COOKIES.get('institute_id')
+        'institute_id': request.COOKIES.get('institute_id'),
+        "organization_name": request.COOKIES.get("organization_name"),
+        "message": request.COOKIES.get("message"),
     }
     return render(request, 'notice_create.html', payload)
-
 
 def notice_edit(request,notice_id):
     access_token = request.COOKIES.get('access_token')
@@ -306,10 +322,11 @@ def notice_edit(request,notice_id):
             "notice_id": notice_data['data']['notice_id'],
             'url': API_URL,
             'jwt_token': access_token,
-            'institute_id': institute_id
+            'institute_id': institute_id,
+            "organization_name": request.COOKIES.get("organization_name"),
+            "message": request.COOKIES.get("message"),
         }
     return render(request, 'notice_create.html', payload)
-
 
 def edit_student(request, student_slug):
     access_token = request.COOKIES.get("access_token")
@@ -327,6 +344,8 @@ def edit_student(request, student_slug):
             "url": API_URL,
             "jwt_token": access_token,
             "institute_id": institute_id,
+            "organization_name": request.COOKIES.get("organization_name"),
+            "message": request.COOKIES.get("message"),
         }
     return render(request, "register_student.html", payload)
 
@@ -350,10 +369,11 @@ def student_info(request, student_slug):
             "institute_id": institute_id,
             "student_data":student_data,
             "parent_data": parent_data,
-            "transport_data": transport_data
+            "transport_data": transport_data,
+            "organization_name": request.COOKIES.get("organization_name"),
+            "message": request.COOKIES.get("message"),
         }
     return render(request, "student_info.html", payload)
-
 
 def edit_staff(request, staff_slug):
     access_token = request.COOKIES.get("access_token")
@@ -375,17 +395,78 @@ def edit_staff(request, staff_slug):
             "url": API_URL,
             "jwt_token": access_token,
             "institute_id": institute_id,
+            "organization_name": request.COOKIES.get("organization_name"),
+            "message": request.COOKIES.get("message"),
         }
     return render(request, "register_staff.html", payload)
 
-
 def staff_info(request, staff_slug):
+    institute_id = request.COOKIES.get("institute_id")
     access_token = request.COOKIES.get("access_token")
     if staff_slug:
         staff = StaffInfo(api_url=API_URL, slug=staff_slug, jwt=access_token)
         staff_data = asyncio.run(staff.get_all_data(staff_slug))
         payload = {
+            "url": API_URL,
+            "jwt_token": access_token,
             "staff_data": staff_data["staff_data"],
+            "payroll_data" : staff_data["staff_payroll_data"],
             "transport_data": staff_data["staff_transport_data"],
+            "documents": staff_data["get_staff_documents_data"],
+            "organization_name": request.COOKIES.get("organization_name"),
+            "message": request.COOKIES.get("message"),
         }
     return render(request, "staff_info.html", payload)
+
+# gradeing
+def gradings(request):
+    institute_id = request.COOKIES.get('institute_id')
+    params = {"institute_id": institute_id}
+    url=f"{API_URL}/Grades/get_grades_institute/?institute_id={institute_id}"
+    access_token = request.COOKIES.get('access_token')
+    grade_obj = Data(API_URL)
+    class_data = grade_obj.get_class_data(
+        end_point=f"/Classes/get_classes_by_institute/?institite_id={int(institute_id)}",
+        jwt=access_token,
+        params=params,
+    )
+    header ={
+            'accept': 'application/json',
+            'Authorization': f'Bearer {access_token}',
+            "organization_name": request.COOKIES.get("organization_name"),
+            "message": request.COOKIES.get("message"),
+    }
+    grade_data=requests.get(url=url,headers=header)
+    if grade_data.status_code==200:
+        payload={
+            'gradings':grade_data.json(),
+            'jwt_token':request.COOKIES.get('access_token'),
+            'institute_id':institute_id,
+            "class_data": class_data["data"],
+            'url':API_URL,
+            "organization_name": request.COOKIES.get("organization_name"),
+            "message": request.COOKIES.get("message"),
+        }
+    return render(request,'gradings.html',payload) 
+# accounts
+def accounts(request):
+    institute_id = request.COOKIES.get('institute_id')
+    url=f"{API_URL}/Accounts/get_all_transaction_by_institute/?institute_id={institute_id}"
+    access_token = request.COOKIES.get('access_token')
+    header ={
+            'accept': 'application/json',
+            'Authorization': f'Bearer {access_token}',
+            "organization_name": request.COOKIES.get("organization_name"),
+            "message": request.COOKIES.get("message"),
+    }
+    account_data=requests.get(url=url,headers=header)
+    if account_data.status_code==200:
+        payload={
+            'accounts':account_data.json(),
+            'jwt_token':request.COOKIES.get('access_token'),
+            'institute_id':institute_id,
+            'url':API_URL,
+            "organization_name": request.COOKIES.get("organization_name"),
+            "message": request.COOKIES.get("message"),
+        }
+    return render(request,'accounts.html', payload)

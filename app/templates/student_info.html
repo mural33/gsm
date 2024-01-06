@@ -1,92 +1,146 @@
+
 {% extends '_layout.html' %}
 {% block title %} Student Info {% endblock %}
 {% load static %}
 {% block content %}
-<link rel="stylesheet" href="{% static 'app-css/common.css' %}">
-<script src="{% static 'app-js/sweetalert.js' %}"></script>
+<script type="module" src="{% static 'app-js/utlity.js' %}"></script>
+<!-- Include FullCalendar JavaScript -->
 <script src="{% static 'app-js/studentInfo.js' %}"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 
 <div class="row" id="heading-row">
-    <div class="col-sm-12 col-md-12 col-xl-7.5" style="padding: 1rem">
-        <h5>Student Information</h5>
+    <div class="col-sm-12 col-md-9 col-xl-11 d-flex align-items-center" style="padding: 1rem">
+        <a href="{% url 'students' %}">
+            <i class="bi bi-arrow-left" style="font-size:1.5rem;"></i>
+        </a>
+        <div class="mx-2">
+            <h5>Student Information</h5>
         <quote>Students are the architects of their own tomorrows, shaping futures with every lesson learned.</quote>
+        </div>
+        
     </div>
 </div>
+<input type="hidden" id="studentInfo" value='{"classId":{{student_data.class_id}}, "sectionId":{{student_data.section_id}}, "studentId":{{student_data.student_id}}}' />
 <div class="row">
-    <div class="col-md-3">
-        <div class="row">
-            <div class="card">
-                <div class="card-head text-center my-2">
-                    <img src="{% static 'img/students.jpg' %}" alt="" srcset="" class="card-img-top student_profile">
-                    <p class="card-title h2">{{student_data.student_name}}</p>
-                </div>
-                <hr class="my-3"> <!-- Added margin-top (my-3) to the hr -->
-                <div class="card-body row">
-                    <!-- Student information -->
-                    <p class="card-title col-md-5">
+    <div class="col-xl-3 col-lg-3 col-md-12 ">          
+    <div class="card">
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12">
+            <div class="card-head text-center">
+                <img src="{{student_data.photo}}" alt="" srcset="" class="card-img-top student-profile">
+                <p class="card-title h2 mt-2">{{student_data.student_name}}</p>
+            </div>
+        </div>
+        <div class="col-lg-12 col-md-12 col-sm-12">
+            <div class="card-body row">
+                <!-- Adjusted grid classes -->
+                <div class="col-md-12 col-sm-12 ">
+                    <p class="card-title">
                         <span class="d-block">
                             Roll Number
                         </span>
-                        <span class="d-block">
+                        <span class="d-block txt-color">
                             {{student_data.roll_number}}
                         </span>
                     </p>
-                    <p class="card-title col-md-3">
-                        <span class="d-block">
-                            Gender
-                        </span>
-                        <span class="d-block">
-                            {{student_data.gender}}
-                        </span>
-                    </p>
-                    <p class="card-title col-md-2">
+                </div>
+                <div class="col-md-12 col-sm-12 col-xs-6 ">
+                    <p class="card-title">
                         <span class="d-block">
                             Class
                         </span>
-                        <span class="d-block">
-                            {{student_data.class_id}}
+                        <span class="d-block txt-color">
+                            {{student_data.classes.class_name}}
                         </span>
                     </p>
-                    <p class="card-title col-md-6">
+                </div>
+                <div class="col-md-12 col-sm-12 col-xs-6 ">
+                    <p class="card-title">
                         <span class="d-block">
                             Section
                         </span>
-                        <span class="d-block">
-                            {{student_data.section_id}}
+                        <span class="d-block txt-color">
+                            {{student_data.sections.section_name}}
                         </span>
                     </p>
                 </div>
-                <div class="card-footer">
-                    <table class="table table-borderless">
-                        <tr>
-                            <td class="w-50"><i class="bi bi-gift mx-1"></i>DOB</td>
-                            <td class="w-50">{{student_data.date_of_birth}}</td>
-                        </tr>
-                        <tr>
-                            <td class="w-50"><i class="bi bi-telephone-fill mx-1"></i> Mobile</td>
-                            <td class="w-50">{{student_data.phone_number}}</td>
-                        </tr>
-                        <tr>
-                            <td class="w-50"><i class="bi bi-envelope mx-1"></i> Email</td>
-                            <td class="w-50">{{student_data.email}}</td>
-                        </tr>
-                        <tr>
-                            <td class="w-50">
-                                <i class="bi bi-heart-pulse mx-1"></i> BloodGroup</td>
-                            <td class="w-50">{{student_data.blood_group}}</td>
-                        </tr>
-                        <tr>
-                            <td class="w-50">
-                                <i class="bi bi-geo-alt-fill mx-1"></i> Address</td>
-                            <td class="w-50">{{student_data.address}}</td>
-                        </tr>
-                        
-                    </table>
-                </div>
-            </div>            
+            </div>
+        </div>
+        <div class="col-lg-12 col-md-12 col-sm-12">
+            <div class="card-footer">
+                <table class="table table-borderless">
+                    <!-- Adjusted grid classes for the table content -->
+                    <tr>
+                        <td class="">
+                            <span class="d-block">
+                                {% if student_data.gender == 'Male' %}
+                                <i class="bi bi-gender-male"></i>
+                                {% else %}
+                                <i class="bi bi-gender-female"></i>
+                                {% endif %}
+                                <span class="txt-color">
+                                    {{student_data.gender}}
+                                </span>
+                            </span> 
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="">
+                            <span class="d-block"><i class="bi bi-gift mx-1"></i>
+                                <span class="txt-color">
+                                    {{student_data.date_of_birth}}
+                                </span>
+                            </span>
+                            
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="">
+                            <span class="d-block">
+                                <i class="bi bi-telephone-fill mx-1"></i> 
+                                <span class="txt-color">
+                                    {{student_data.phone_number}}
+                                </span>
+                            </span>
+                            
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="">
+                            <span class="d-block">
+                                <i class="bi bi-envelope mx-1"></i>
+                                <span class="txt-color">{{student_data.email}}</span>
+                            </span>
+                            
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <span class="d-block">
+                                <i class="bi bi-heart-pulse mx-1"></i>
+                                <span class="txt-color">{{student_data.blood_group}}</span>
+                            </span>
+                            
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="w-50">
+                            <span class="d-block">
+                                <i class="bi bi-geo-alt-fill mx-1"></i>
+                                <span class="txt-color">{{student_data.address}}</span>
+                            </span>
+                            
+                        </td>
+                    </tr>
+                </table>
+            </div>
         </div>
     </div>
-    <div class="col-md-9">
+</div>
+
+    </div>
+    <div class="col-xl-9 col-lg-9 col-md-12">
         <div class="card">
             <div class="card-body">
                 <div>
@@ -152,7 +206,8 @@
                         <div class="tab-pane active" id="basic" role="tabpanel">
                             <div class="row">
                                 <div class="col-md-6">
-                                    <h5 class="my-2">Parents Details</h5>
+                                    <h6>Parents</h6>
+                                    <blockquote>Empowering Families, Nurturing Futures..</blockquote>
                                 </div>
                                 <div class="col-md-6">
                                     <button type="button"  data-bs-toggle="modal"
@@ -193,25 +248,46 @@
                                         </div>
                                         {% endfor %}
                                     {% else %}
-                                    <div class="row mx-0 my-2" id="no_data_found">
-                                        <img src="{% static 'img/no_data_found.png' %}" alt="No Image" class="no_data_found">
+                                    <div class="text-center" id="no_data_found">
+                                        <img src="{% static 'img/no_data_found.png' %}" alt="No Image" class="no_data_found" id="no_data_found">
                                     </div>
                                     {% endif %}
                                 </div>
                             </div>
                         </div>
                         <div class="tab-pane" id="attendance" role="tabpanel">
-                            <h6>List of Attendance</h6>
-                            <div class="mb-0">
-                                dynamic code goes here
+                            <h6>Attendance</h6>
+                            <qoute>Consistent attendance breeds achievement.</qoute>
+                            <div class="mb-0 my-3">
                                 <div class="row">
-                                <div class="col-md-12">
-                                    {% if transport_dat %}
-                                    {% else %}
-                                        <img src="{% static 'img/no_data_found.png' %}" alt="No Image" class="no_data_found">
-                                    {% endif %}
+                                    <div class="col-md-12">
+                                        <div class="row">
+                                            <div class="col-md-6 col-sm-12">
+                                                <table id="attendanceTable" class="table table-striped table-hover table-sticky table_students table-center">
+                                                    <thead class="thead-dark">
+                                                        <tr>
+                                                            <th>Date</th>
+                                                            <th>Status</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody class='attendanceTbody' id="attendance_data">
+                                                        {% if attendance_data %}
+                                                        {% else %}
+                                                            <tr>
+                                                                <td colspan="7" class="text-center">
+                                                                    <img src="{% static 'img/no_data_found.png' %}" alt="No Image" class="no_data_found">
+                                                                </td>
+                                                            </tr>
+                                                        {% endif %}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <div class="col-md-6 col-sm-12">
+                                                <canvas id="studentPieChart" class="pie-chart"></canvas>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
                             </div>
                         </div>
                         <div class="tab-pane" id="calendar" role="tabpanel">
@@ -219,7 +295,7 @@
                             <div class="mb-0">
                                 dynamic code goes here
                                 <div class="row">
-                                <div class="col-md-12">
+                                <div class="col-md-12 text-center">
                                     {% if transport_dat %}
                                     {% else %}
                                         <img src="{% static 'img/no_data_found.png' %}" alt="No Image" class="no_data_found">
@@ -229,17 +305,57 @@
                             </div>
                         </div>
                         <div class="tab-pane" id="examination" role="tabpanel">
-                            <h6>List of examination</h6>
+                            <h6>Exams</h6>
+                            <blockquote>Success in exams is the result of preparation meeting opportunity.</blockquote>
                             <div class="mb-0">
-                                dynamic code goes here
                                 <div class="row">
-                                <div class="col-md-12">
-                                    {% if transport_dat %}
-                                    {% else %}
-                                        <img src="{% static 'img/no_data_found.png' %}" alt="No Image" class="no_data_found">
-                                    {% endif %}
+                                    <div class="col-md-12">
+                                        <h6>UpComing Exams</h6>
+                                        <table id="attendanceTable" class="table table-striped table-hover table-sticky table_students table-center">
+                                            <thead class="thead-dark">
+                                                <tr>
+                                                    <th>Exam Name</th>
+                                                    <th>Start Date</th>
+                                                    <th>End Date</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class='attendanceTbody' id="UpComingExam">
+                                                {% if attendance_data %}
+                                                {% else %}
+                                                    <tr>
+                                                        <td colspan="7" class="text-center">
+                                                            <img src="{% static 'img/no_data_found.png' %}" alt="No Image" class="no_data_found">
+                                                        </td>
+                                                    </tr>
+                                                {% endif %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <h6>Past Exams</h6>
+                                        <table id="attendanceTable" class="table table-striped table-hover table-sticky table_students table-center">
+                                            <thead class="thead-dark">
+                                                <tr>
+                                                    <th>Exam Name</th>
+                                                    <th>Start Date</th>
+                                                    <th>End Date</th>
+                                                    <th>Reslut Date</th>
+                                                    <th>Result</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class='attendanceTbody' id="pastExam">
+                                                {% if attendance_data %}
+                                                {% else %}
+                                                    <tr>
+                                                        <td colspan="7" class="text-center">
+                                                            <img src="{% static 'img/no_data_found.png' %}" alt="No Image" class="no_data_found">
+                                                        </td>
+                                                    </tr>
+                                                {% endif %}
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
-                            </div>
                             </div>
                         </div>
                         <div class="tab-pane" id="transportation" role="tabpanel">
@@ -268,7 +384,7 @@
                             <div class="mb-0">
                                 dynamic code goes here
                                 <div class="row">
-                                <div class="col-md-12">
+                                <div class="col-md-12 text-center">
                                     {% if transport_data %}
                                     {% else %}
                                         <img src="{% static 'img/no_data_found.png' %}" alt="No Image" class="no_data_found">
@@ -282,7 +398,7 @@
                             <div class="mb-0">
                                 dynamic code goes here
                                 <div class="row">
-                                <div class="col-md-12">
+                                <div class="col-md-12 text-center">
                                     {% if transport_data %}
                                     {% else %}
                                         <img src="{% static 'img/no_data_found.png' %}" alt="No Image" class="no_data_found">
@@ -291,30 +407,64 @@
                             </div>
                             </div>
                         </div>
+                        <!-- assginment Tab Start -->
                         <div class="tab-pane" id="assignments" role="tabpanel">
-                            <h6>assignments of this class</h6>
-                            <div class="mb-0">
-                                dynamic code goes here
+                            <h6>Assignments</h6>
+                            <quote>Where challenges become triumphs, and learning is a journey, not a destination</quote>
+                            <div class="mb-0 my-3">
                                 <div class="row">
-                                <div class="col-md-12">
-                                    {% if transport_data %}
-                                    {% else %}
-                                        <img src="{% static 'img/no_data_found.png' %}" alt="No Image" class="no_data_found">
-                                    {% endif %}
+                                    <div class="col-md-12">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <table class="table table-striped table-hover table-sticky table_students table-center">
+                                                    <thead class="thead-dark">
+                                                        <tr>
+                                                            <th>Title</th>
+                                                            <th>Date</th>
+                                                            <th>Due Date</th>
+                                                            <th>Details</th>
+                                                            <th>Status</th>
+                                                            <th>Action</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody class='assignTbody' id="assignments_details">
+                                                        {% if assignment_data %}
+                                                        {% else %}
+                                                            <tr>
+                                                                <td colspan="7" class="text-center">
+                                                                    <img src="{% static 'img/no_data_found.png' %}" alt="No Image" class="no_data_found">
+                                                                </td>
+                                                            </tr>
+                                                        {% endif %}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                            </div>
                         </div>
+                        <!-- assginment Tab End -->
                         <div class="tab-pane" id="documents" role="tabpanel">
-                            <h6>documents of this class</h6>
+                            <div class="row">
+                                <div class="col-md-9">
+                                    <h6>Documents</h6>
+                                    <blockquote>The only way to do great work is to love what you do</blockquote>
+                                </div>
+                                <div class="col-md-3">
+                                    <button type="button"  data-bs-toggle="modal"
+                                        data-bs-target="#documentForm" class="btn btn-success btn-label rounded-pill right float-end">
+                                        <i class="bi bi-plus-circle label-icon align-middle fs-lg ms-2"></i>Add</button>
+                                </div>
+                            </div>
                             <div class="mb-0">
-                                dynamic code goes here
-                                <div class="row">
-                                <div class="col-md-12">
-                                    {% if transport_data %}
-                                    {% else %}
-                                        <img src="{% static 'img/no_data_found.png' %}" alt="No Image" class="no_data_found">
-                                    {% endif %}
+                                <div class="row" id="documentRow">
+                                    <div class="col-md-12 text-center">
+                                        {% if transport_data %}
+                                        {% else %}
+                                            <img src="{% static 'img/no_data_found.png' %}" alt="No Image" class="no_data_found">
+                                        {% endif %}
+                                    </div>
                                 </div>
                             </div>
                             </div>
@@ -341,14 +491,14 @@
                 <div class="row">
                     <input type="hidden" name="student_id" id="student_id" value="{{student_data.student_id}}">
                     <input type="hidden" name="parent_id" id="parent_id" value="">
-                    <div class="col-md-12 flex-grow-1 ms-2">
+                    <div class="col-md-12 flex-grow-1">
                         <p class="text-muted mb-0">
                             <label class="form-label">Name</label>
                             <input type="text" class="form-control" id="parent_name" name="parent_name"
                                 placeholder=" Enter Full Name">
                         </p>
                     </div>
-                    <div class="col-md-2 flex-grow-1 ms-2">
+                    <div class="col-md-2 flex-grow-1">
                         <p class="text-muted mb-0">
                             <label for="parent_age" class="form-label">Age</label>
                             <input type="text" class="form-control" id="parent_age" name="parent_age"
@@ -366,7 +516,7 @@
                             </select>
                         </p>
                     </div>
-                    <div class="col-md-4 flex-grow-1 ms-2">
+                    <div class="col-md-4 flex-grow-1">
                         <p class="text-muted mb-0">
                             <label for="relation_with_student" class="form-label">Relation with
                                 student</label>
@@ -379,20 +529,20 @@
                             </select>
                         </p>
                     </div>
-                    <div class="col-md-12 flex-grow-1 ms-2">
+                    <div class="col-md-12 flex-grow-1">
                         <p class="text-muted mb-0">
                             <label class="form-label" for="parent_email">Email</label>
                             <input type="text" class="form-control" id="parent_email" name="parent_email" placeholder=" Enter Email" >
                         </p>
                     </div>
-                    <div class="col-md-12 flex-grow-1 ms-2">
+                    <div class="col-md-12 flex-grow-1">
                         <p class="text-muted mb-0">
                             <label class="form-label">Phone Number</label>
                             <input type="text" class="form-control" id="parent_phone" name="parent_phone"
-                                placeholder=" Enter Phone Number">
+                                placeholder=" Enter Phone Number" minlength="10" maxlength="10">
                     </div>
                     
-                    <div class="col-md-12 flex-grow-1 ms-2">
+                    <div class="col-md-12 flex-grow-1">
                         <p class="text-muted mb-0">
                             <label for="parent_profession" class="form-label">Occupation</label>
                             <input type="text" class="form-control" id="parent_profession" name="parent_profession"
@@ -412,6 +562,175 @@
     </div>
 </div>
 <!-- modelform form parent end -->
+<!-- model popupfor assignment detailse-->
+<div class="modal fade bs-example-modal-lg" id="assignmentDetailse" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title"></h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                </button>
+            </div>
+            <div class="modal-body">
+                <p class="modal-desc"></p>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- model popupfor assignment detailse-->
+<!--ModelPopup For Assignments Submission-->
+<div class="modal fade bs-example-modal-lg" id="assignmentSubmission" tabindex="-1" role="dialog" aria-labelledby="myMediumModalLabel">
+    <div class="modal-dialog modal-md" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title"></h6>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                </button>
+            </div>
+            <div class="modal-body">
+                <form action="" method="post" enctype="multipart/form-data">
+                    <input type="hidden" name="" id="assginmentId" >
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label for="" class="form-label">Date</label>
+                            <input type="date" name="" id="" class="form-control">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="assignment_file" class="form-label">File</label>
+                            <input type="File" accept=".pdf" name="" id="assignment_file" class="form-control">
+                        </div>
+                        <div class="col-md-12 my-2">
+                            <label for="submission_details" class="form-label">Details</label>
+                            <textarea name="" id="submission_details" cols="30" rows="10" class="form-control"></textarea>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <a href="javascript:void(0);" class="btn btn-link link-success fw-medium" data-bs-dismiss="modal">
+                    <i class="ri-close-line me-1 align-middle"></i> Close
+                </a>
+                <button type="submit" class="btn btn-primary" id="btnSubmitAssignment">
+                    Submit
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--ModelPopup For Assignments Submission-->
+<!--ModelPopup For Exam Result-->
+<div class="modal fade bs-example-modal-lg" id="resultModel" tabindex="-1" role="dialog" aria-labelledby="myMediumModalLabel">
+    <div class="modal-dialog modal-md" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title"></h6>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                </button>
+            </div>
+            <div class="modal-body">
+                <table id="attendanceTable" class="table table-striped table-hover table-sticky table_students table-center">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>Subject Name</th>
+                            <th>Full Marks</th>
+                            <th>Optained Maks</th>
+                            <th>Percentage %</th>
+                            <th>Grade</th>
+                        </tr>
+                    </thead>
+                    <tbody class='attendanceTbody' id="pastExam">
+                        <tr>
+                            <td>English</td>
+                            <td>100</td>
+                            <td>80</td>
+                            <td>80%</td>
+                            <td>A</td>
+                        </tr>
+                        <tr>
+                            <td>Hindi</td>
+                            <td>100</td>
+                            <td>70</td>
+                            <td>70%</td>
+                            <td>B+</td>
+                        </tr>
+                        <tr>
+                            <td>Math</td>
+                            <td>100</td>
+                            <td>90</td>
+                            <td>90%</td>
+                            <td>A+</td>
+                        </tr>
+                        <tr>
+                            <td>Science</td>
+                            <td>100</td>
+                            <td>85</td>
+                            <td>85%</td>
+                            <td>A</td>
+                        </tr>
+                        <tr>
+                            <td>History</td>
+                            <td>100</td>
+                            <td>75</td>
+                            <td>75%</td>
+                            <td>B</td>
+                        </tr>
+                        <tr>
+                            <td>Geography</td>
+                            <td>100</td>
+                            <td>88</td>
+                            <td>88%</td>
+                            <td>A</td>
+                        </tr>
+                        <tr>
+                            <td colspan="3">Total Percentage</td>
+                            <td>80%</td>
+                            <td>B</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
 
+            </div>
+        </div>
+    </div>
+</div>
+<!--ModelPopup For Exam Result-->
+<!-- Document PopModel -->
+<div class="modal fade bs-example-modal-lg" id="documentForm" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title"></h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                </button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" name="" id="document_id" >
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-label">Document Name</div>
+                        <input type="text" class="form-control" placeholder="Document Name" id="document_name">
+                    </div>
+                    <div class="col-12 my-2">
+                        <label for="document_file" class="form-label">Attachment</label>
+                        <input type="file" class="form-control" accept="image/jpeg, image/png, image/jpg, .pdf" id="document_file">
+                        <p class="form-label my-2">Note:<br class="text-danger">Supported files:.jpeg, .jpg, .png and .pdf<br>Max size:
+                            5MB</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a href="javascript:void(0);" class="btn btn-link link-success fw-medium" data-bs-dismiss="modal">
+                    <i class="ri-close-line me-1 align-middle"></i> Close
+                </a>
+                <button type="submit" class="btn btn-primary" id="btnstudentDocument">
+                    Save
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Document PopModel -->
 {% endblock %}
 

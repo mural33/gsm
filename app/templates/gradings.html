@@ -1,0 +1,116 @@
+{% extends '_layout.html' %}
+{% load static %}
+{% block title %} Gradings {% endblock %}
+{% block content %}
+<script src="{% static 'app-js/gradings.js' %}"></script>
+
+<div class="row" id="heading-row">
+    <div class="col-sm-12 col-md-8 col-xl-8">
+        <h5>Grades</h5>
+        <quote>Fueling Ambitions, Fostering Achievement: Grades That Illuminate the Path to Excellence.</quote>
+    </div>
+    <div class="col-sm-12 col-md-4 col-xl-4">
+        <div class="row">
+            <div class="col text-end">
+                <button type="button" class="btn btn-success btn-label rounded-pill right" data-bs-toggle="modal" data-bs-target="#addeditGradeModal">    
+                    <i class="bi bi-plus-circle label-icon align-middle fs-lg ms-2"></i>Add Grade</button>                
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade bs-example-modal-md" id="addeditGradeModal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-centered">
+        <div class="modal-content" id="gradeFormArea">
+            <div class="modal-header">
+                <h5 class="modal-title" id="mysmallModalLabel">Add Grade</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <input type="hidden" name="grade_id" id="grade_id">
+            <div class="modal-body">
+                <div class="d-flex">
+                    <div class="flex-shrink-0">
+                        <i class="ri-checkbox-circle-fill text-success"></i>
+                    </div>
+                    <div class="flex-grow-1 ms-2">
+                        <p class="text-muted mb-0">Empowering Minds, Inspiring Futures: Grades as Stepping Stones to Success.</p>
+                    </div>
+                </div>
+                <div class="d-flex mt-2">
+                    <div class="col-md-12">
+                        <label class="form-label">Grade Name</label>
+                        <input type="text" class="form-control" id="grade_name" name="grade_name" placeholder=" Enter Grade Name" maxlength="100" minlength="1">
+                    </div>
+                </div>
+                <div class="d-flex mt-2 row">
+                    <div class="col-md-6 form-content">
+                        <label for="percent_from" class="form-label">Minimum Percentage(%)</label>
+                        <input type="number" class="form-control percent_from" id="percent_from" name="percent_from"
+                        placeholder="Enter Minimum Percentage" min="1" max="100">
+                    </div>
+                    <div class="col-md-6 form-content">
+                        <label for="percent_upto" class="form-label">Maximum Percentage(%)</label>
+                        <input type="number" class="form-control percent_upto" id="percent_upto" name="percent_upto"
+                        placeholder="Enter Maximum Percentage" min="1" max="100">
+                    </div>
+                </div>
+                
+                <div class="d-flex mt-2">
+                    <div class="col-md-12">
+                        <label class="form-label">Applicable Class</label>
+                        <select id="class_id" class="form-select" name="class_id" data-class-id="{{ grade.class_id }}">
+                            <option selected value="">Select Multiple Classes</option>
+                            {% for class in class_data %}
+                                <option value="{{ class.class_id }}">{{ class.class_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>    
+            </div>
+            <div class="modal-footer">
+                <a href="javascript:void(0);" class="btn btn-link link-success fw-medium" data-bs-dismiss="modal">
+                    <i class="ri-close-line me-1 align-middle"></i> Close</a>
+                <button type="button" class="btn btn-primary" id="btnSaveGrade" name="btnSaveGrade">Save</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div>
+
+<div class="row">
+    <div class="col-xl-12">
+        <table class="table table-striped table-hover table-sticky table_students" id="gradeTable">
+            <thead class="thead-dark">
+                <tr>
+                <th>Grade Name</th>
+                <th>Percentage(%) of Mark</th> 
+                <th>Applicable to Class</th>
+                <th>Action</th>
+                </tr>
+            </thead>
+            <tbody class="tbl__bdy" id="grade_details">
+            {% if gradings %}
+                {% for grade in gradings %}
+                <tr class="tr-grade-{{grade.grade_id}}">
+                    <td class="grade_name">{{grade.grade_name}}</td>
+                    <td class="percentage">{{ grade.percent_from }}% - {{ grade.percent_upto }}%</td>
+                    <td class="class_id">{{grade.classes.class_name}}</td>
+                    <td>
+                        <button type="button" data-id="{{grade.grade_id}}" class="btn btn-sm btn-info btnGradeEdit" id="btnGradeEdit"><i class="bi bi-pencil-square"></i></button>
+                        <a href="#" data-id="{{grade.grade_id}}" class="dltBtn btn btn-sm btn-danger"><i class="bi bi-trash3"></i></a>
+                    </td>
+                </tr>                     
+                {% endfor %}
+            {% else %}
+            <tr class="no_data_found-tr">
+                <td colspan="7" class="text-center">
+                    <img src="{% static 'img/no_data_found.png' %}" alt="No Image" class="no_data_found">
+                </td>
+            </tr>
+            {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+</section>
+
+{% endblock %}

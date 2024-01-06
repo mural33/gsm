@@ -16,16 +16,15 @@ class Data:
 
     def get_data_by_institute_id(self, url="", jwt="", params={}):
         self.headers = {"accept": "application/json", "Authorization": f"Bearer {jwt}"}
-        self.total_url = f"{self.api_link}{url}"  # Use f-string for better readability
+        self.total_url = f"{self.api_link}{url}" 
         self.response = requests.get(
             url=self.total_url, params=params, headers=self.headers
         )
+        print(self.response)
         if self.response.status_code == 200:
             return self.response.json()
         else:
-            return HttpResponse(
-                "Something went wrong", status=self.response.status_code
-            )
+            return []
 
     def get_class_data(self, end_point="", jwt="", params={}):
         self.headers = {"accept": "application/json", "Authorization": f"Bearer {jwt}"}
