@@ -65,7 +65,7 @@ async function addParent(){
     var endPoint = parentId ? `/Parents/update_parent/?parent_id=${parentId}` : "/Parents/add_parent/";
     var totalUrl = apiUrl+endPoint
 
-    await ajaxRequest(method, totalUrl, parentData,"parent_form","sm",(response) => {
+    await ajaxRequest(method, totalUrl, parentData,"parentFormArea","sm",(response) => {
         $("#parent_form").modal('hide');
         var parentData = response.response;
         raiseSuccessAlert(response.msg);
@@ -270,7 +270,7 @@ class StudentData {
         payload["assignment_file"] = "http//"
         raiseErrorAlert("Blob not working,Access-Control-Allow-Origin’ missing");
 
-        await this.ajaxCall("POST", totalUrl, payload, "assignmentSubmission", "sm",(response) => {
+        await this.ajaxCall("POST", totalUrl, payload, "assginmentFormArea", "sm",(response) => {
             this.tBody = $("#assignments_details")
             this.tr = this.tBody.find(`.tr-assignment-${assignmentId}`);
             this.tr.find(".assignment_status").html(`<span class="bg-success p-2 text-white">Submited</span>`);
@@ -300,7 +300,7 @@ class StudentData {
         var endPoint = documentId ? updateEndPoint : postEndPoint;
         var totalUrl = apiUrl + endPoint;
 
-        await this.ajaxCall(method, totalUrl, payload, "documentForm", "sm",(response) => {
+        await this.ajaxCall(method, totalUrl, payload, "documentFormArea", "sm",(response) => {
             $("#documentForm").modal('hide')
             this.docuemntRow = $("#documentRow")
             var docs = response.response
@@ -332,6 +332,7 @@ class StudentData {
                 `
                 this.docuemntRow.append(card);
                 raiseSuccessAlert("Document Added Successfully")
+                $("#documentRow").find(".no_data_found").hide()
             }
             else{
                 $(`.card-student-${docs.document_id}`).find(".card-title").text(`Document Name:${document_name}`)
@@ -347,7 +348,7 @@ class StudentData {
         await this.ajaxCall("GET", totalUrl, "", "documents", "sm",(response) => {
             this.documents = $("#documentRow")
             this.studenDocuments = response.response
-            if(this.studenDocuments){
+            if(this.studenDocuments.length > 0){
                 this.documents.empty();
                 for (const key in this.studenDocuments) {
                     var docs = this.studenDocuments[key]
@@ -531,7 +532,7 @@ async function deleteStudentDocument(element){
     await ajaxRequest("DELETE", totalUrl, "","documents","lg",(response) => {
         raiseSuccessAlert(response.msg);
         if ($('#documentRow .card').length === 0) {
-            $('#documentRow > .no_data_found').show();
+            $("#documentRow").find(".no_data_found").show()
         }
     })
 }

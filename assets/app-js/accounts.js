@@ -28,7 +28,8 @@ $(document).ready(function () {
     $("#btnSaveAccounts").on("click", async (e) => {
         $("#btnSaveAccounts").removeClass("btn-shake")
         e.preventDefault();
-        if (validateAccountsForm() === false) {
+        var isValidForm = validateAccountsForm();
+        if (isValidForm === false) {
             $("#btnSaveAccounts").addClass("btn-shake");
             return false;
         } else {
@@ -38,27 +39,34 @@ $(document).ready(function () {
 });
  
 let fields = [
-    'transaction_type', 'payment_type', 'transaction_date', 'transaction_id', 'description', 'net_balance', 'transaction_amount', 'payment_mode', 'particular_name', 'transaction_reference',
+    'transaction_date','payment_type','particular_name','description','transaction_amount','transaction_amount','transaction_type','net_balance','payment_mode',
+    'transaction_id','transaction_reference',
 ];
  
 //validate grade form
-async function validateAccountsForm() {
+function validateAccountsForm() {
     var isValid = true;
     for (const field of fields) {
-        const element = $(`#${field}`);
-        const value = element.val().trim();
-        if (value === "") {
-            element.addClass("is-invalid");
-            isValid = false;
-        }
-        else{
-                // Remove "is-invalid" class if the field is not empty
-                element.removeClass("is-invalid");
+        try{
+            const element = $(`#${field}`);
+            const value = element.val().trim();
+            if (value === "") {
+                element.addClass("is-invalid");
+                isValid = false;
             }
+            else{
+                    // Remove "is-invalid" class if the field is not empty
+                    element.removeClass("is-invalid");
+                }
+        }
+        catch{
+            raiseErrorAlert(`Please fill all the fields ${field}`)
+            return false;
+        }
     }    
     return isValid;
 }
- 
+
 async function accountsSubmitForm() {
     const accountsId = $("#account_id").val();  
     const accountsData = {

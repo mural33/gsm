@@ -34,14 +34,21 @@ async function deleteStaff(staffId) {
                 },
                 success: (response) => {
                     raiseSuccessAlert(response.detail);
-                    if($('#staffTable tr').length == 1) {
-                        $(".no_data_found-tr").show()
+                    if($("#staffTable tr").length == 0){
+                        $("#staffsTable").html(
+                            `<tr class="">
+                                <td colspan="8" class="text-center">
+                                <img src="/assets/img/no_data_found.png" alt="No Image" class="no_data_found">
+                                </td>
+                            </tr>`
+                        )
                     }
                 },
                 error: (error) => {
                     raiseErrorAlert(error.responseJSON.detail);
                 },
                 complete: (e) => {
+                    
                 }
             });
         }

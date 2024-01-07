@@ -89,11 +89,17 @@ function validateGradeForm() {
     var isValid = true;
     // const fields = ["percent_from", "percent_upto", "grade_name"];
     for (const field of fields) {
-        const element = $(`#${field}`);
-        const value = element.val().trim();
-        if (value === "") {
-            element.focus().addClass("is-invalid");
-            isValid = false;
+        try{
+            const element = $(`#${field}`);
+            const value = element.val().trim();
+            if (value === "") {
+                element.focus().addClass("is-invalid");
+                isValid = false;
+            }
+        }
+        catch{
+            raiseErrorAlert(`Please fill  the fields ${field}`)
+            return false;
         }
     }
     if (!isNaN(minPercentage) && !isNaN(maxPercentage)) {
@@ -151,6 +157,7 @@ async function gradeSubmitForm() {
                 tr.find(".class_id").text(selectedClassText);
                 $('#addeditGradeModal').removeClass("model fade"); 
                 raiseSuccessAlert("Grade Updated Successfully");
+                $("#grade_id").val("")
             } else {
                 $("#grade_details").find(".no_data_found-tr").remove();
                 const responseData = data.response; 
@@ -170,6 +177,7 @@ async function gradeSubmitForm() {
         },
         error: (error) => {
             raiseErrorAlert(error.responseJSON.detail);
+            console.log(error);
         },
         complete: (e) => {
             removeLoader("gradeFormArea", "sm");

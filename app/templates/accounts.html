@@ -128,7 +128,7 @@
                     <div class="col-md-12">
                         <label class="form-label">Payment Type</label>
                         <select class="form-select" name="payment_type" id="payment_type">
-                            <option value="" selected disabled>Select Type</option>
+                            <option value="" selected>Select Type</option>
                             <option value="Fee Collections">Fee Collections</option>
                             <option value="Salary">Salary</option>
                             <option value="Expenditure">Expenditure</option>
@@ -160,7 +160,7 @@
                     <div class="col-md-6 form-content">
                         <label class="form-label">Transaction Type</label>
                         <select class="form-select" name="transaction_type" id="transaction_type">
-                            <option value="" selected disabled>Select Debit/Credit</option>
+                            <option value="" selected>Select Debit/Credit</option>
                             <option value="Debit">Debit</option>
                             <option value="Credit">Credit</option>
                         </select>
@@ -175,7 +175,7 @@
                     <div class="col-md-6 form-content">
                         <label class="form-label">Payment Mode</label>
                         <select class="form-select" name="payment_mode" id="payment_mode">
-                            <option selected value="" selected disabled>Select Mode of Payment</option>
+                            <option value="" selected >Select Mode of Payment</option>
                             <option value="Cash">Cash</option>
                             <option value="UPI">UPI</option>
                             <option value="Net Banking-NEFT">Net Banking-NEFT</option>
@@ -209,7 +209,6 @@
     </div><!-- /.modal-dialog -->
 </div>
 
-<section data-jwt-tokens="{{ jwt_token }}" id="jwt_card"></section>
 <div class="row mt-2">
     <div class="col-xl-12">
         <table class="table table-striped table-hover table-sticky table_students" id="accountsTable">
@@ -240,8 +239,8 @@
                 </tr>
                 {% endfor %}
             {% else %}
-                <tr>
-                    <td colspan="8">
+                <tr class="no_data_found-tr">
+                    <td colspan="8" class="text-center">
                         <img src="{% static 'img/no_data_found.png' %}" alt="noImage" class="no_data_found" />
                     </td>
                 </tr>

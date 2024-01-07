@@ -3,6 +3,8 @@
 {% block title %} Transport{% endblock %}
 
 {% block content %}
+<link href="{% static 'app-css/transport.css' %}" rel="stylesheet" />
+
 <div class="row" id="heading-row">
     <div class="col-sm-12 col-md-8 col-xl-8" style="padding: 1rem">
         <h5>Transportation</h5>
@@ -70,7 +72,6 @@
         </div>
     </div>
 </div>
-
 <div class="row">
     <div class="col-md-12 text-center">
         <table class="table table-striped table-hover table-sticky table_students">
@@ -92,10 +93,10 @@
                     {% for transport in transportation %}
                         <tr class="tr-transport-{{transport.transport_id}}">
                             <td>{{forloop.counter}}</td>
-                            <td class="vehicle_number">{{transport.vehicle_number}}</td>
-                            <td class="vehicle_details w-25">{{transport.vehicle_details}}</td>
+                            <td class=" text-break vehicle_number">{{transport.vehicle_number}}</td>
+                            <td class=" text-break vehicle_details w-25">{{transport.vehicle_details}}</td>
                             <td class="register_date">{{transport.register_date}}</td>
-                            <td class="transport_name">{{transport.transport_name}}</td>
+                            <td class=" text-break transport_name">{{transport.transport_name}}</td>
                             <td>
                                 <button class="btn btn-sm btn-dark rounded-pill" data-bs-toggle="modal"
                                     data-bs-target="#stopFormModal"
@@ -104,12 +105,12 @@
                             </td>
                             <td>
                                 <button class="btn btn-sm btn-dark rounded-pill" data-bs-toggle="modal"  
-                                    data-bs-target="#studentModal" onclick="showStudentDetails(this)" 
+                                    data-bs-target="#studentModal" onclick="showStudentDetails(this)"
                                     data-trans-id="{{transport.transport_id}}">View</button>
                             </td>
                             <td>
                                 <button class="btn btn-sm btn-dark rounded-pill" data-bs-toggle="modal"  
-                                    data-bs-target="#staffModal" onclick="showStaffDetails(this)" 
+                                    data-bs-target="#staffModal" onclick="showStaffDetails(this)"
                                     data-trans-id="{{transport.transport_id}}">View</button>
                             </td>
                             <td>
@@ -123,17 +124,16 @@
                         </tr>
                     {% endfor %}
                 {% else %}
-                    <tr>
-                        <td colspan="9" class="text-center" id="no_data_found">
-                            <img src="{% static 'img/no_data_found.png' %}" alt="No Data Found" class="no_data_found" id="no_data_found">
-                        </td>
-                    </tr>
-                {% endif %}
+                <tr>
+                    <td colspan="9" class="text-center" id="no_data_found">
+                        <img src="{% static 'img/no_data_found.png' %}" alt="No Data Found" class="no_data_found" id="no_data_found">
+                    </td>
+                </tr>
+            {% endif %}
             </tbody>
         </table>
     </div>
 </div>
-
 <!-- Student form -->
 
 <div class="modal fade" tabindex="-1" id="studentModal">
@@ -146,10 +146,13 @@
                 <div class="modal-body">
                     <div class="d-flex gap-2">
                         <input type="text" class="form-control" placeholder="Enter Roll Number" id="roll_number">
-                        <button type="button" class="btn btn-success btn-sm rounded-pill" id="trns-std-id" data-transport-id="" onclick="fetchStudentDetails(this)">Assign</button>
+                            <button type="button" class="btn btn-success btn-label rounded-pill right assign" 
+                            id="trns-std-id" data-transport-id="" onclick="fetchStudentDetails(this)">
+                             <i class="bi bi-plus-circle label-icon align-middle fs-lg ms-2"></i>Assign
+                         </button>    
                     </div>
                     <div class="mt-2">
-                    <table class="table">
+                    <table class="table" id="studentAssignTable">
                         <thead class="thead-dark">
                             <tr>
                                 <tr>
@@ -200,7 +203,7 @@
                                             data-stop-id="${stopdata['stop_id']}"><i class="bi bi-trash3"
                                                 style="color: red; padding: 16px;"></i></a>
                                     </div>
-                                </div>
+                                </div> 
                             </div>
                         </div>
                     </div>
@@ -219,10 +222,13 @@
                 <div class="modal-body">
                     <div class="d-flex gap-2">
                         <input type="text" class="form-control" placeholder="Enter empolyee No" id="employee_id">
-                        <button type="button" class="btn btn-success btn-sm rounded-pill" id="trns-staff-id" data-transport-id="" onclick="fetchStaffDetails(this)">Assign</button>
+                            <button type="button" class="btn btn-success btn-label rounded-pill right assign" 
+                           id="trns-staff-id" data-transport-id="" onclick="fetchStaffDetails(this)">
+                            <i class="bi bi-plus-circle label-icon align-middle fs-lg ms-2"></i>Assign
+                        </button>
                     </div>
                     <div class="mt-2">
-                    <table class="table">
+                    <table class="table" id="staffAssignTable">
                         <thead class="thead-dark">
                             <tr>
                                 <tr>

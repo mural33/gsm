@@ -1,64 +1,115 @@
-name: Build and deploy Python app to Azure Web App - GSM_Webapp
-on:
-  push:
-    branches:
-      - main
-  workflow_dispatch:
+trigger:
+- develop
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
+variables:
+  azureServiceConnection: 'AlongX-Azure-Account-Development'
+  webAppName: 'gsm-webapp'
+  resourceGroupName: 'Development'
+  vmImageName: 'ubuntu-latest'
+  environmentName: 'gsm-webapp'
+  projectRoot: $(System.DefaultWorkingDirectory)
+  pythonVersion: '3.12'
+  isRelease: $[eq(variables['Build.SourceBranch'], 'refs/heads/develop')]
 
+
+stages:
+- stage: Build
+  displayName: Build Stage
+  jobs:
+  - job: BuildJob
+    pool:
+      vmImage: $(vmImageName)
     steps:
-      - uses: actions/checkout@v2
+    - task: UsePythonVersion@0
+      inputs:
+        versionSpec: '$(pythonVersion)'
+      displayName: 'Use Python $(pythonVersion)'
 
-      - name: Set up Python version
-        uses: actions/setup-python@v1
-        with:
-          python-version: '3.8'
+    - script: |
+        sudo apt install python3-venv
+        python3 -m venv djangoenv
+        source djangoenv/bin/activate
+        python -m pip install django
+        python -m pip install --upgrade pip
+        pip install setup
+        pip install -r requirements.txt
+        python manage.py makemigrations
+        python manage.py migrate
+        python manage.py collectstatic --no-input
+      workingDirectory: $(projectRoot)
+      displayName: "Install requirements"
 
-      - name: Create and start virtual environment
-        run: |
-          python -m venv venv
-          source venv/bin/activate
-      
-      - name: Install dependencies
-        run: pip install -r requirements.txt
+    - task: ArchiveFiles@2
+      displayName: 'Archive files'
+      inputs:
+        rootFolderOrFile: '$(projectRoot)'
+        includeRootFolder: false
+        archiveType: zip
+        archiveFile: $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
+        replaceExistingArchive: true
 
-      - name: Run collectstatic
-        run: python manage.py collectstatic --no-input
-        
-      - name: Run collectstatic
-        run: python manage.py migrate
-        
-      # Optional: Add step to run tests here (PyTest, Django test suites, etc.)
-      
-      - name: Upload artifact for deployment jobs
-        uses: actions/upload-artifact@v2
-        with:
-          name: python-app
-          path: |
-            . 
-            !venv/
+    - task: PublishPipelineArtifact@1
+      displayName: 'Publish Pipeline Artifact'
+      inputs:
+        targetPath: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
+        artifact: 'drop'
+        publishLocation: 'pipeline'
 
-  deploy:
-    runs-on: ubuntu-latest
-    needs: build
-    environment:
-      name: 'Production'
-      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
-
-    steps:
-      - name: Download artifact from build job
-        uses: actions/download-artifact@v2
-        with:
-          name: python-app
-          path: .
+- stage: Deploy
+  displayName: 'Deploy to Develop Environment'
+  dependsOn: Build
+  condition: and(succeeded(), eq(variables.isRelease, true))
+  jobs:
+  - deployment: DeploymentJob
+    pool:
+      vmImage: $(vmImageName)
+    environment: $(environmentName)
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: UsePythonVersion@0
+            inputs:
+              versionSpec: '$(pythonVersion)'
+            displayName: 'Use Python version'
           
-      - name: 'Deploy to Azure Web App'
-        uses: azure/webapps-deploy@v2
-        id: deploy-to-webapp
-        with:
-          app-name: 'GSM_Webapp'
-          slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_C29BCA7C0EF444F5857A76114D27B266 }}
+          - task: AzureAppServiceSettings@1
+            inputs:
+              azureSubscription: '$(azureServiceConnection)'
+              appName: $(webAppName)
+              resourceGroupName: '$(resourceGroupName)'
+              appSettings: |
+                [
+                  {
+                    "name": "ENABLE_ORYX_BUILD",
+                    "value": 1
+                  },
+                  {
+                    "name": "SCM_DO_BUILD_DURING_DEPLOYMENT",
+                    "value": 1
+                  },
+                  {
+                    "name": "POST_BUILD_COMMAND",
+                    "value": "pip install -r requirements.txt"
+                  }
+                ]
+
+          - task: AzureWebApp@1
+            displayName: 'Deploy Azure Web App : $(webAppName)'
+            inputs:
+              azureSubscription: '$(azureServiceConnection)'
+              appType: 'webAppLinux'
+              appName: '$(webAppName)'
+              package: '$(Pipeline.Workspace)/drop/$(Build.BuildId).zip'
+
+          # - task: AzureCLI@2
+          #   displayName: 'Restart App Service'
+          #   inputs:
+          #     azureSubscription: '$(azureServiceConnection)'
+          #     scriptType: 'bash'
+          #     scriptLocation: 'inlineScript'
+          #     inlineScript: |
+          #       # Restart Azure App Service
+          #       resourceGroupName='Development'
+          #       webAppName='gsm-webapp'
+          #       az webapp restart --resource-group $resourceGroupName --name $webAppName

@@ -3,19 +3,19 @@
 {% block title %} Assignment Management {% endblock %}
 {% block content %}
 <link href="{% static 'app-css/assignments.css' %}" rel="stylesheet">
+
 <div class="row" id="heading-row">
-    <div class="col-sm-12 col-md-5 col-xl-8" style="padding: 1rem">
-        <div>
-            <h5>Assignments</h5>
-            <quote>Assignments as Stepping Stones, Exams as Peaks: Your Academic Ascent.</quote>
-        </div>
+    <div class="col-sm-12 col-md-8 col-xl-8" style="padding: 1rem">
+        <h5>Assignments</h5>
+        <quote>Assignments as Stepping Stones, Exams as Peaks: Your Academic Ascent.</quote>
     </div>
-    <div class="col-sm-12 col-md-7 col-xl-4" style="padding: 1rem">
+    <div class="col-sm-12 col-md-4 col-xl-4" style="padding: 1rem">
         <div class="row">
             <div class="col text-end">
-                <button class="btn btn-success rounded-pill" data-bs-toggle="modal"
-                data-bs-target="#assignmentModal"><i class="bi bi-plus-circle me-2"></i>Create
-                Assignment</button>
+                <button type="button" class="btn btn-success btn-label rounded-pill right" data-bs-toggle="modal"
+                    data-bs-target="#assignmentModal">
+                    <i class="bi bi-plus-circle label-icon align-middle fs-lg ms-2"></i>Create  Assigment
+                </button>
             </div>
         </div>
     </div>
@@ -101,12 +101,12 @@
                 {% for assign in assignment_data %}
                 <tr class="tr-assign-{{assign.id}}">
                     <td>{{ forloop.counter }}</td>
-                    <td class="assignment_title w-25">{{ assign.assignment_title }}</td>
-                    <td>
+                    <td class="text-break assignment_title">{{ assign.assignment_title }}</td>
+                    <td class="text-break">
                         <span class="class_id">{{ assign.classes.class_name }}</span>-
                         <span class="section_id">{{ assign.sections.section_name }}</span>
                     </td>
-                    <td class="assignment_Date">{{ assign.assignment_Date }}</td>
+                    <td class=" text-break assignment_Date">{{ assign.assignment_Date }}</td>
                     <td class="assignment_due_date">{{ assign.assignment_due_date }}</td>
                     <td>
                         <button type="button" class="openAssignmentBtn btn btn-sm btn-dark rounded-pill" data-bs-toggle="modal" data-bs-target="#assignment-view-modal" data-id="{{ assign.id }}" data-description="{{ assign.assignment_details }}">View</button>

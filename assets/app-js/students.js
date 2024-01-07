@@ -50,8 +50,8 @@ async function deleteStudent(studentId){
             raiseErrorAlert(error.responseJSON.detail);
         },
         complete:(e) => {
-            if($("#studentsTable tr").length == 0){
-                $("#studentsTable").html(
+            if($("#studentTable tr").length == 0){
+                $("#studentTable").html(
                     `<tr class="">
                         <td colspan="8" class="text-center">
                         <img src="/assets/img/no_data_found.png" alt="No Image" class="no_data_found">

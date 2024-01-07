@@ -115,12 +115,12 @@ function addAssignment() {
                 const responseData = data.response; 
                 if (isUpdate) {
                     const tr = document.querySelector(`.tr-assign-${responseData.id}`);
-                    for (const key in responseData) {
-                        const element = tr.querySelector(`.${key}`);
-                        if (element) {
-                            element.textContent = responseData[key];
-                        }
-                    }
+                    tr.find(".assignment_title").text(responseData.assignment_title);
+                    tr.find(".class_id").text(responseData.classes.class_name);
+                    tr.find(".section_id").text(responseData.sections.section_name);
+                    tr.find(".assignment_Date").text(responseData.assignment_Date);
+                    tr.find(".assignment_due_date").text(responseData.assignment_due_date);
+                    tr.find(".openAssignmentBtn").attr("data-description", responseData.assignment_details);
                     $("#assignment_id").val("");
                     $('#assignmentModal').addClass("model fade");
                     raiseSuccessAlert("Assignment Record Updated Successfully");

@@ -1,0 +1,56 @@
+.assign{
+    height: 2rem;
+}
+#transport_details th,
+#transport_details td {
+    text-align: center;
+}
+ 
+#transport_details th:nth-child(1),
+#transport_details td:nth-child(1) {
+    width: 5%;
+}
+ 
+#transport_details th:nth-child(2),
+#transport_details td:nth-child(2) {
+    width: 10%;
+}
+ 
+#transport_details th:nth-child(3),
+#transport_details td:nth-child(3) {
+    width: 10%;
+}
+ 
+#transport_details th:nth-child(4),
+#transport_details td:nth-child(4) {
+    width: 10%;
+}
+ 
+#transport_details th:nth-child(5),
+#transport_details td:nth-child(5) {
+    width: 10%;
+}
+ 
+#transport_details th:nth-child(6),
+#transport_details td:nth-child(6) {
+    width: 10%;
+}
+ 
+#transport_details th:nth-child(7),
+#transport_details td:nth-child(7) {
+    width: 10%;
+}
+ 
+#transport_details th:nth-child(8),
+#transport_details td:nth-child(8) {
+    width: 10%;
+}
+ 
+#transport_details th:nth-child(9),
+#transport_details td:nth-child(9) {
+    width: 10%;
+}
+ 
+#transportNameContent {
+    word-wrap: break-word;
+}

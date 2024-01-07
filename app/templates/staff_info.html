@@ -14,7 +14,6 @@
             <h5>Staff Information</h5>
             <quote>Teachers illuminate the path to knowledge, guiding minds to brilliance with each lesson they share.</quote>
         </div>
-       
     </div>
 
     <div class="col-xl-3 col-lg-3 col-md-12 ">          
@@ -258,7 +257,7 @@
                           </tr>
                           {% endfor %} 
                         {% else %}
-                        <tr>
+                        <tr class="no_data_found-tr">
                             <td colspan="7" class="text-center">
                                 <img src="{% static 'img/no_data_found.png' %}" alt="No Image" class="no_data_found">
                             </td>
@@ -326,8 +325,8 @@
                   </div>
               </div>
                 <div class="mb-0" id="documentDetails">
-                {% if documents%}
                     <div class="row" id="documentRow">
+                    {% if documents %}
                       {% for docs in documents %}
                         <div class="col-md-4 card-staff-{{docs.document_id}}">
                           
@@ -353,12 +352,12 @@
                             
                         </div>
                         {% endfor %}
+                      {% else %}
+                        <div class="text-center" id="no_data_found">
+                            <img src="{% static 'img/no_data_found.png' %}" alt="No Image" class="no_data_found">
+                        </div>
+                      {% endif %}
                     </div>
-                  {% else %}
-                  <div class="text-center" id="no_data_found">
-                      <img src="{% static 'img/no_data_found.png' %}" alt="No Image" class="no_data_found">
-                  </div>
-                  {% endif %}
                 </div>
               </div>
           </div>
@@ -480,9 +479,4 @@
     </div>
 </div>
 <!-- Document PopModel -->
-
 {% endblock %}
-
-
-
-

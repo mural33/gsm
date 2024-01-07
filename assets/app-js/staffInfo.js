@@ -53,6 +53,7 @@ async function addPayroll(){
             displayNewPayroll(payrollData);
         }
         resetForm(payrollFieldNames);
+        $("#payroll_detail").find(".no_data_found-tr").hide();
     });
 }
 async function displayNewPayroll(response) {
@@ -145,9 +146,9 @@ async function deletePayroll(payrollId){
     }).then((result) => {
         if (result.isConfirmed) {
             $(`.tr-payroll-${payrollId}`).remove()
-            if ($('#staffPayroll').length === 0) {
-                $("#parentRow").html('<img src="/assets/img/no_data_found.png" class="no_data_found">');
-              }
+            if ($('#staffPayroll').length === 1) {
+                $("#payroll_detail").find(".no_data_found-tr").show()
+            }
             var endPoint = `/StaffPayrole/delete_payroll/?payroll_id=${payrollId}`
             var totalUrl = apiUrl+endPoint;
             ajaxRequest("DELETE",totalUrl, "","payrollFormId","lg", (response) => {  
@@ -180,24 +181,24 @@ async function addDocuments() {
     var endPoint = isUpdate ? `/StaffDocuments/update_staff_documents/?document_id=${documentId}` : "/StaffDocuments/add_staff_documents/";
     var totalUrl = apiUrl + endPoint
     // Extract file name before making the AJAX request
-    var documentFile = documentData.document_file;
-    var splitFile = documentFile.split('/');
-    var fileName = splitFile[splitFile.length - 1];
     await ajaxRequest(method, totalUrl, documentData, "documentFormId", "lg", (response) => {
         $("#documentForm").modal('hide');
         var documentData = response.response;
-        raiseSuccessAlert(response.msg);
-        if (documentId) {
+        var docsName = documentData.document_file.split('/').pop();
+        var document_name = documentData.document_name
+        if (isUpdate) {
             var updatedRow = $(`.card-staff-${documentId}`);
-            updatedRow.find('.card-title').text(documentData.document_name);
-            updatedRow.find('.card-text').text(fileName); 
+            updatedRow.find(".card-title").text(`Document Name:${document_name}`)
+            updatedRow.find(".card-text").text(`Document type:${docsName}`)
+            raiseSuccessAlert("Document Updated Successfully")
         } else {
             displayNewDocument(documentData);
         }
         resetForm(documentFields);
+        isUpdate = false;
+        $("#documentRow").find("#no_data_found").hide()
     });
 }
-
 
 async function displayNewDocument(response) {
     var documentFile = response.document_file.split('/').pop();
@@ -223,8 +224,10 @@ async function displayNewDocument(response) {
         </div>
     `;
     $("#documentRow").append(newDocumentHTML);
+    raiseSuccessAlert("Document Added Successfully")
     resetForm(documentFields);
-    isUpdate = false
+    isUpdate = false;
+    
     
 }
 
@@ -244,8 +247,8 @@ async function deleteDocuments(element){
             var endPoint = `/StaffDocuments/delete_staff_documents/?document_id=${documentId}`;
             var totalUrl = apiUrl + endPoint;
             $(`.card-staff-${documentId}`).remove()
-            if ($('#documentDetails').length === 0 ) {
-                $("#documentRow").html('<img src="/assets/img/no_data_found.png" class="no_data_found">');
+            if ($('#documentRow').length === 1 ) {
+                $("#documentRow").find("#no_data_found").show()
             }
             ajaxRequest("DELETE", totalUrl, "","documentRow","lg",(response) => {
                 Swal.fire({
@@ -276,12 +279,14 @@ async function openDocumentForm(element) {
         for (const key in documentData) {
             try {
                 $(`#${key}`).val(documentData[key]);
-                isUpdate = true;
             } catch (e) {
                 // Handle any potential errors
             }
         }
+        isUpdate = true;
+        
     });
+    
 }
 
 

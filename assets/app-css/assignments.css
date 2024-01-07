@@ -1,21 +1,39 @@
-.form_section{
-    display: none;
-    position:absolute;
-    top: 0;
-    right: 0;
-    /* left: 0; */
-    width: 100%;
-    height: 100%;
-    z-index: 10000;
-    background-color: #f3eeee70 !important;
+#assignmentTable th,
+#assignmentTable td {
+    text-align: center;
 }
-.form_div{
-    background-color: #ffff;
-    height: 100vh;
+
+#assignmentTable th:nth-child(1),
+#assignmentTable td:nth-child(1) {
+    width: 5%; 
 }
-#add-student{
-    margin-top: 43px;
-    border-radius: 5px;
-    color: white;
-    background: black;
+
+#assignmentTable th:nth-child(2),
+#assignmentTable td:nth-child(2) {
+    width: 20%; 
+}
+
+#assignmentTable th:nth-child(3),
+#assignmentTable td:nth-child(3) {
+    width: 15%; 
+}
+
+#assignmentTable th:nth-child(4),
+#assignmentTable td:nth-child(4) {
+    width: 15%; 
+}
+
+#assignmentTable th:nth-child(5),
+#assignmentTable td:nth-child(5) {
+    width: 15%; 
+}
+
+#assignmentTable th:nth-child(6),
+#assignmentTable td:nth-child(6) {
+    width: 15%; 
+}
+
+#assignmentTable th:nth-child(7),
+#assignmentTable td:nth-child(7) {
+    width: 15%; 
 }

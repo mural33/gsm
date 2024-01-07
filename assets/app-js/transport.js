@@ -156,14 +156,10 @@ async function deleteTransport(recordId, jwtToken) {
             const deleteRow = document.querySelector(`.tr-transport-${recordId}`);
             if (deleteRow) {
                 deleteRow.remove();
-                removeLoader("body", "lg")
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Deleted!',
-                    text: 'Transport data deleted Successfully',
-                });
+                removeLoader("body", "lg");
+                raiseSuccessAlert("Transport Details Deleted Successfully")
             }
-            if ($('#transport_details tr').length === 0) {
+            if ($('#transport_details tr').length === 1) {
                 $('#no_data_found').show();
             }
             
@@ -245,6 +241,7 @@ function addMore(element) {
                                 </a>
                             </div>`;
                 stoppageContainer.append(stop);
+                displayStopages(transport_id);
                 stopageInput.val('');
                 raiseSuccessAlert("Stop Added Successfully");
             },
@@ -275,6 +272,7 @@ function displayStopages(transport_id) {
         success: function (data) {
             const stoppageContainer = $('#stopagesList');
             stoppageContainer.empty();
+            if(data.length > 0){
             data.forEach(stopdata => {
                 const stop = `<div class="mt-2 d-flex align-items-center" id="stopage_id_${stopdata['stop_id']}">
                             <input type="text" class="form-control" value="${stopdata["stop_name"]}">
@@ -284,6 +282,10 @@ function displayStopages(transport_id) {
                         </div>`;
                 stoppageContainer.append(stop);
             });
+        }else {
+            stoppageContainer.html('<div class="mt-2"><img src="/assets/img/no_data_found.png" class="no_data_found"></div>');
+        }
+        
         },
         error: function (error) {
             raiseErrorAlert('Error:');
@@ -311,6 +313,9 @@ function deleteStoppage(element) {
             const deletedStopage = $(`#stopage_id_${id}`);
             if (deletedStopage.length) {
                 deletedStopage.remove();
+                if ($('#stopagesList .d-flex').length === 0) {
+                    $("#stopagesList").html('<div class="mt-2"><img src="/assets/img/no_data_found.png" class="no_data_found"></div>');
+                }
                 raiseSuccessAlert("Stop deleted Successfully");
             } else {
                 raiseErrorAlert("Stoppage row not deleted");
@@ -361,6 +366,7 @@ function fetchStudentDetails() {
                 row.append(cell1, cell2, deleteButton);
                 tableBody.append(row);
                 localStorage.setItem('assignedStudents', JSON.stringify([{ roll_number: data.response.roll_number, student_name: data.response.student_name }]));
+                displayAssignedStudents(transportId);
                 $('#roll_number').val('');
                 raiseSuccessAlert("Student Added Successfully");
             } else {
@@ -406,7 +412,7 @@ function displayAssignedStudents(transportId) {
                 });
                 localStorage.setItem('assignedStudents', JSON.stringify(data.response));
             } else {
-                raiseErrorAlert('No students found for the given transport ID.');
+                tableBody.html('<tr><td colspan="3"><img src="/assets/img/no_data_found.png" class="no_data_found"></td></tr>');
             }
         },
         error: function (error) {
@@ -417,6 +423,7 @@ function displayAssignedStudents(transportId) {
         }
     });
 }
+
 
 function deleteStudent(button) {
     var roll_number = $(button).attr('data-student-id').trim();
@@ -433,6 +440,9 @@ function deleteStudent(button) {
         },
         success: function (data) {
             $('tr[data-roll-number="' + roll_number + '"]').remove();
+            if ($('#assignedStudents tr').length === 0) {
+                $("#assignedStudents").html('<tr><td colspan="3"><img src="/assets/img/no_data_found.png" class="no_data_found"></td></tr>');
+            }
             raiseSuccessAlert("Student deleted Successfully");
         },
         error: function (error) {
@@ -480,6 +490,7 @@ function fetchStaffDetails() {
                 row.append(cell1, cell2, deleteButton);
                 tableBody.append(row);
                 localStorage.setItem('assignedStaff', JSON.stringify([{ employee_id: data.response.employee_id, staff_name: data.response.staff_name }]));
+                displayAssignedStaff(transportId);
                 $('#employee_id').val('');
                 raiseSuccessAlert("Staff Added Successfully");
             } else {
@@ -524,7 +535,7 @@ function displayAssignedStaff(transportId) {
                 });
                 localStorage.setItem('assignedStaff', JSON.stringify(data.response));
             } else {
-                raiseErrorAlert('No staff found for the given transport ID.');
+                tableBody.html('<tr><td colspan="3"><img src="/assets/img/no_data_found.png" class="no_data_found"></td></tr>');
             }
         },
         error: function (error) {
@@ -551,6 +562,9 @@ function deleteStaff(button) {
         },
         success: function (data) {
             $('tr[data-employee_id="' + employee_id + '"]').remove();
+            if ($('#assignedStaff tr').length === 0) {
+                $("#assignedStaff").html('<tr><td colspan="3"><img src="/assets/img/no_data_found.png" class="no_data_found"></td></tr>');
+            }
             raiseSuccessAlert("Staff deleted Successfully");
         },
         error: function (error) {
