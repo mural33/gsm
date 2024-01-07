@@ -1,0 +1,15 @@
+.resdiv{
+    border: 1px solid #dddbe4;
+    width: 12%; 
+    text-align: center;
+    padding: 6px;
+    padding-top: 6px;
+    border-radius: 4px;
+    font-size: 14px;
+    gap:4.5px;
+    margin-left: 11px;
+    color: #fff;
+}
+.resdiv:first-child{
+    margin-left: 13px;
+}

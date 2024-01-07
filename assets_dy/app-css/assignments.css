@@ -1,0 +1,39 @@
+#assignmentTable th,
+#assignmentTable td {
+    text-align: center;
+}
+
+#assignmentTable th:nth-child(1),
+#assignmentTable td:nth-child(1) {
+    width: 5%; 
+}
+
+#assignmentTable th:nth-child(2),
+#assignmentTable td:nth-child(2) {
+    width: 20%; 
+}
+
+#assignmentTable th:nth-child(3),
+#assignmentTable td:nth-child(3) {
+    width: 15%; 
+}
+
+#assignmentTable th:nth-child(4),
+#assignmentTable td:nth-child(4) {
+    width: 15%; 
+}
+
+#assignmentTable th:nth-child(5),
+#assignmentTable td:nth-child(5) {
+    width: 15%; 
+}
+
+#assignmentTable th:nth-child(6),
+#assignmentTable td:nth-child(6) {
+    width: 15%; 
+}
+
+#assignmentTable th:nth-child(7),
+#assignmentTable td:nth-child(7) {
+    width: 15%; 
+}
