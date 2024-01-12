@@ -54,11 +54,10 @@
                         placeholder="Enter Maximum Percentage" min="1" max="100">
                     </div>
                 </div>
-                
                 <div class="d-flex mt-2">
                     <div class="col-md-12">
                         <label class="form-label">Applicable Class</label>
-                        <select id="class_id" class="form-select" name="class_id" data-class-id="{{ grade.class_id }}">
+                        <select id="class_id" class="form-select" name="class_id" data-class-id="{{ grade.class_id }}" multiple aria-label="multiple select example">
                             <option selected value="">Select Multiple Classes</option>
                             {% for class in class_data %}
                                 <option value="{{ class.class_id }}">{{ class.class_name }}</option>
@@ -88,25 +87,21 @@
                 </tr>
             </thead>
             <tbody class="tbl__bdy" id="grade_details">
-            {% if gradings %}
                 {% for grade in gradings %}
                 <tr class="tr-grade-{{grade.grade_id}}">
                     <td class="grade_name">{{grade.grade_name}}</td>
                     <td class="percentage">{{ grade.percent_from }}% - {{ grade.percent_upto }}%</td>
-                    <td class="class_id">{{grade.classes.class_name}}</td>
+                    <td class="class_id">
+                        {% for classData in grade.grades %}
+                        <span>{{classData.class_name}}{% if not forloop.last %}, {% endif %}</span>
+                        {% endfor %}  
+                    </td>
                     <td>
                         <button type="button" data-id="{{grade.grade_id}}" class="btn btn-sm btn-info btnGradeEdit" id="btnGradeEdit"><i class="bi bi-pencil-square"></i></button>
                         <a href="#" data-id="{{grade.grade_id}}" class="dltBtn btn btn-sm btn-danger"><i class="bi bi-trash3"></i></a>
                     </td>
-                </tr>                     
+                </tr>         
                 {% endfor %}
-            {% else %}
-            <tr class="no_data_found-tr">
-                <td colspan="7" class="text-center">
-                    <img src="{% static 'img/no_data_found.png' %}" alt="No Image" class="no_data_found">
-                </td>
-            </tr>
-            {% endif %}
             </tbody>
         </table>
     </div>

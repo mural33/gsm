@@ -1078,7 +1078,6 @@ async function loadCalendarDetails(selectedClassId) {
 function validateExamForm() {
   var isValid = true;
   const fields = ["start_date", "end_date", "result_date", "parent_exam_name","subject_Input"];
-  const fields = ["start_date", "end_date", "result_date", "parent_exam_name","subject_Input"];
   for (const field of fields) {
     const element = $(`#${field}`);
     const value = element.val().trim();
@@ -1291,7 +1290,6 @@ async function addExam() {
             existingRow.find('td:eq(1)').text(responseData.parent_exam_name);
             existingRow.find('td:eq(2)').text(formattedResultDate);
           }
-          raiseSuccessAlert("Examination Updated Successfully");
           raiseSuccessAlert("Examination Updated Successfully");
           $("#parent_exam_id").val("");
           resetExamForm();

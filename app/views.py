@@ -40,7 +40,6 @@ def azure_upload(request):
 def azure_download(request, file_name, location):
     try:
         file_content = download_blob(filename=file_name, location=location)
-
         # Create a Django HttpResponse object
         ext = Path(file_name).suffix
         response = HttpResponse(file_content, content_type=mimetypes.guess_type(ext))
@@ -444,7 +443,6 @@ def staff_info(request, staff_slug):
     if staff_slug:
         staff = StaffInfo(api_url=API_URL, slug=staff_slug, jwt=access_token)
         staff_data = asyncio.run(staff.get_all_data(staff_slug))
-        print("staffslug", staff_slug)
         payload = {
             "url": API_URL,
             "jwt_token": access_token,

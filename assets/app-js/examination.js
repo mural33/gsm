@@ -1,7 +1,6 @@
 $(document).ready(function () {
     $("#examTable").DataTable()
     $(".dataTables_empty").html(`<img src="/assets/img/no_data_found.png" alt="No Image" class="no_data_found">`)
-    
     $("#btnSaveExam").on("click", async (e) => {
         $("#btnSaveExam").removeClass("btn-shake");
         e.preventDefault();

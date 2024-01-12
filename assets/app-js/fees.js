@@ -1,6 +1,4 @@
 $(document).ready(async function () {
-    $('#feeTable').DataTable()
-    $(".dataTables_empty").html(`<img src="/assets/img/no_data_found.png" alt="No Image" class="no_data_found">`)
     await loadInstallments();
     await loadClass();
     $('.installment_dropdown').each(function () {

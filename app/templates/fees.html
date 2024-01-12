@@ -46,6 +46,7 @@
         </tr>
       </thead>
       <tbody class="tbl__bdy" id="feesdetails">
+        {% if fees_data %}
         {% for data in fees_data %}
           <tr id="feeId-{{data.fee_id}}">
             <td>{{data.class_fees.class_name}}</td>
@@ -53,7 +54,7 @@
             <td>{{data.fee_admission}}</td>
             <td>{{ data.total_installments }}</td>
             <td>
-              <select class="installment_dropdown form-select" data-fee-id="{{data.fee_id}}">
+              <select class="installment_dropdown" data-fee-id="{{data.fee_id}}">
                 {% for installment in data.class_installments %}
                   <option value="{{installment.installment_id}}" data-installment-id="{{installment.installment_number}}">{{installment.installment_name}}</option>
                 {% endfor %}
@@ -65,7 +66,14 @@
               <a href="#" data-fee-id="{{data.fee_id}}" class="btn btn-sm btn-danger btnDeleteFee"><i class="bi bi-trash3"></i></a>
             </td>
           </tr>
-      {% endfor %}     
+      {% endfor %} 
+      {% else %}
+      <tr class="no_data_found-tr">
+          <td colspan="7" class="text-center">
+              <img src="{% static 'img/no_data_found.png' %}" alt="No Image" class="no_data_found">
+          </td>
+      </tr>
+      {% endif %}     
       </tbody>
     </table>
   </div>

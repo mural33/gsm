@@ -22,7 +22,13 @@ $(document).ready(function () {
     $('#calendarPrintView').on('click', function () {
         window.print();
     });
-
+    $(".btnCloseEditModel").on("click", function(e){
+        const parentModel = $(this).closest(".modal");
+        console.log(parentModel);
+        parentModel.modal("hide");
+        $("input, textarea, select",parentModel).val("");
+        $('.context-menu-root').removeAttr('style').hide();
+    });
     $("#class_id").on("change", function () {
         const selectedClassId = $(this).val();
         getSectionsByClass(selectedClassId, "section_id", 'body');
@@ -168,6 +174,7 @@ async function submitaCalenderForm() {
                         if (CalenderRow.length) {
                             loadCalendarDetails(class_id, section_id);
                             raiseSuccessAlert("Calender Updated Successfully");
+                            $('.context-menu-root').removeAttr('style').hide();
                         } else {
                             console.error('Row with data-id not found:', responseData.calender_id);
                         }
@@ -346,7 +353,6 @@ async function openEditForm(cellData) {
                 $('#end_time').val(responseData.end_time);
                 $('#calendarmodal').modal('show');
                 simulateContextMenu(cellData);
-
             }
         },
         error: function (xhr, status, error) {

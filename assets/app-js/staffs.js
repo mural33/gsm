@@ -1,4 +1,5 @@
 $("document").ready(function(){
+    $('#staffsTable').DataTable();
     $('#staffTable').on('click', '.dltBtn', async function() {
         var staffId = $(this).attr("data-id");
         await deleteStaff(staffId);
@@ -36,11 +37,9 @@ async function deleteStaff(staffId) {
                     raiseSuccessAlert(response.detail);
                     if($("#staffTable tr").length == 0){
                         $("#staffsTable").html(
-                            `<tr class="">
-                                <td colspan="8" class="text-center">
+                            `<div class="col-md-12 text-center">
                                 <img src="/assets/img/no_data_found.png" alt="No Image" class="no_data_found">
-                                </td>
-                            </tr>`
+                            </div>`
                         )
                     }
                 },

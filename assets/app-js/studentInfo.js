@@ -402,7 +402,8 @@ class StudentData {
             this.documents = $("#documentRow")
             this.studenDocuments = response.response
             if(this.studenDocuments.length > 0){
-                this.documents.empty();
+                $("#documentRow").find(".no_data_found").hide()
+                // this.documents.empty();
                 for (const key in this.studenDocuments) {
                     var docs = this.studenDocuments[key]
                     var docsName = docs.document_file.split('/').pop();
@@ -452,7 +453,11 @@ class StudentData {
             var fee = response.fee_data[0]
             var installment = response.student_fee
             var isFeeFixed = false
-            $("#discount").val(response.discount["discount"])
+            if(response.discount){
+                $("#discount").val(response.discount["discount"])
+            }else{
+                $("#discount").val(0)
+            }
             if(installment.length > 0){
                 isFeeFixed = true
                 $("#discount").attr('readonly', 'readonly')
@@ -694,25 +699,27 @@ class StudentData {
     }
 
     async displayFeeData(response, isFeeFixed) {
-        const {
-            fee_total,
-            fee_admission,
-            fee_discount,
-            total_installments,
-            class_installments
-        } = response;
-    
-        // Set values using jQuery
-        $("#total_fee").val(fee_total);
-        $("#admission_fee").val(fee_admission);
-        // $("#discount").val(fee_discount || 0);
-    
-        // Calculate total installment amount
-        const total_insta_amount = total_installments -  0;
-        $("#total_insta_amount").val(total_insta_amount);
-    
-        // Update installment options
-        this.updateInstallmentOptions(class_installments, isFeeFixed);
+        if(response){
+            const {
+                fee_total,
+                fee_admission,
+                fee_discount,
+                total_installments,
+                class_installments
+            } = response;
+        
+            // Set values using jQuery
+            $("#total_fee").val(fee_total);
+            $("#admission_fee").val(fee_admission);
+            $("#discount").val(fee_discount || 0);
+        
+            // Calculate total installment amount
+            const total_insta_amount = total_installments -  0;
+            $("#total_insta_amount").val(total_insta_amount);
+        
+            // Update installment options
+            this.updateInstallmentOptions(class_installments, isFeeFixed);
+        }
     }
     
     async updateInstallmentOptions(installments, isFeeFixed) {
@@ -728,26 +735,28 @@ class StudentData {
     }
 
     async showInstallmentData(response){
-        var installmentTable = $("#installmentTable");
-        installmentTable.empty();
-        for (const key in response) {
-            var installment = response[key]
-            var color = installment.installment_status === true ? "bg-success" : "bg-danger"
-            var statusMsg = installment.installment_status === true ? "Paid" : "Unpaid"
-            var row = `
-                <tr>
-                    <td>${installment.installment_name}</td>
-                    <td>${installment.installment_due_date}</td>
-                    <td>${installment.installment_amount}</td>
-                    <td>${installment.installment_paid_date}</td>
-                    <td class="${color}">
-                        ${statusMsg}
-                    </td>
-                </tr>
-            `
-            $('#Installment').DataTable().row.add($(row)).draw()
+        if(response.length > 0){
+            var installmentTable = $("#installmentTable");
+            installmentTable.empty();
+            for (const key in response) {
+                var installment = response[key]
+                var color = installment.installment_status === true ? "bg-success" : "bg-danger"
+                var statusMsg = installment.installment_status === true ? "Paid" : "Unpaid"
+                var row = `
+                    <tr>
+                        <td>${installment.installment_name}</td>
+                        <td>${installment.installment_due_date}</td>
+                        <td>${installment.installment_amount}</td>
+                        <td>${installment.installment_paid_date}</td>
+                        <td class="${color}">
+                            ${statusMsg}
+                        </td>
+                    </tr>
+                `
+                $('#Installment').DataTable().row.add($(row)).draw()
+            }
+            removeLoader("installmentTable","sm")
         }
-        removeLoader("installmentTable","sm")
     }
 
 }
@@ -760,7 +769,7 @@ async function deleteStudentDocument(element){
     $(`.card-student-${documentId}`).remove()
     await ajaxRequest("DELETE", totalUrl, "","documents","lg",(response) => {
         raiseSuccessAlert(response.msg);
-        if ($('#documentRow .card').length === 0) {
+        if ($('#documentRow .card').length <= 0) {
             $("#documentRow").find(".no_data_found").show()
         }
     })
