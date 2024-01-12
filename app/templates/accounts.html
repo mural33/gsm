@@ -212,16 +212,16 @@
             </thead>
             <tbody class="tbl__bdy" id="accounts_details">
                 {% for account in accounts %}
-                <tr class="tr-accounts-{{account.account_id}}">
-                    <td class="transaction_date">{{account.transaction_date}}</td>
-                    <td class="payment_type">{{account.payment_type}}</td>
-                    <td class="particular_name">{{account.particular_name}}</td>
-                    <td class="description">{{account.description}}</td>
-                    <td class="transaction_details">{{account.payment_mode}}<br>{{account.transaction_reference}}</td>
-                    <td Class="transaction_amount">{{account.transaction_amount}}</td>
-                    <td Class="transaction_type">{{account.transaction_type}}</td>
-                    <td Class="net_balance">{{account.net_balance}}</td>
-                </tr>
+                    <tr class="tr-accounts-{{account.account_id}}">
+                        <td class="transaction_date">{{account.transaction_date}}</td>
+                        <td class="payment_type">{{account.payment_type}}</td>
+                        <td class="particular_name">{{account.particular_name}}</td>
+                        <td class="description">{{account.description}}</td>
+                        <td class="transaction_details">{{account.payment_mode}}<br>{{account.transaction_reference}}</td>
+                        <td Class="transaction_amount">{{account.transaction_amount}}</td>
+                        <td Class="transaction_type">{{account.transaction_type}}</td>
+                        <td Class="net_balance">{{account.net_balance}}</td>
+                    </tr>
                 {% endfor %}
             </tbody>
         </table>

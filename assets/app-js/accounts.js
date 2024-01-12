@@ -1,5 +1,6 @@
 $(document).ready(function () {
     var dataTable = $('#accountsTable').DataTable({ order: [[0, 'desc']] });
+    $(".dataTables_empty").html(`<img src="/assets/img/no_data_found.png" alt="No Image" class="no_data_found">`)
     updateSummaryCards();
     applyTransactionTypeColor();
     $("#exportButton").on("click", function () {
@@ -159,10 +160,8 @@ async function accountsSubmitForm() {
                     <td class="net_balance">${responseData.net_balance}</td>
                 </tr>`;
             dataTable.row.add($(newAccountsRow)).draw(); //pagination
-            $("#accounts_details").prepend(newAccountsRow);
             calculateUpdatedSummary(accountsData["payment_type"], accountsData["transaction_amount"])
             raiseSuccessAlert(data.msg);
-
         },
         error: function (error) {
             raiseErrorAlert(error.responseJSON.detail);

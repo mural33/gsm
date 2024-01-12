@@ -691,7 +691,7 @@ class StudentData {
                             <button class="btn btn-sm btn-danger" data-activity_id ='${activity.activity_id}' onClick="deleteActivity(this)">
                                 <i class="bi bi-trash3"></i>
                             </button>
-                        <td>
+                        </td>
                     </tr>`;
                 $("#activityTable").DataTable().row.add($(row)).draw()
             }

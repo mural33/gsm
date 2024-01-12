@@ -499,13 +499,15 @@ def accounts(request):
     account_data=requests.get(url=url,headers=header)
     if account_data.status_code==200:
         payload={
-            'accounts':account_data.json(),
+            'accounts':account_data.json()["transactions"],
+            'summary':account_data.json()["summary"],
             'jwt_token':request.COOKIES.get('access_token'),
             'institute_id':institute_id,
             'url':API_URL,
             "organization_name": request.COOKIES.get("organization_name"),
             "message": request.COOKIES.get("message"),
         }
+        print(payload["accounts"])
     return render(request,'accounts.html', payload)
 
 def fees(request):
