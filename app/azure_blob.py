@@ -3,6 +3,7 @@ from io import BytesIO
 from datetime import datetime, timedelta
 from azure.storage.blob import BlobServiceClient,BlobSasPermissions,generate_blob_sas
 from django.conf import settings
+from urllib.parse import unquote
 Connection_String = settings.AZURE_STORAGE_CONNECTION_STRING
 AZURE_CONTAINERS = settings.AZURE_CONTAINERS
 
@@ -50,12 +51,13 @@ def upload_to_blob(azure_file="",location="",file_name=""):
 
 
 def download_blob(filename,location):
-    location = os.environ[location]
+    location = AZURE_CONTAINERS[location]
     # takeing blob for store
     blob_service_client = azure_connection()
     # creating container in which we will saved our files
     container_client = blob_service_client.get_container_client(container=location)
     # getting blob data by its name
+    filename = unquote(filename)
     blob_client = container_client.get_blob_client(blob=filename)
     # downloading blob and saving it locally
     blob_content = blob_client.download_blob()

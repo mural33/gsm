@@ -1,0 +1,185 @@
+{% extends '_layout.html' %}
+{% load static %}
+{% block title %} Fee Structure {% endblock %}
+{% block content %}
+<link href="{% static 'app-css/fees.css' %}" rel="stylesheet">
+<script src="{% static 'app-js/fees.js' %}"></script>
+
+<div class="row" id="heading-row">
+  <div class="col-sm-12 col-md-8 col-xl-8" style="padding: 1rem">
+    <h5>Fee Structure</h5>
+    <quote>Specific fees charged for each academic term or semester.</quote>
+  </div>
+  <div class="col-sm-12 col-md-4 col-xl-4" style="padding: 1rem">
+    <div class="row">
+      <div class="col text-end">
+        <button type="button" class="btn btn-success btn-label rounded-pill right" data-bs-toggle="modal"
+          data-bs-target="#addEditFeesmodal">
+          <i class="bi bi-plus-circle label-icon align-middle fs-lg ms-2"></i>Add Fees</button>
+        <button class="btn btn-outline-primary rounded-pill btn-icon tripledots-dropdown-toggle"
+          data-bs-toggle="dropdown" aria-expanded="false">
+          <i class="bi bi-three-dots-vertical"></i>
+        </button>
+        <div class="input-group">
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#addInstallmentmodal"><i
+                  class="bi bi-plus-circle me-2"></i>Add Installment</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-xl-12">
+    <table class="table table-striped table-hover table-sticky table_students" id="feeTable">
+      <thead class="thead-dark">
+        <tr>
+          <th>Class Name</th>
+          <th>Total Fee</th>
+          <th>Admission Fee</th>
+          <th>Total Installment Amount</th>
+          <th>Installment Type</th>
+          <th>Per Installment Amount</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody class="tbl__bdy" id="feesdetails">
+        {% for data in fees_data %}
+          <tr id="feeId-{{data.fee_id}}">
+            <td>{{data.class_fees.class_name}}</td>
+            <td>{{data.fee_total}}</td>
+            <td>{{data.fee_admission}}</td>
+            <td>{{ data.total_installments }}</td>
+            <td>
+              <select class="installment_dropdown form-select" data-fee-id="{{data.fee_id}}">
+                {% for installment in data.class_installments %}
+                  <option value="{{installment.installment_id}}" data-installment-id="{{installment.installment_number}}">{{installment.installment_name}}</option>
+                {% endfor %}
+              </select>
+            </td>            
+            <td class="per-installment-amount"></td>
+            <td>
+              <a href="#" data-fee-id="{{data.fee_id}}" class="btn btn-sm btn-info btnEditFee"><i class="bi bi-pencil-square"></i></a>
+              <a href="#" data-fee-id="{{data.fee_id}}" class="btn btn-sm btn-danger btnDeleteFee"><i class="bi bi-trash3"></i></a>
+            </td>
+          </tr>
+      {% endfor %}     
+      </tbody>
+    </table>
+  </div>
+</div>
+</section>
+
+<div class="modal fade bs-example-modal-sm" id="addInstallmentmodal" tabindex="-1" role="dialog"
+  aria-labelledby="mySmallModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content" id="installmentFormArea">
+      <div class="modal-header">
+        <h5 class="modal-title" id="mySmallModalLabel">Save Installment</h5>
+        <button type="button" class="btn-close btnCloseModel" data-bs-dismiss="modal" aria-label="Close">
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="d-flex">
+          <div class="flex-shrink-0">
+            <i class="ri-checkbox-circle-fill text-success"></i>
+          </div>
+          <div class="flex-grow-1 ms-2">
+            <p class="text-muted mb-0">A section serves as a distinct segment within a course or grade, providing a
+              dynamic environment
+              where students explore their interests, acquire knowledge, and shape their future paths.</p>
+          </div>
+        </div>
+        <div class="mt-2" id="addInstallment">
+          <div class="col-md-12 form-content">
+            <input type="hidden" id="installment_id" name="installment_id">
+            <label for="installment_name" class="form-label">Installment Type</label>
+            <input type="text" class="form-control installment_name" id="installment_name" name="installment_name"
+              placeholder="Enter a Installment Type" maxlength="1000">
+          </div>
+          <div class="col-md-12 form-content">
+            <label for="installment_number" class="form-label">Installment Number</label>
+            <input type="text" class="form-control installment_number" id="installment_number" name="installment_number"
+              placeholder="Enter a Installment number">
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <a href="javascript:void(0);" class="btn btn-link link-success fw-medium btnCloseModel" data-bs-dismiss="modal"><i
+            class="ri-close-line me-1 align-middle"></i> Close</a>
+        <button type="submit" class="btn btn-primary" id="btnSaveInstall">Save</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div>
+
+<div class="modal fade" id="addEditFeesmodal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content" id="feeFormArea">
+      <div class="modal-header">
+        <h5 class="modal-title" id="mySmallModalLabel">Save Fees</h5>
+        <button type="button" class="btn-close btnCloseModel" data-bs-dismiss="modal" aria-label="Close">
+        </button>
+      </div>
+      <div class="modal-body" id="AddFees">
+        <div class="d-flex">
+          <div class="flex-shrink-0">
+            <i class="ri-checkbox-circle-fill text-success"></i>
+          </div>
+          <div class="flex-grow-1 ms-2">
+            <p class="text-muted mb-0"> Fees are applied in a variety of ways such as costs, charges, commissions, and
+              penalties.</p>
+          </div>
+        </div>
+        <div class="d-flex mt-2 row">
+          <div class="col-md-4 form-content">
+            <input type="hidden" name="fee_id" id="fee_id">
+            <label for="fee_total" class="form-label">Total Fees</label>
+            <input type="number" class="form-control fee_total" id="fee_total" name="fee_total"
+              placeholder="Enter Total Course Fee">
+          </div>
+          <div class="col-md-4 form-content">
+            <label for="fee_admission" class="form-label">Admission Fees</label>
+            <input type="number" class="form-control fee_admission" id="fee_admission" name="fee_admission"
+              placeholder="Enter Admission Fee">
+          </div>
+        </div>
+        <div class="d-flex mt-2">
+          <div class="col-md-4 form-content">
+            <label for="install_amount" class="form-label feesLabel">Total Installment Amount</label>
+            <input type="number" class="form-control" id="install_amount" name="total_installments"
+              placeholder="e.g. 17000" required />
+          </div>
+          <div class="col-md-4 form-content" id="classId">
+            <label for="getClassId" class="form-label feesLabel" id="Class">Class Name</label>
+            <select class="custom-select custom-select-lg bg-white form-control classDropdown" id="getClassId"
+              name="class_id">
+            </select>
+          </div>
+        </div>
+        <div class="d-flex mt-2">
+          <div class="col-md-6 form-content installment">
+            <label for="installment_dropdown" class="form-label feesLabel" id="Installment">Installment By</label>
+            <select class="form-select" id="installment_dropdown" multiple aria-label="multiple select example"
+              name="installment_id">
+            </select>
+          </div>
+          <!-- <div class="col-md-4 form-content">
+            <label for="installment_display" class="form-label feesLabel">No. of Installments</label>
+            <input type="number" class="form-control" id="installment_display" name="installment_number"
+              placeholder="e.g. 4" readonly />
+          </div> -->
+        </div>
+      </div>
+      <div class="modal-footer">
+        <a href="javascript:void(0);" class="btn btn-link link-success fw-medium btnCloseModel" data-bs-dismiss="modal"><i
+            class="ri-close-line me-1 align-middle"></i> Close</a>
+        <button type="submit" class="btn btn-primary" id="btnSaveFees">Save</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div>
+{% endblock %}

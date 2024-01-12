@@ -4,9 +4,10 @@
 {% block content %}
 <link rel="stylesheet" href="{% static 'app-css/common.css' %}" />
 <script src="{% static 'app-js/staffInfo.js' %}"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <div class="row" id="heading-row">
-    <div class="col-sm-12 col-md-9 col-xl-11 d-flex align-items-center" style="padding: 1rem">
+    <div class="col-sm-12 col-md-9 col-xl-12 d-flex align-items-center" style="padding: 1rem">
         <a href="{% url 'staffs' %}">
             <i class="bi bi-arrow-left" style="font-size:1.5rem;"></i>
         </a>
@@ -14,8 +15,18 @@
             <h5>Staff Information</h5>
             <quote>Teachers illuminate the path to knowledge, guiding minds to brilliance with each lesson they share.</quote>
         </div>
-    </div>
+        <div class="ms-auto">
+          <a href="{% url 'edit_staff' staff_slug %}" data-id="{{ staff_data.staff_id }}"
+              class="btnStaffEdit btn btn-sm btn-info">
+              <i class="bi bi-pencil-square"></i>
+          </a>
+          <a href="#" data-id="{{ staff_data.staff_id }}" onClick="deleteStaff(this)" class="dltBtn btn btn-sm btn-danger">
+              <i class="bi bi-trash3"></i>
+          </a>
+      </div>
 
+      </div>
+    <input type="hidden" id="staffInfo" value='{"staffId":{{staff_data.staff_id}}}'/>
     <div class="col-xl-3 col-lg-3 col-md-12 ">          
     <div class="card">
     <div class="row">
@@ -129,7 +140,7 @@
               <a
                 class="nav-link active"
                 data-bs-toggle="tab"
-                href="#Basic"
+                href="#Calendar"
                 role="tab"
               >
                 <span class="d-block d-sm-none"
@@ -139,7 +150,7 @@
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" data-bs-toggle="tab" href="#Exam" role="tab">
+              <a class="nav-link" data-bs-toggle="tab" href="#attendance" role="tab">
                 <span class="d-block d-sm-none"
                   ><i class="ti ti-user-circle"></i
                 ></span>
@@ -150,7 +161,7 @@
               <a
                 class="nav-link"
                 data-bs-toggle="tab"
-                href="#calendar"
+                href="#payroll"
                 role="tab"
               >
                 <span class="d-block d-sm-none"
@@ -188,30 +199,79 @@
           </ul>
           <!-- Tab panes -->
           <div class="tab-content text-muted">
-            <div class="tab-pane active" id="Basic" role="tabpanel">
-              <div class="col-md-6">
-                  <h5 class="my-2">Calendar Details</h5>
+            <div class="tab-pane active" id="Calendar" role="tabpanel">
+              <h6>Calendar</h6>
+                  <quote>The class timetable: a symphony of learning, where every subject has its moment and knowledge finds its rhythm.</quote>
+              <div class="row">
+                <div class="text-center" id="tabCalender">
+                  <div class="container">
+                    <table class="styled-table" id="calenderTable">
+
+                    </table>
+                  </div>
+                  <img src="/assets/img/no_data_found.png" class="no_data_found">
+                </div>     
               </div>
-              <div class="text-center">
-                <div class="container">
-                    <img src="{% static 'img/no_data_found.png' %}" alt="No Image" class="no_data_found">
-                </div>
+            </div> 
+
+            {% comment %} <div class="text-center">
+                  <div class="container">
+                      <img src="{% static 'img/no_data_found.png' %}" alt="No Image" class="no_data_found">
+                  </div>
+              </div> {% endcomment %}
+            {% comment %} <div class="tab-pane" id="Calendar" role="tabpanel">
+                  <h6>Calendar</h6>
+                  <qoute>Consistent attendance breeds achievement.</qoute>
+                  <div class="mb-0 my-3">
+                      <div class="row">
+                          <div class="col-md-12">
+                              <h4>This is Calendar Tab</h4>
+                          </div>
+                      </div>
+                  </div>
+              </div> {% endcomment %}
+
+            {% comment %} Attendance Tab {% endcomment %}
+            <div class="tab-pane" id="attendance" role="tabpanel">
+                  <h6>Attendance</h6>
+                  <qoute>Consistent attendance breeds achievement.</qoute>
+                  <div class="mb-0 my-3">
+                      <div class="row">
+                          <div class="col-md-12">
+                              <div class="row">
+                                  <div class="col-md-6 col-sm-12">
+                                      <table id="attendanceTable" class="table table-striped table-hover table-sticky table_students table-center">
+                                          <thead class="thead-dark">
+                                              <tr>
+                                                  <th>Date</th>
+                                                  <th>Status</th>
+                                              </tr>
+                                          </thead>
+                                          <tbody class='attendanceTbody' id="attendance_data">
+                                              {% if attendance_data %}
+                                              {% else %}
+                                                  <tr>
+                                                      <td colspan="7" class="text-center">
+                                                          <img src="{% static 'img/no_data_found.png' %}" alt="No Image" class="no_data_found">
+                                                      </td>
+                                                  </tr>
+                                              {% endif %}
+                                          </tbody>
+                                      </table>
+                                  </div>
+                                  <div class="col-md-6 col-sm-12">
+                                      <canvas id="staffPieChart" class="pie-chart"></canvas>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
               </div>
-            </div>
-            <div class="tab-pane" id="Exam" role="tabpanel">
-              <div class="col-md-6">
-                  <h5 class="my-2">Attendace Details</h5>
-              </div>
-              <div class="text-center">
-                <div class="container">
-                    <img src="{% static 'img/no_data_found.png' %}" alt="No Image" class="no_data_found">
-                </div>
-              </div>
-            </div>
-            <div class="tab-pane" id="calendar" role="tabpanel">
+            <div class="tab-pane" id="payroll" role="tabpanel">
               <div class="row">
                 <div class="col-md-6">
-                    <h5 class="my-2">Payroll Details</h5>
+                    <h6>Payroll</h6>
+                    <quote>An investment in knowledge pays the best interest</quote>
                 </div>
                 <div class="col-md-6">
                     <button type="button"  data-bs-toggle="modal"
@@ -223,7 +283,6 @@
                     <table class="table table-striped table-hover table-sticky" id="staffPayroll">
                       <thead class="thead-dark">
                         <tr>
-                          <th>S.No</th>
                           <th>Date Of Payment </th>
                           <th>Employement Type</th>
                           <th>Salary</th>
@@ -238,7 +297,6 @@
                         {% if payroll_data %}
                           {% for payroll in payroll_data %}
                           <tr class="tr-payroll-{{payroll.payroll_id}}">
-                            <td>{{forloop.counter}}</td>
                             <td class="payment_date">{{payroll.payment_date}}</td>
                             <td class="payroll_type">{{payroll.payroll_type}}</td>
                             <td class="salary_amount">{{payroll.salary_amount}}</td>
@@ -276,7 +334,8 @@
               <div class="mb-0">
                 <div class="row">
                   <div class="col-md-6">
-                      <h5 class="my-2">Transportation Details</h5>
+                      <h6>Transportation</h6>
+                        <quote>In the school bus of knowledge, every journey is a chapter waiting to unfold.</quote>
                   </div>
                   <div class="col-md-12 text-center">
                     {% if transport_data %}
@@ -333,20 +392,19 @@
                             <div class="card mb-3">
                                 <!-- Display record details here -->
                                 <div class="card-body">
-                                    <p class="card-title">Document Name: {{ docs.document_name }}</p>
-                                    <p class="card-text">Document type: {{ docs.document_file }}</p>
-                                
+                                    <p class="card-title">{{ docs.document_name }}</p>
+                                  
                                 </div>
                                 <div class="card-footer d-flex justify-content-evenly">
                                     <button data-document-id="{{docs.document_id}}" class="btn btn-sm btn-info" onClick="openDocumentForm(this)">
                                         <i class="bi bi-pencil-square"></i>
                                     </button>
-                                    <button onClick="deleteDocuments(this)" data-document-id="{{docs.document_id}}" class="btn btn-sm btn-danger">
+                                    <button onClick="deleteDocument(this)" data-document-id="{{docs.document_id}}" class="btn btn-sm btn-danger">
                                         <i class="bi bi-trash3"></i>
                                     </button>
-                                    <button data-document-id="{{docs.document_id}}" class="btn btn-sm btn-dark">
+                                    <a href="/app/azure_download/{{ docs.document_file }}/staff_documents/" data-documentId="${docs.document_id}"  class="btn btn-sm btn-dark">
                                         <i class="bi bi-download"></i>
-                                    </button>
+                                    </a>
                                 </div>
                             </div>
                             
@@ -378,7 +436,7 @@
             <div class="modal-header">
                 <h5 class="modal-title" id="myMediumModalLabel">
                     Save Payroll</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                <button type="button" class="btn-close btnCloseModal" data-bs-dismiss="modal" aria-label="Close">
                 </button>
             </div>
             <div class="modal-body">
@@ -433,9 +491,9 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <a href="javascript:void(0);" class="btn btn-link link-success fw-medium" data-bs-dismiss="modal"><i
+                <a href="javascript:void(0);" class="btn btn-link link-success fw-medium btnCloseModal" data-bs-dismiss="modal"><i
                         class="ri-close-line me-1 align-middle"></i> Close</a>
-                <button type="submit" class="btn btn-primary"  id="btnPayrollForm">Save
+                <button type="submit" class="btn btn-primary"  id="addPayrollForm">Save
                     changes</button>
             </div>
         </div>
@@ -462,8 +520,7 @@
                     <div class="col-12 my-2">
                         <label for="document_file" class="form-label">Attachment</label>
                         <input type="file" class="form-control" accept="image/jpeg, image/png, image/jpg, .pdf" id="document_file" name="document_file">
-                        <p class="form-label my-2">Note:<br class="text-danger">Supported files:.jpeg, .jpg, .png and .pdf<br>Max size:
-                            5MB</p>
+                        <p class="form-label my-2">Note:<br class="text-danger">Supported files:.jpeg, .jpg, .png and .pdf<br></p>
                     </div>
                 </div>
             </div>

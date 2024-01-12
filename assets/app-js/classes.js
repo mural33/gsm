@@ -22,7 +22,27 @@ $(document).ready(function () {
       } else {
       }
     });
+    $(".btnCloseExamModel").on("click", function(e){
+      const parentModel = $(this).closest(".modal");
+      parentModel.modal("hide");
+      $('#start_date,#end_date,#result_date,#parent_exam_id,#parent_exam_name,#subject_Input',parentModel).val("");
   });
+  });
+  const installmentDropdown = document.getElementById("installment-dropdown");
+  installmentDropdown.addEventListener("change", function () {
+      const selectedInstallment = this.options[this.selectedIndex];
+      const installmentNumber = selectedInstallment.getAttribute("data-install-number");
+      $("#installment_display").val(installmentNumber);
+      console.log("Selected Installment Number:", installmentNumber);
+      var installment = $("#installment-dropdown").val()
+      if(installment.trim() != ""){
+          showDynamicFee(installment)
+      }
+      else{
+          $("#Installment tbody").empty()
+      }
+  });
+  $('#total_fee, #fee_admission').on('input', updateInstallAmount);
 
   // _____Add/Edit ClassbuttonTrigger_____
   $("#btnSave").click(async function (e) {
@@ -39,6 +59,8 @@ $(document).ready(function () {
   // _____Class Update____
   $("#btnEdit").click(async function () {
     var classId = $(this).data("class-id");
+    $("#class_creation_modal").modal("show");
+    $("#class_creation_modal .modal-title").text("Edit Class");
     const editurl = apiUrl + "/Classes/class_id/?class_id=" + classId;
     await $.ajax({
       type: "GET",
@@ -50,22 +72,20 @@ $(document).ready(function () {
         "Authorization": `Bearer ${jwtToken}`,
       },
       beforeSend: (e) => {
-        showLoader("body", "sm");
+        showLoader("class-form-area", "sm");
       },
       success: (data) => {
         if (data && data.response) {
           var responseData = data.response;
           $("#class_id").val(responseData.class_id);
           $("#class_name").val(responseData.class_name);
-          $("#class_creation_modal").modal("show");
-          $("#class_creation_modal .modal-title").text("Edit Class");
         }
       },
       error: (error) => {
         raiseErrorAlert(error["responseJSON"]["detail"]);
       },
       complete: (e) => {
-        removeLoader("body", "sm");
+        removeLoader("class-form-area", "sm");
       },
     });
   });
@@ -188,6 +208,7 @@ async function fetchDropdownValue(selectedClassId, selectedClassName) {
   await loadGradeDetails(selectedClassId);
   await loadExams(selectedClassId);
   await loadCalendarDetails(selectedClassId);
+  await loadFeeDetails(selectedClassId)
 }
 
 // _______ADD/EDIT Class_______
@@ -201,7 +222,6 @@ async function addClass() {
   };
   const url = isUpdate ? apiUrl + "/Classes/" + data.class_id : apiUrl + "/Classes/create_class/";
   const requestType = isUpdate ? "PUT" : "POST";
-  const sectionsUrl = apiUrl + "/Sections/create_section/";
   await $.ajax({
     type: requestType,
     url: url,
@@ -233,24 +253,7 @@ async function addClass() {
             `<option value="${responseData.class_id}">${responseData.class_name}</option>`
           );
           // $dropdown.val(responseData.class_id);
-          const sectionData = {
-            class_id: responseData.class_id,
-            section_name: "Section A",
-          };
-          await $.ajax({
-            type: requestType,
-            url: sectionsUrl,
-            mode: "cors",
-            crossDomain: true,
-            headers: {
-              "Content-Type": "application/json",
-              "Authorization": `Bearer ${jwtToken}`,
-            },
-            data: JSON.stringify(sectionData),
-            success: (sectionResponse) => {
-              removeLoader("class-form-area", "sm");
-            },
-          });
+         await addSectionInClass(responseData.class_id)
           raiseSuccessAlert("Class Added Successfully.");
         }
         resetFormFields("class");
@@ -258,6 +261,33 @@ async function addClass() {
     },
     error: (error) => {
       raiseErrorAlert(error["responseJSON"]["detail"]);
+    },
+    complete: (e) => {
+      removeLoader("class-form-area", "sm");
+    },
+  });
+}
+
+async function addSectionInClass(classId){
+  const sectionsUrl = apiUrl + "/Sections/create_section/";
+  const sectionData = {
+    class_id: classId,
+    section_name: "Section A",
+  };
+  await $.ajax({
+    type: "POST",
+    url: sectionsUrl,
+    mode: "cors",
+    crossDomain: true,
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${jwtToken}`,
+    },
+    beforeSend: (e) => {
+      showLoader("class-form-area", "sm");
+    },
+    data: JSON.stringify(sectionData),
+    success: (sectionResponse) => {
     },
     complete: (e) => {
       removeLoader("class-form-area", "sm");
@@ -289,11 +319,12 @@ function validateClassModuleForm(formType) {
           formType
         )} name must be at least 3 characters long`
       );
+    }else{
+      element.focus().removeClass("is-invalid");
     }
   }
   return isValid;
 }
-
 function resetFormFields(formType) {
   const fields = [`${formType}_name`];
   for (const field of fields) {
@@ -304,7 +335,6 @@ function resetFormFields(formType) {
     }
   }
 }
-
 // _______GET Section_______
 async function loadSectionDetails(selectedClassId) {
   var loadSectionUrl = apiUrl + "/Sections/get_sections_by_class/?class_id=" + selectedClassId;
@@ -357,7 +387,6 @@ async function loadSectionDetails(selectedClassId) {
     },
   });
 }
-
 // _______ADD/EDIT Section_______
 async function addSection() {
   let isUpdate = $("#section_id").val() !== "";
@@ -405,11 +434,12 @@ async function addSection() {
     },
   });
 }
-
 // _______GET SectionforEdit_______
 async function editSection(element) {
   event.preventDefault();
   var sectionId = element.getAttribute("data-section-id");
+  $("#section_creation_modal").modal("show");
+  $("#section_creation_modal .modal-title").text("Edit Section");
   const editSectionUrl = apiUrl + "/Sections/section_id/?section_id=" + sectionId;
   await $.ajax({
     type: "GET",
@@ -421,26 +451,23 @@ async function editSection(element) {
       "Authorization": `Bearer ${jwtToken}`,
     },
     beforeSend: (e) => {
-      showLoader("body", "sm");
+      showLoader("section-form-area", "sm");
     },
     success: (data) => {
       if (data && data.response) {
         var responseData = data.response;
         $("#section_id").val(responseData.section_id);
         $("#section_name").val(responseData.section_name);
-        $("#section_creation_modal").modal("show");
-        $("#section_creation_modal .modal-title").text("Edit Section");
       }
     },
     error: (error) => {
       raiseErrorAlert(error["responseJSON"]["detail"]);
     },
     complete: (e) => {
-      removeLoader("body", "sm");
+      removeLoader("section-form-area", "sm");
     },
   });
 }
-
 // _______DELETE Section_______
 async function deleteSection(element) {
   event.preventDefault();
@@ -485,7 +512,6 @@ async function deleteSection(element) {
     }
   });
 }
-
 // _______GET Section_______
 async function loadSubjectDetails(selectedClassId) {
   var loadSubUrl = apiUrl + "/Subjects/get_subjects_by_class/?class_id=" + selectedClassId;
@@ -547,7 +573,6 @@ function removeSubject(button) {
   var subjectId = $(button).data("subjects-id");
   $(`#subRow-${subjectId}`).remove();
 }
-
 // _______ADD/EDIT Subject_______
 async function addSubject() {
   let isEdit = $("#subject_id").val() !== "";
@@ -595,11 +620,12 @@ async function addSubject() {
     },
   });
 }
-
 // _______GET SubjectforEdit_______
 async function editSubject(element) {
   event.preventDefault();
   var subjectId = element.getAttribute("data-subject-id");
+  $("#subject_creation_modal").modal("show");
+  $("#subject_creation_modal .modal-title").text("Edit Subject");
   const editSubjectUrl = apiUrl + "/Subjects/subject_id/?subject_id=" + subjectId;
   await $.ajax({
     type: "GET",
@@ -611,26 +637,23 @@ async function editSubject(element) {
       "Authorization": `Bearer ${jwtToken}`,
     },
     beforeSend: (e) => {
-      showLoader("body", "sm");
+      showLoader("subject-form-area", "sm");
     },
     success: (data) => {
       if (data && data.response) {
         var responseData = data.response;
         $("#subject_id").val(responseData.subject_id);
         $("#subject_name").val(responseData.subject_name);
-        $("#subject_creation_modal").modal("show");
-        $("#subject_creation_modal .modal-title").text("Edit Subject");
       }
     },
     error: (error) => {
       raiseErrorAlert(error["responseJSON"]["detail"]);
     },
     complete: (e) => {
-      removeLoader("body", "sm");
+      removeLoader("subject-form-area", "sm");
     },
   });
 }
-
 // _______DELETE Subject_______
 async function deleteSubject(element) {
   event.preventDefault();
@@ -675,7 +698,6 @@ async function deleteSubject(element) {
     }
   });
 }
-
 // _______GET Student_______
 async function loadStudentDetails(selectedClassId) {
   var loadStudentUrl = apiUrl + "/Students/get_students_by_field/class_id/" + selectedClassId + "/";
@@ -702,7 +724,7 @@ async function loadStudentDetails(selectedClassId) {
           '<img src="/assets/img/no_data_found.png" class="no_data_found">'
         );
       } else {
-        var studentTableHtml = '<table class="table table-striped table-hover table-sticky table_students">' +
+        var studentTableHtml = '<table class="table table-striped table-hover table-sticky table_students" id="classStudent">' +
           '<thead class="thead-dark">' +
           '<tr>' +
           '<th>Photo</th>' +
@@ -721,7 +743,9 @@ async function loadStudentDetails(selectedClassId) {
           var studentHtml =
             '<tr class="tr-student-' + student.student_id + '">' +
             "<td>" + "<img src=" + student.photo + " class='studetImage'>" + "</td>" +
-            '<td class="student_name">' + student.student_name + "</td>" +
+            '<td class="student_name">' + 
+           "<a href='/student/" + student.slug + "'>" + student.student_name + "</a>" +
+            "</td>" +
             '<td class="roll_number">' + student.roll_number + "</td>" +
             '<td class="class_id">' + student.classes.class_name + "</td>" +
             '<td class="section_id">' + student.sections.section_name + "</td>" +
@@ -732,6 +756,7 @@ async function loadStudentDetails(selectedClassId) {
         }
         studentTableHtml += '</tbody></table>';
         studentDetailsContainer.html(studentTableHtml);
+        $('#classStudent').DataTable();
       }
     },
     error: (error) => {
@@ -742,10 +767,9 @@ async function loadStudentDetails(selectedClassId) {
     },
   });
 }
-
 //_______GET Gradings_______
 async function loadGradeDetails(selectedClassId) {
-  var loadGradeUrl = apiUrl + "/Grades/get_grade_by_field/class_id/" + selectedClassId + "/";
+  var loadGradeUrl = apiUrl + "/Grades/get_grade_by_class_id/?class_id=" + selectedClassId;
   const gradeData = await $.ajax({
     type: "GET",
     url: loadGradeUrl,
@@ -798,10 +822,10 @@ async function loadGradeDetails(selectedClassId) {
 // _______ADD/EDIT Grade_______
 async function addGrade() {
   let editGrade = $("#grade_id").val() !== "";
-  classId = $("#classes_id").val();
+  classId =$("#classes_id").val();
   const data = {
     institute_id: instituteId,
-    class_id: classId,
+    class_id: [classId],
     grade_id: $("#grade_id").val(),
     grade_name: $("#grade_name").val(),
     percent_from: $("#percent_from").val(),
@@ -829,11 +853,11 @@ async function addGrade() {
         const responseData = data.response;
         if (editGrade) {
           raiseSuccessAlert("Grade Updated Successfully");
-          await loadGradeDetails(responseData.class_id);
+          await loadGradeDetails(classId);
           $("#grade_id").val("");
         } else {
           raiseSuccessAlert("Grade Added Successfully.");
-          await loadGradeDetails(responseData.class_id);
+          await loadGradeDetails(classId);
         }
         resetGradeForm();
       }
@@ -846,7 +870,6 @@ async function addGrade() {
     },
   });
 }
-
 function validateGradeForm() {
   var minPercentage = parseFloat($("#percent_from").val());
   var maxPercentage = parseFloat($("#percent_upto").val());
@@ -858,6 +881,8 @@ function validateGradeForm() {
     if (value === "") {
       element.focus().addClass("is-invalid");
       isValid = false;
+    }else{
+      element.focus().removeClass("is-invalid");
     }
   }
   if (!isNaN(minPercentage) && !isNaN(maxPercentage)) {
@@ -886,11 +911,12 @@ function resetGradeForm() {
     }
   }
 }
-
 // _______GET GradeforEdit_______
 async function editGrading(element) {
   event.preventDefault();
   var gradeId = element.getAttribute("data-grade-id");
+  $("#grade_creation_modal").modal("show");
+  $("#grade_creation_modal .modal-title").text("Edit Grading");
   const editGradeUrl = apiUrl + "/Grades/get_grade_by_id/?grade_id=" + gradeId;
   await $.ajax({
     type: "GET",
@@ -902,7 +928,7 @@ async function editGrading(element) {
       "Authorization": `Bearer ${jwtToken}`,
     },
     beforeSend: (e) => {
-      showLoader("body", "sm");
+      showLoader("grade-form-area", "sm");
     },
     success: (data) => {
       if (data) {
@@ -911,19 +937,16 @@ async function editGrading(element) {
         $("#percent_from").val(responseData.percent_from);
         $("#percent_upto").val(responseData.percent_upto);
         $("#grade_name").val(responseData.grade_name);
-        $("#grade_creation_modal").modal("show");
-        $("#grade_creation_modal .modal-title").text("Edit Grading");
       }
     },
     error: (error) => {
       raiseErrorAlert(error["responseJSON"]["detail"]);
     },
     complete: (e) => {
-      removeLoader("body", "sm");
+      removeLoader("grade-form-area", "sm");
     },
   });
 }
-
 // _______DELETE Grade_______
 async function deleteGrading(element) {
   event.preventDefault();
@@ -1009,12 +1032,13 @@ async function loadCalendarDetails(selectedClassId) {
       var headerRow = $("<tr class='col' id='column'>");
       headerRow.append("<th>Time</th>");
 
-      if (Array.isArray(data)) {
-        var uniqueDays = [...new Set(data.map(item => item.day))];
-        uniqueDays.forEach(day => {
-          headerRow.append(`<th>${day}</th>`);
-        });
-      }
+      const dayOrder = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+      var uniqueDays = [...new Set(data.map(item => item.day))];
+      uniqueDays.sort((a, b) => dayOrder.indexOf(a) - dayOrder.indexOf(b));
+
+      uniqueDays.forEach(day => {
+        headerRow.append(`<th>${day}</th>`);
+      });
       calendarTable.append(headerRow);
 
       var timeDayMap = {};
@@ -1053,13 +1077,15 @@ async function loadCalendarDetails(selectedClassId) {
 
 function validateExamForm() {
   var isValid = true;
-  const fields = ["start_date", "end_date", "result_date", "parent_exam_name"];
+  const fields = ["start_date", "end_date", "result_date", "parent_exam_name","subject_Input"];
   for (const field of fields) {
     const element = $(`#${field}`);
     const value = element.val().trim();
     if (value === "") {
       element.focus().addClass("is-invalid");
       isValid = false;
+    }else{
+      element.focus().removeClass("is-invalid");
     }
   }
   const todayDate = new Date().toISOString().split('T')[0];
@@ -1075,6 +1101,7 @@ function validateExamForm() {
     raiseErrorAlert("End Date must be less than Result Date");
     isValid = false;
   }
+  
   return isValid;
 }
 
@@ -1113,23 +1140,29 @@ async function loadExams(selectedClassId) {
         if (examsData.upcoming_parent_exam.length > 0) {
           var upcomingHtml = '<h5 class="examHeading">Upcoming Exams</h5>' +
             '<table class="table table-striped table-hover table-sticky mt-3 table_students" id="upcomingExam">' +
+            '<thead class="thead-dark">' +
             '<tr>' +
             '<th>Exam Date</th>' +
             '<th>Name of Exams</th>' +
+            '<th>Result Announced Date</th>'+
             '<th>Action</th>' +
             '</tr>' +
+            '</thead>' +
             '<tbody class="tbl__bdy">';
 
           for (var i = 0; i < examsData.upcoming_parent_exam.length; i++) {
             var exam = examsData.upcoming_parent_exam[i];
             var startDate = new Date(exam.start_date);
             var endDate = new Date(exam.end_date);
+            var resultDate = new Date(exam.result_date);
             var formattedStartDate = formatDate(startDate);
             var formattedEndDate = formatDate(endDate);
+            var formattedResultDate = formatDate(resultDate);
             var upcomingExamHtml =
               '<tr class="upcomExam" data-exm-id="' + exam.parent_exam_id + '">' +
               '<td>' + formattedStartDate + ' - ' + formattedEndDate + '</td>' +
               '<td>' + exam.parent_exam_name + '</td>' +
+              '<td>' + formattedResultDate + '</td>' +
               '<td>' +
               '<a class="btn btn-sm btn-info" onclick="editExam(this)" data-exam-id="' + exam.parent_exam_id + '"><i class="bi bi-pencil-square"></i></a>' +
               '<a class="btn btn-sm btn-danger" onclick="deleteExam(this)" data-exam-id="' + exam.parent_exam_id + '" id="examDelete"><i class="bi bi-trash3"></i></a>' +
@@ -1141,6 +1174,7 @@ async function loadExams(selectedClassId) {
 
           upcomingHtml += '</tbody></table>';
           examsContainer.append(upcomingHtml);
+          $('#upcomingExam').DataTable();
         }
         if (examsData.old_parent_exams.length > 0) {
           var pastHtml = '<h5 class="examHeading">Past Exams</h5>' +
@@ -1175,6 +1209,7 @@ async function loadExams(selectedClassId) {
 
           pastHtml += '</tbody></table>';
           examsContainer.append(pastHtml);
+          $('#pastExam').DataTable();
         }
       }
     },
@@ -1230,86 +1265,77 @@ async function addExam() {
         const responseData = data["response"];
         var startDate = new Date(responseData.start_date);
         var endDate = new Date(responseData.end_date);
+        var resultDate = new Date(responseData.result_date);
         var formattedStartDate = formatDate(startDate);
         var formattedEndDate = formatDate(endDate);
+        var formattedResultDate = formatDate(resultDate);
+
         if (editExam) {
           let rows = document.querySelectorAll('.sublabel');
           for (let i = 0; i < rows.length; i++) {
             let row = rows[i];
             let subjectId = row.dataset.subjectId;
+            // var examId = row.querySelector(".fullMarks").getAttribute("data-child-id");
             let examId = localStorage.getItem(`child_exam_id_${subjectId}`);
             let ancestorRow = row.closest('.subjectRow');
             if (ancestorRow) {
               let fullMarksInput = ancestorRow.querySelector(".fullMarks");
               let fullMarksValue = fullMarksInput.value;
-
-              const editChildExam = apiUrl + "/Exams/update_exam/?exam_id=" + examId;
-              let updatedChildExamData = {
-                "parent_exam_id": responseData.parent_exam_id,
-                "subject_id": subjectId,
-                "full_marks": fullMarksValue,
-                "is_deleted": false,
-              };
-              await $.ajax({
-                type: requestsType,
-                url: editChildExam,
-                mode: "cors",
-                crossDomain: true,
-                headers: {
-                  "Content-Type": "application/json",
-                  "Authorization": `Bearer ${jwtToken}`,
-                },
-                data: JSON.stringify(updatedChildExamData),
-                success: (childData) => {
-                },
-              });
+              await updateChildExam(examId, responseData.parent_exam_id, subjectId, fullMarksValue);
             }
-            removeLoader("exam-form-area", "sm");
           }
           const existingRow = $("tr[data-exm-id='" + responseData.parent_exam_id + "']");
           if (existingRow.length) {
             existingRow.find('td:eq(0)').text(formattedStartDate + ' - ' + formattedEndDate);
             existingRow.find('td:eq(1)').text(responseData.parent_exam_name);
+            existingRow.find('td:eq(2)').text(formattedResultDate);
           }
-          raiseSuccessAlert("Exam Updated Successfully");
+          raiseSuccessAlert("Examination Updated Successfully");
           $("#parent_exam_id").val("");
           resetExamForm();
         } else {
-          const examUrl = apiUrl + "/Exams/create_bulk_exam/";
-          let subjects = document.querySelectorAll(".sublabel");
-          let fullmarksList = document.querySelectorAll(".fullMarks");
-          let subject_data = [];
+          await addChildExam(responseData.parent_exam_id);
+          var examsContainer = $("#tabExam");
+          var noDataImage = examsContainer.find('.no_data_found');
+          if (noDataImage.length > 0) {
+            noDataImage.remove();
+          }
+          var upcomingTable = $("#upcomingExam").DataTable();
 
-          subjects.forEach((element, index) => {
-            let subjectId = element.dataset.subjectId;
-            let fullmarks = fullmarksList[index].value;
-
-            subject_data.push({
-              full_marks: fullmarks,
-              subject_id: subjectId,
-              parent_exam_id: responseData.parent_exam_id,
-              is_deleted: false,
-            });
-          });
-          await $.ajax({
-            type: requestsType,
-            url: examUrl,
-            mode: "cors",
-            crossDomain: true,
-            headers: {
-              "Content-Type": "application/json",
-              "Authorization": `Bearer ${jwtToken}`,
-            },
-            data: JSON.stringify(subject_data),
-            success: (examData) => {
-              console.log(examData);
-            },
-            complete: (e) => {
-              removeLoader("exam-form-area", "sm");
-            },
-          });
-          await loadExams(classesId)
-          raiseSuccessAlert("Exam Added Successfully.");
+          if (!upcomingTable.data().any()) {
+              upcomingTable.destroy();
+              var upcomingHtml =
+                  '<div id="upcomingExamination">' +
+                  '<h5 class="examHeading">Upcoming Exams</h5>' +
+                  '<table class="table table-striped table-hover table-sticky mt-3 table_students" id="upcomingExam">' +
+                  '<thead class="thead-dark">' +
+                  '<tr>' +
+                  '<th>Exam Date</th>' +
+                  '<th>Name of Exams</th>' +
+                  '<th>Result Announced Date</th>' +
+                  '<th>Action</th>' +
+                  '</tr>' +
+                  '</thead>' +
+                  '<tbody class="tbl__bdy">' +
+                  '</tbody>' +
+                  '</table>' +
+                  '</div>';
+              examsContainer.append(upcomingHtml);
+              upcomingTable = $("#upcomingExam").DataTable();
+          }
+  
+          var upcomingExamHtml =
+              '<tr class="upcomExam" data-exm-id="' + responseData.parent_exam_id + '">' +
+              '<td>' + formattedStartDate + ' - ' + formattedEndDate + '</td>' +
+              '<td>' + responseData.parent_exam_name + '</td>' +
+              '<td>' + formattedResultDate + '</td>' +
+              '<td>' +
+              '<a class="btn btn-sm btn-info" onclick="editExam(this)" data-exam-id="' + responseData.parent_exam_id + '"><i class="bi bi-pencil-square"></i></a>' +
+              '<a class="btn btn-sm btn-danger" onclick="deleteExam(this)" data-exam-id="' + responseData.parent_exam_id + '" id="examDelete"><i class="bi bi-trash3"></i></a>' +
+              '</td>' +
+              '</tr>';
+          upcomingTable.row.add($(upcomingExamHtml)).draw();    
+          raiseSuccessAlert("Examination Added Successfully.");
         }
         resetExamForm();
       }
@@ -1322,9 +1348,80 @@ async function addExam() {
     },
   });
 }
+async function addChildExam(parentExamId){
+  const examUrl = apiUrl + "/Exams/create_bulk_exam/";
+  let subjects = document.querySelectorAll(".sublabel");
+  let fullmarksList = document.querySelectorAll(".fullMarks");
+  let subject_data = [];
+
+  subjects.forEach((element, index) => {
+    let subjectId = element.dataset.subjectId;
+    let fullmarks = fullmarksList[index].value;
+
+    subject_data.push({
+      full_marks: fullmarks,
+      subject_id: subjectId,
+      parent_exam_id: parentExamId,
+      is_deleted: false,
+    });
+  });
+  await $.ajax({
+    type: "POST",
+    url: examUrl,
+    mode: "cors",
+    crossDomain: true,
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${jwtToken}`,
+    },
+    beforeSend: (e) => {
+      showLoader("exam-form-area", "sm");
+    },
+    data: JSON.stringify(subject_data),
+    success: (examData) => {
+      console.log(examData);
+    },
+    complete: (e) => {
+      removeLoader("exam-form-area", "sm");
+    },
+  });
+}
+
+async function updateChildExam(examId, parentExamId, subjectId, fullMarksValue) {
+  const editChildExamUrl = apiUrl + "/Exams/update_exam/?exam_id=" + examId;
+  const updatedChildExamData = {
+    "parent_exam_id": parentExamId,
+    "subject_id": subjectId,
+    "full_marks": fullMarksValue,
+    "is_deleted": false,
+  };
+   await $.ajax({
+      type: "PUT",
+      url: editChildExamUrl,
+      mode: "cors",
+      crossDomain: true,
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${jwtToken}`,
+      },
+      beforeSend: (e) => {
+        showLoader("exam-form-area", "sm");
+      },
+      data: JSON.stringify(updatedChildExamData),
+      success: (childData) => {
+        localStorage.removeItem(`child_exam_id_${subjectId}`);
+      },
+      complete: (e) => {
+        removeLoader("exam-form-area", "sm");
+      },
+    });
+}
+
 async function editExam(element) {
   event.preventDefault();
   var parentExamId = element.getAttribute("data-exam-id");
+  $("#exam_creation_modal").modal("show");
+  $("#exam_creation_modal .modal-title").text("Edit Examination");
   const editExamUrl = apiUrl + "/ParentExams/get_parent_exam_by_parent_exam_id?parent_exam_id=" + parentExamId;
   const editChildExamUrl = apiUrl + "/Exams/get_exam_by_parent_exam_id/?parent_exam_id=" + parentExamId;
 
@@ -1338,7 +1435,7 @@ async function editExam(element) {
       "Authorization": `Bearer ${jwtToken}`,
     },
     beforeSend: (e) => {
-      showLoader("body", "sm");
+      showLoader("exam-form-area", "sm");
     },
     success: async function (parentExamData) {
       if (parentExamData) {
@@ -1366,7 +1463,7 @@ async function editExam(element) {
               var childExam = childExamsData.response[i];
               var newRow = $(`<tr class="subjectRow" id="subRow-${childExam.subject_id}">`);
               newRow.append(`<td class="sublabel" id="subjectId" name="subject_id" data-childExm-id="${childExam.exam_id}" data-subject-id="${childExam.subject_id}" value="${childExam.subject_id}">${childExam.subject.subject_name}</td>`);
-              newRow.append(`<td><input type="text" class="form-control fullMarks" id="subject_Input" value="${childExam.full_marks}" name="full_marks"></td>`);
+              newRow.append(`<td><input type="text" class="form-control fullMarks" id="subject_Input" data-child-id=${childExam.exam_id} value="${childExam.full_marks}" name="full_marks"></td>`);
               newRow.append(`<td><a class="btn btn-sm btn-danger" onclick="removeSubject(this)" data-subjects-id="${childExam.subject_id}"><i class="bi bi-trash3"></i></a></td>`);
               $("#subData").append(newRow);
               localStorage.setItem(`child_exam_id_${childExam.subject_id}`, childExam.exam_id);
@@ -1374,58 +1471,162 @@ async function editExam(element) {
           }
         },
         complete: (e) => {
-          removeLoader("body", "sm");
+          removeLoader("exam-form-area", "sm");
         },
       });
-      $("#exam_creation_modal").modal("show");
-      $("#exam_creation_modal .modal-title").text("Edit Examination");
     },
     error: (error) => {
       raiseErrorAlert(error["responseJSON"]["detail"]);
     },
   });
 }
+
 async function deleteExam(element) {
   event.preventDefault();
   var examId = element.getAttribute("data-exam-id");
   const deleteExamUrl = apiUrl + "/ParentExams/delete_parent_exam?parent_exam_id=" + examId;
   Swal.fire({
-    title: 'Are you sure, you want to delete this Record?',
-    text: 'This can\'t be reverted!',
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonColor: '#3085d6',
-    cancelButtonColor: '#d33',
-    confirmButtonText: 'Yes, delete it!'
+      title: 'Are you sure, you want to delete this Record?',
+      text: 'This can\'t be reverted!',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, delete it!'
   }).then(async (result) => {
-    if (result.isConfirmed) {
-      const data = await $.ajax({
-        type: "DELETE",
-        url: deleteExamUrl,
-        mode: "cors",
-        crossDomain: true,
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${jwtToken}`,
-        },
-        beforeSend: (e) => {
-          showLoader("body", "sm");
-        },
-        success: async function (data) {
-          var parentDiv = $(element).closest(`.upcomExam`);
-          parentDiv.remove();
-          if ($('.upcomExam').length === 0 && $('.pastExam').length === 0) {
-            $("#tabExam").html('<img src="/assets/img/no_data_found.png" class="no_data_found">');
-          }
-          raiseSuccessAlert("Examination Data Deleted Successfully.");
-        },
-        error: (error) => {
-          raiseErrorAlert(error["responseJSON"]["detail"]);
-        },
-        complete: (e) => {
-          removeLoader("body", "sm");
-        },
-      });
-    }
+      if (result.isConfirmed) {
+          const data = await $.ajax({
+              type: "DELETE",
+              url: deleteExamUrl,
+              mode: "cors",
+              crossDomain: true,
+              headers: {
+                  "Content-Type": "application/json",
+                  "Authorization": `Bearer ${jwtToken}`,
+              },
+              beforeSend: (e) => {
+                  showLoader("body", "sm");
+              },
+              success: async function (data) {
+                  var parentDiv = $(element).closest(`.upcomExam`);
+                  parentDiv.remove();
+                  var dataTable = $('#upcomingExam').DataTable();
+                  dataTable.row(parentDiv).remove().draw();
+                  if (dataTable.rows().count() === 0) {
+                      $("#tabExam").html('<img src="/assets/img/no_data_found.png" class="no_data_found">');
+                  }
+                  raiseSuccessAlert("Examination Deleted Successfully.");
+              },
+              error: (error) => {
+                  raiseErrorAlert(error["responseJSON"]["detail"]);
+              },
+              complete: (e) => {
+                  removeLoader("body", "sm");
+              },
+          });
+      }
+  });
+}
+
+function showDynamicFee(installment){
+  showLoader("installment_table","sm")
+  // var installments = {
+  //     'Monthly':12,
+  //     'Quarterly':4,
+  //     'Half Yearly':2,
+  //     'Yearly':1
+  // }
+  var totalInstallmentAmount = $("#install_amount").val();
+  var installmentNumber = $("#installment_display").val();
+  var installmentAmount =parseInt(totalInstallmentAmount/installmentNumber);
+  var installmentTable = $("#feeInstallmentTable");
+  installmentTable.empty();
+  var noInstallment = parseInt(installment);
+  var trList = []
+  for (let index = 1; index <= noInstallment; index++) {
+    var dueDate = new Date();
+    dueDate.setMonth(dueDate.getMonth() + index);
+    var day = String(dueDate.getDate()).padStart(2, '0');
+    var month = String(dueDate.getMonth() + 1).padStart(2, '0');
+    var year = dueDate.getFullYear();
+    var formattedDueDate = `${day}-${month}-${year}`;
+
+      var row = `
+          <tr>
+              <td>Installment-${index}</td>
+              <td>${formattedDueDate}</td>
+              <td>${installmentAmount}</td>
+          </tr>
+      `
+      trList.push(row);
+  }
+  removeLoader("installment_table","sm")
+  installmentTable.append(trList);
+}
+function updateInstallAmount() {
+  var totalFee = parseFloat($('#total_fee').val()) || 0;
+  var admissionFee = parseFloat($('#fee_admission').val()) || 0;
+  var totalInstallAmount = totalFee - admissionFee;
+
+  $('#install_amount').val(totalInstallAmount);
+}
+function getSelectedOption(dropdownId) {
+  var dropdown = document.getElementById(dropdownId);
+  var selectedOption = dropdown.options[dropdown.selectedIndex];
+  return selectedOption;
+}
+
+async function loadFeeDetails(selectedClassId) {
+  var loadFeeUrl = apiUrl + "/Fees/get_all_fees_by_class/?class_id=" + selectedClassId;
+  const feeData = await $.ajax({
+    type: "GET",
+    url: loadFeeUrl,
+    mode: "cors",
+    crossDomain: true,
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${jwtToken}`,
+    },
+    beforeSend: (e) => {
+      showLoader("tabFees", "sm"); 
+    },
+    success: async function (feeData) {
+      var feeInfoContainer = $("#installment_table tbody");
+      var dropdown = $("#installment-dropdown");
+      
+      if (feeData.length === 0) {
+        feeInfoContainer.html('<tr><td colspan="3"><img src="/assets/img/no_data_found.png" class="no_data_found"></td></tr>');
+        $("#total_fee").val('');
+        $("#fee_admission").val('');
+        $("#install_amount").val('');
+        $("#installment_display").val('');
+        dropdown.empty();
+      } else {
+        feeInfoContainer.empty();
+        var fee = feeData[0]; 
+        var installments = fee.class_installments;
+        dropdown.empty();
+        for (var i = 0; i < installments.length; i++) {
+          var installment = installments[i];
+          dropdown.append(`<option value="${installment.installment_number}" data-install-id=${installment.installment_id} data-install-number=${installment.installment_number}>${installment.installment_name}</option>`);
+        }
+        var selectedOption = getSelectedOption("installment-dropdown");
+        var selectedInstallmentNumber = $(selectedOption).data("install-number");
+        
+        $("#total_fee").val(fee.fee_total);
+        $("#fee_admission").val(fee.fee_admission);
+        $("#install_amount").val(fee.total_installments);
+        $("#installment_display").val(selectedInstallmentNumber);
+        $("#installment-dropdown").val(selectedOption.value);
+        showDynamicFee(selectedInstallmentNumber);
+      }
+    },
+  
+    error: (error) => {
+      raiseErrorAlert(error);
+    },
+    complete: (e) => {
+      removeLoader("tabFees", "sm");
+    },
   });
 }

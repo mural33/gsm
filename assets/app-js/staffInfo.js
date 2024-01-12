@@ -1,21 +1,37 @@
 $(document).ready(e => {
-    $("#btnPayrollForm").on('click', e => {
+    $("#staffPayroll").DataTable();
+    $("#addPayrollForm").on('click', e => {
         if(validateForm(payrollFieldNames) === true){
             addPayroll();
         }
-        })
+    })
+    
+    $('#staffPayroll').on('click', '.dltBtn', async function() {
+        var StaffPayRoleId = $(this).attr("data-payroll-id");
+        await deletePayroll(StaffPayRoleId);
+    });
+    $("#btnstaffDocument").on('click', e => {
+        if(validateForm(documentFields) === true){
+            addDocument();
+        }
+    })
+       
+    let staffInfo = JSON.parse($("#staffInfo").val());
+    let staffData = new StaffData();
+    staffData.getStaffAttendance(staffInfo.staffId);
+    staffData.loadCalendarDetailsByStaff(staffInfo.staffId);
+    callPieChart();
+    
+});
 
-        $('#staffPayroll').on('click', '.dltBtn', async function() {
-            var StaffPayRoleId = $(this).attr("data-payroll-id");
-            await deletePayroll(StaffPayRoleId);
-        });
-
-        $("#btnstaffDocument").on('click', e => {
-            if(validateForm(documentFields) === true){
-                addDocuments();
-            }
-        })
-})
+function callPieChart(absent, present, leave) {
+    var existingChart = Chart.getChart("staffPieChart");
+    if (existingChart) {
+        existingChart.destroy();
+    }
+    // Create a new pie chart
+    generatePieChart("staffPieChart", [present, absent, leave], ["Present", "Absent", "Leave"], ["#28a745", "#dc3545", "#ffc107"]);
+}
 
 let payrollFieldNames = [
     'payment_date','payroll_type','salary_amount','payment_mode',
@@ -26,6 +42,7 @@ let documentFields = [
 ]
 isUpdate = false
 async function addPayroll(){
+
     var payrollData = {
         "payment_date": $("#payment_date").val(),
         "payroll_type": $("#payroll_type").val(),
@@ -53,13 +70,23 @@ async function addPayroll(){
             displayNewPayroll(payrollData);
         }
         resetForm(payrollFieldNames);
-        $("#payroll_detail").find(".no_data_found-tr").hide();
+        // $("#payroll_detail").find(".no_data_found-tr").hide();
+        var tableBody = $("#payroll_detail");
+        var noDataImage = tableBody.find('.no_data_found-tr');
+        if (noDataImage.length > 0) {
+          noDataImage.remove();
+        }
+        isUpdate = false;
     });
 }
 async function displayNewPayroll(response) {
+    var tableBody = $("#payroll_detail");
+    var noDataImage = tableBody.find('.no_data_found-tr');
+    if (noDataImage.length > 0) {
+      noDataImage.remove();
+    }
     newRow = `
     <tr class="tr-payroll-${response.payroll_id}">
-        <td>${$("#payroll_detail tr").length + 1}</td>
         <td class="payment_date">${response.payment_date}</td>
         <td class="payroll_type">${response.payroll_type}</td>
         <td class="salary_amount">${response.salary_amount}</td>
@@ -77,12 +104,11 @@ async function displayNewPayroll(response) {
         </td>
     </tr>
     `;
-    var tableBody = document.querySelector('.tbl__bdy');
-    tableBody.innerHTML += newRow;
+    // var tableBody = document.querySelector('.tbl__bdy');
+    // tableBody.innerHTML += newRow;
     resetForm(payrollFieldNames);
-    isUpdate = false
+    $("#staffPayroll").DataTable().row.add($(newRow)).draw();
 }
-
 
 async function openPayrollForm(element){
     var payrollId = $(element).attr("data-payroll-id");
@@ -90,7 +116,6 @@ async function openPayrollForm(element){
     var endPoint = `/StaffPayrole/get_payroll_by_id/?payroll_id=${payrollId}`
     var totalUrl = apiUrl+endPoint;
     var method = "GET";
-
     await ajaxRequest(method, totalUrl,"","payrollFormId","lg", (response) =>{
         var payrollData = response.response;
         for (const key in payrollData) {
@@ -145,31 +170,39 @@ async function deletePayroll(payrollId){
         confirmButtonText: 'Yes, delete it!'
     }).then((result) => {
         if (result.isConfirmed) {
-            $(`.tr-payroll-${payrollId}`).remove()
-            if ($('#staffPayroll').length === 1) {
-                $("#payroll_detail").find(".no_data_found-tr").show()
+            const dataTable = $('#staffPayroll').DataTable();
+            const deletedRow = dataTable.row(`.tr-payroll-${payrollId}`);
+        
+            if (deletedRow) {
+                deletedRow.remove().draw();
+                if (dataTable.rows().count() === 0) {
+                    $("#staffPayroll").html(
+                        `<div class="col-md-12 text-center">
+                            <img src="/assets/img/no_data_found.png" alt="No Image" class="no_data_found">
+                        </div>`
+                    )
+                }
+                var endPoint = `/StaffPayrole/delete_payroll/?payroll_id=${payrollId}`
+                var totalUrl = apiUrl+endPoint;
+                ajaxRequest("DELETE",totalUrl, "","payrollFormId","lg", (response) => {  
+                })
+                Swal.fire({
+                    title: 'Deleted!',
+                    text: 'Your file has been deleted.',
+                    icon: 'success',
+                    customClass: {
+                        title: 'swal-title',
+                        content: 'swal-text',
+                        confirmButton: 'swal-confirm-button',
+                    },
+                });
             }
-            var endPoint = `/StaffPayrole/delete_payroll/?payroll_id=${payrollId}`
-            var totalUrl = apiUrl+endPoint;
-            ajaxRequest("DELETE",totalUrl, "","payrollFormId","lg", (response) => {  
-            })
-            Swal.fire({
-                title: 'Deleted!',
-                text: 'Your file has been deleted.',
-                icon: 'success',
-                customClass: {
-                    title: 'swal-title',
-                    content: 'swal-text',
-                    confirmButton: 'swal-confirm-button',
-                },
-            });
         }
     });
-
 }
 
 // documentsss
-async function addDocuments() {
+async function addDocument() {
     var documentData = {
         "document_name": $("#document_name").val(),
         "document_file": await uploadFile("document_file", "staff_documents"),
@@ -180,7 +213,6 @@ async function addDocuments() {
     var method = isUpdate ? "PUT" : "POST";
     var endPoint = isUpdate ? `/StaffDocuments/update_staff_documents/?document_id=${documentId}` : "/StaffDocuments/add_staff_documents/";
     var totalUrl = apiUrl + endPoint
-    // Extract file name before making the AJAX request
     await ajaxRequest(method, totalUrl, documentData, "documentFormId", "lg", (response) => {
         $("#documentForm").modal('hide');
         var documentData = response.response;
@@ -188,8 +220,7 @@ async function addDocuments() {
         var document_name = documentData.document_name
         if (isUpdate) {
             var updatedRow = $(`.card-staff-${documentId}`);
-            updatedRow.find(".card-title").text(`Document Name:${document_name}`)
-            updatedRow.find(".card-text").text(`Document type:${docsName}`)
+            updatedRow.find(".card-title").text(`${document_name}`)
             raiseSuccessAlert("Document Updated Successfully")
         } else {
             displayNewDocument(documentData);
@@ -199,40 +230,34 @@ async function addDocuments() {
         $("#documentRow").find("#no_data_found").hide()
     });
 }
-
 async function displayNewDocument(response) {
     var documentFile = response.document_file.split('/').pop();
     var newDocumentHTML = `
         <div class="col-md-4 card-staff-${response.document_id}">
             <div class="card mb-3">
                 <div class="card-body">
-                    <p class="card-title">Document Name: ${response.document_name}</p>
-                    <p class="card-text">Document type: ${documentFile}</p>
+                    <p class="card-title">${response.document_name}</p>
+                    
                 </div>
                 <div class="card-footer d-flex justify-content-evenly">
                     <button data-document-id="${response.document_id}" class="btn btn-sm btn-info" onclick="openDocumentForm(this)">
                         <i class="bi bi-pencil-square"></i>
                     </button>
-                    <button data-document-id="${response.document_id}" class="btn btn-sm btn-danger" onclick="deleteDocuments(this)">
+                    <button data-document-id="${response.document_id}" class="btn btn-sm btn-danger" onclick="deleteDocument(this)">
                         <i class="bi bi-trash3"></i>
                     </button>
-                    <button data-document-id="${response.document_id}" class="btn btn-sm btn-dark">
+                    <a href="/app/azure_download/${ documentFile }/staff_documents/" data-documentId="${response.document_id}"  class="btn btn-sm btn-dark">
                         <i class="bi bi-download"></i>
-                    </button>
+                    </a>
                 </div>
             </div>
         </div>
     `;
     $("#documentRow").append(newDocumentHTML);
-    raiseSuccessAlert("Document Added Successfully")
+    raiseSuccessAlert(response.msg)
     resetForm(documentFields);
-    isUpdate = false;
-    
-    
 }
-
- 
-async function deleteDocuments(element){
+async function deleteDocument(element) {
     var documentId = $(element).attr("data-document-id");
     await Swal.fire({
         title: 'Are you sure, do you want to delete this Record?',
@@ -246,11 +271,15 @@ async function deleteDocuments(element){
         if (result.isConfirmed) {
             var endPoint = `/StaffDocuments/delete_staff_documents/?document_id=${documentId}`;
             var totalUrl = apiUrl + endPoint;
-            $(`.card-staff-${documentId}`).remove()
-            if ($('#documentRow').length === 1 ) {
-                $("#documentRow").find("#no_data_found").show()
+            $(`.card-staff-${documentId}`).remove();
+            if ($('.card-staff').length === 0) {
+                $("#documentRow").html(
+                    `<div class="text-center" id="no_data_found">
+                        <img src="/assets/img/no_data_found.png" class="no_data_found">
+                    </div>`
+                );
             }
-            ajaxRequest("DELETE", totalUrl, "","documentRow","lg",(response) => {
+            ajaxRequest("DELETE", totalUrl, "", "documentRow", "lg", (response) => {
                 Swal.fire({
                     title: 'Deleted!',
                     text: 'Your file has been deleted.',
@@ -266,6 +295,7 @@ async function deleteDocuments(element){
         }
     });
 }
+
 
 async function openDocumentForm(element) {
     var documentId = $(element).attr("data-document-id");
@@ -285,8 +315,235 @@ async function openDocumentForm(element) {
         }
         isUpdate = true;
         
+    }); 
+}
+
+function generatePieChart (id = "",parcenatge= [],labels = [],colors = []) {
+    var data = {
+        labels:labels,
+        datasets: [{
+            data: parcenatge,
+            backgroundColor: colors
+        }]
+    };
+    // Configuration options
+    var options = {
+        responsive: true,
+        maintainAspectRatio: false
+    };
+    // Get the canvas element
+    var ctx = document.getElementById(`${id}`).getContext('2d');
+    // Create the pie chart
+    var myPieChart = new Chart(ctx, {
+        type: 'pie',
+        data: data,
+        options: options
+    });
+}
+
+async function deleteStaff(element) {
+    var staffId = element.getAttribute("data-id");
+    await Swal.fire({
+        title: 'Are you sure, do you want to delete this Staff?',
+        text: 'This can\'t be reverted!',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            var endPoint = `/Staff/delete_staff/?staff_id=${staffId}`
+            var totalUrl = apiUrl+endPoint;
+            ajaxRequest("DELETE",totalUrl, "","body","lg", (response) => {  
+            })
+            Swal.fire({
+                title: 'Deleted!',
+                text: 'Your file has been deleted.',
+                icon: 'success',
+                customClass: {
+                    title: 'swal-title',
+                    content: 'swal-text',
+                    confirmButton: 'swal-confirm-button',
+                },
+            });
+            window.location.href = `/app/staffs/`;
+        }
     });
     
 }
 
+// function deleteStaff(element) {
+//     var staffId = element.getAttribute("data-id");
+//     var confirmation = confirm("Are you sure you want to delete this staff?");
+    
+//     if (confirmation) {
+//         $.ajax({
+//             type: "DELETE",
+//             url: `https://gsm-fastapi.azurewebsites.net/Staff/delete_staff/?staff_id=${staffId}`,
+//             headers: {
+//                 'Authorization': `Bearer ${jwtToken}`,
+//                 'Content-Type': 'application/json',
+//             },
+//             success: function(response) {
+//                 // Optional: Remove the staff entry from the UI
+//                 // $(element).closest('.col-sm-12').remove();
+//                 alert("Staff deleted successfully!");
+//                 // Reload the page after successful deletion
+//                 window.location.href = `/app/staffs/`;
+                
+//             },
+//             error: function(xhr, textStatus, errorThrown) {
+//                 alert("Error deleting staff.");
+//                 console.log(xhr.responseText);
+//             }
+//         });
+//     }
+// }
 
+// Staff attendance 
+class StaffData {
+    
+    async ajaxCall(type, url, data, loaderId,loaderSize ,successCallback) {
+        await $.ajax({
+            type: type,
+            url: url,
+            data: JSON.stringify(data),
+            mode: "cors",
+            crossDomain: true,
+            headers: {
+                "Authorization": `Bearer ${jwtToken}`,
+                "Content-Type": "application/json",
+            },
+            contentType: "application/json",
+            dataType: "json",
+            beforeSend: () => {
+                showLoader(loaderId, loaderSize);
+            },
+            success: (response) => {
+                successCallback(response);
+            },
+            error: (error) => {
+                raiseErrorAlert(error.responseJSON);
+            },
+            complete: () => {
+                removeLoader(loaderId, loaderSize);
+            }
+        });
+    }
+    async getStaffAttendance(staffId) {
+        var endPoint = `/StaffAttendance/get_staff_attendance_by_staff_id/?staff_id=${staffId}`
+        var totalUrl = apiUrl + endPoint;
+        await this.ajaxCall("GET", totalUrl, "", "attendance", "sm",(response) => {
+            var staffAttedance = response.staff_attendance;
+            this.displayAttendanceData(staffAttedance);
+            var absent = response.staff_attendance_percentage.absent_percentage
+            var present = response.staff_attendance_percentage.present_percentage
+            var leave = response.staff_attendance_percentage.leave_percentage
+            callPieChart(absent,present,leave)
+        });
+    }
+    async displayAttendanceData(response) {     
+        this.tBody = $("#attendance_data");
+        if (Array.isArray(response) && response.length > 0) {
+            this.tBody.empty();
+            for (const attendance of response) {
+                let statusClass;
+                if (attendance.attendance_status === "Present") {
+                    statusClass = "bg-success";
+                } else if (attendance.attendance_status === "Absent") {
+                    statusClass = "bg-danger";
+                } else {
+                    statusClass = "bg-warning";
+                }
+                const row = `
+                    <tr>
+                        <td>${attendance.attendance_date}</td>
+                        <td class="bg ${statusClass} text-white">${attendance.attendance_status}</td>
+                    </tr>
+                `;
+                this.tBody.append(row);
+            }
+        }
+        else {
+            this.tBody.html(`
+                 <tr>
+                     <td colspan="2" class="text-center">
+                         <img src="/assets/img/no_data_found.png" class="no_data_found">
+                     </td>
+                 </tr>
+            `);
+        }
+    }
+    // calendar details
+    async loadCalendarDetailsByStaff(staffId) {
+        try {
+            const loadCalendarUrl = apiUrl + `/Calender/get_calender_by_staff/?staff_id=${staffId}`;
+            await this.ajaxCall("GET", loadCalendarUrl, "", "tabCalender", "sm", async function (calendarData) {
+                const calendarDetailsContainer = $("#tabCalender");
+                const calendarTable = calendarDetailsContainer.find("#calenderTable");
+                const noDataImage = calendarDetailsContainer.find('.no_data_found');
+                if (!calendarData.response || calendarData.response.length === 0) {
+                    noDataImage.show();
+                    calendarTable.empty().hide();
+                } else {
+                    noDataImage.hide();
+                    calendarTable.empty().show();
+                    const data = calendarData.response;
+                    const uniqueDays = [...new Set(data.map(item => item.day))];
+                    const calendarHeader = $("#calendar .row h6");
+                    calendarHeader.text("Calendar/TimeTable of this staff");
+                    // Order the days
+                    const orderedDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']; // Define the order of days
+                    const headerRow = $("<tr class='col' id='column'>");
+                    headerRow.append("<th>Time</th>");
+                    orderedDays.forEach(day => {
+                    if (uniqueDays.includes(day)) {
+                        headerRow.append(`<th>${day}</th>`);
+                    }
+                    });
+                    calendarTable.append(headerRow);
+                    const timeDayMap = {};
+                    data.forEach(item => {
+                    const timeKey = `${item.start_time}-${item.end_time}`;
+                    if (!timeDayMap[timeKey]) {
+                        timeDayMap[timeKey] = {};
+                    }
+                        timeDayMap[timeKey][item.day] = {
+                            subject: item.subjects.subject_name,
+                            class: item.classes.class_name,
+                        };
+                    });
+                    const uniqueTimeSlots = Object.keys(timeDayMap);
+                    // Sort time slots
+                    const orderedTimes = uniqueTimeSlots.sort((a, b) => {
+                    const timeA = new Date(`1970/01/01 ${a.split('-')[0].trim()}`).getTime();
+                    const timeB = new Date(`1970/01/01 ${b.split('-')[0].trim()}`).getTime();
+                    return timeA - timeB;
+                    });
+                    orderedTimes.forEach(timeKey => {
+                        const timeSlotRow = $("<tr class='rowData'>");
+                        timeSlotRow.append(`<td class="mod" id="tdData">${timeKey}</td>`);
+                        uniqueDays.forEach(day => {
+                        const cellData = timeDayMap[timeKey][day];
+                        if (cellData) {
+                            timeSlotRow.append(`<td id="tableData">${cellData.subject} <br> (${cellData.class})</td>`);
+                        } else {
+                            timeSlotRow.append('<td id="tableData"></td>');
+                        }
+                        });
+                        calendarTable.append(timeSlotRow);
+                    });
+                }
+            });
+        } catch (error) {
+            raiseErrorAlert(error);
+        } finally {
+            removeLoader("tabCalender", "sm");
+        }
+    }
+      
+      
+    
+    
+}

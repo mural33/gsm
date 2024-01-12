@@ -1,9 +1,10 @@
-// // importing pie chart function from utlity.js
-// import {genaratePieChart} from "./utlity.js";
 
 $(document).ready(e => {
-    let studentInfo =JSON.parse($("#studentInfo").val());
+    $("#UpComingExamTable,#pastExamTable,#Installment,\
+    #activityTable,#assginmentTable,#attendanceTable").DataTable()
+    $(".dataTables_empty").html(`<img src="/assets/img/no_data_found.png" alt="No Image" class="no_data_found">`)
 
+    let studentInfo =JSON.parse($("#studentInfo").val());
     $("#btnParentForm").on('click', e => {
         if (validateForm(parentFieldNames) === true) {
             addParent();
@@ -19,8 +20,13 @@ $(document).ready(e => {
     studentData.getStudentAttendance(studentInfo.studentId); 
     studentData.getExamsData(studentInfo.classId)
     studentData.getStudentDocuments(studentInfo.studentId);
+    studentData.getFeeData(studentInfo.studentId);
     loadCalendarDetails(studentInfo.classId, studentInfo.sectionId);
+    studentData.showStudentActivity();
     callPieChart();
+    $("#btnFeeForm").on('click', async (e) => {
+        await studentData.fixStudentFee(studentInfo.studentId);
+    })
 
     $("#btnSubmitAssignment").on('click', e => {
         studentData.submitAssignment($("#assginmentId").val(),studentInfo.studentId);
@@ -28,15 +34,44 @@ $(document).ready(e => {
     $("#btnstudentDocument").on('click', e => {
         studentData.uploadDocument(studentInfo.studentId);
     }) 
+    
+    $("#btnActivityForm").on('click', e => {
+        if (studentActivityForm() === true) {
+            studentData.saveActivity();
+        }
+        else{
+            restField()
+        }
+    });
+    $("#installment_type").on("change",()=>{
+        var installment = $("#installment_type").val()
+        if(installment.trim() != ""){
+            var discount = $("#discount").val() || 0
+            var total_fee = ((parseFloat($("#total_fee").val()) || 0) - (parseFloat($("#admission_fee").val()) || 0)) - parseFloat(discount)
+            var total_insta_amount = parseFloat(total_fee) - parseFloat(discount)
+            $("#total_insta_amount").val(total_insta_amount)
+            showDynamicFee(installment)
+        }
+        else{
+            $("#Installment tbody").empty()
+        }
+    })
+    $("#discount").on("input",(e)=>{
+        var discount = $("#discount").val() || 0
+        var total_fee = ((parseFloat($("#total_fee").val()) || 0) - (parseFloat($("#admission_fee").val()) || 0)) - parseFloat(discount)
+        var total_insta_amount = parseFloat(total_fee) - parseFloat(discount)
+        $("#total_insta_amount").val(total_insta_amount)
+    })
+
 });
 
-function callPieChart(absent, present) {
+function callPieChart(absent, present,leave) {
     var existingChart = Chart.getChart("studentPieChart");
     if (existingChart) {
         existingChart.destroy();
     }
     // Create a new pie chart
-    generatePieChart("studentPieChart", [present, absent, 0], ["Present", "Absent", "Leave"], ["#28a745", "#dc3545", "#ffc107"]);
+    generatePieChart("studentPieChart", [present, absent,leave], ["Present", "Absent", "Leave"], ["#28a745", "#dc3545", "#ffc107"]);
 }
 
 
@@ -77,6 +112,9 @@ async function addParent(){
                 } catch (e) {
                 }
             }
+            var imgElement = $(`#parent-img-${parentData.parent_id}`);
+            const imgSrc = parentData.parent_gender === 'Male' ? '/assets/img/male.png' : '/assets/img/female.png';
+            imgElement.attr("src", imgSrc);
         } else {
             displayNewParent(parentData);
         }
@@ -87,10 +125,11 @@ async function addParent(){
 async function displayNewParent(response){
     var parentData = response;
     var parentRow = $("#parentRow");
+    var img = parentData.parent_gender === 'Male' ?'/assets/img/male.png' :'/assets/img/female.png'
     var card = `
     <div class="card col-md-4 mx-2" id="parent-card-${parentData.parent_id}">
         <div class="card-heade text-center my-2">
-            <img src="/assets/img/men.jpg" alt="" srcset="" class="card-img-top parent_profile">
+            <img src=${img} alt="" srcset="" class="card-img-top parent_profile">
         </div>
         <div class="card-body row">
             <p class="card-title col-md-6">
@@ -128,7 +167,7 @@ async function openParentForm(element){
     var totalUrl = apiUrl+endPoint;
     var method = "GET";
 
-    await ajaxRequest(method, totalUrl,"","body","lg",(response) =>{
+    await ajaxRequest(method, totalUrl,"","parentFormArea","sm",(response) =>{
         var parentData = response.response;
         for (const key in parentData) {
             try{
@@ -236,6 +275,22 @@ class StudentData {
         });
     }
 
+    // ------------------------------studentFee--------------------------
+    async  fixStudentFee(studentId){
+    var endPoint = `/StudentFee/create_student_fee/`;
+    var totalUrl = apiUrl + endPoint;
+    var payload = {
+        "student_id":studentId,
+        "fee_total":$("#total_insta_amount").val(),
+        "discount": $("#discount").val(),
+        "intstall_count": $("#installment_type").val(),
+    }
+    await this.ajaxCall("POST", totalUrl, payload,"fee","sm",async (response) => {
+        $("#installment_type").attr('disabled', 'disabled')
+        raiseSuccessAlert("Fee Fixed Successfully")
+    })
+}
+
     async getAssignmentData(classId, sectionId) {
         var endPoint = `/Assignments/get_assignment_for_student_tab/?class_id=${classId}&section_id=${sectionId}`;
         var totalUrl = apiUrl + endPoint;
@@ -250,12 +305,15 @@ class StudentData {
         var totalUrl = apiUrl + endPoint;
         await this.ajaxCall("GET", totalUrl, "", "attendance", "sm",(response) => {
             var studentAttedance = response.student_attendance;
+
             this.displayAttendanceData(studentAttedance);
             var absent = response.student_attendance_percentage.absent_percentage
             var present = response.student_attendance_percentage.present_percentage
-            callPieChart(absent,present)
+            var leave = response.student_attendance_percentage.leave_percentage
+            callPieChart(absent,present,leave)
         });
     }
+
     async submitAssignment(assignmentId,studentId){
         var endPoint = `/AssignmentSubmission/submit_assignment/`;
         var totalUrl = apiUrl + endPoint;
@@ -267,9 +325,6 @@ class StudentData {
             "submission_details":$("#submission_details").val(),
             "is_deleted": false
         }
-        payload["assignment_file"] = "http//"
-        raiseErrorAlert("Blob not working,Access-Control-Allow-Origin’ missing");
-
         await this.ajaxCall("POST", totalUrl, payload, "assginmentFormArea", "sm",(response) => {
             this.tBody = $("#assignments_details")
             this.tr = this.tBody.find(`.tr-assignment-${assignmentId}`);
@@ -312,9 +367,7 @@ class StudentData {
                         <div class="card mb-3">
                             <!-- Display record details here -->
                             <div class="card-body">
-                                <p class="card-title">Document Name:${document_name}</p>
-                                <p class="card-text">Document type:${docsName}</p>
-                                
+                                <p class="card-title">${document_name}</p>                                
                             </div>
                             <div class="card-footer d-flex justify-content-evenly">
                                 <button data-documentId="${docs.document_id}" class="btn btn-sm btn-info" onclick="editeDocument(this)">
@@ -331,14 +384,14 @@ class StudentData {
                     </div>
                 `
                 this.docuemntRow.append(card);
-                raiseSuccessAlert("Document Added Successfully")
+                raiseSuccessAlert(response.msg)
                 $("#documentRow").find(".no_data_found").hide()
             }
             else{
-                $(`.card-student-${docs.document_id}`).find(".card-title").text(`Document Name:${document_name}`)
-                $(`.card-student-${docs.document_id}`).find(".card-text").text(`Document type:${docsName}`)
-                raiseSuccessAlert("Document Updated Successfully")
+                $(`.card-student-${docs.document_id}`).find(".card-title").text(`${document_name}`)
+                raiseSuccessAlert(response.msg)
             }
+            this.docuemntRow.find("input,select,textarea").val("")
         });
     }
 
@@ -359,9 +412,7 @@ class StudentData {
                             <div class="card mb-3">
                                 <!-- Display record details here -->
                                 <div class="card-body">
-                                    <p class="card-title">Document Name:${document_name}</p>
-                                    <p class="card-text">Document type:${docsName}</p>
-                                    
+                                    <p class="card-title">${document_name}</p>                                    
                                 </div>
                                 <div class="card-footer d-flex justify-content-evenly">
                                     <button data-documentId="${docs.document_id}" class="btn btn-sm btn-info" onclick="editeDocument(this)">
@@ -370,9 +421,9 @@ class StudentData {
                                     <button onClick="deleteStudentDocument(this)" data-documentId="${docs.document_id}" class="btn btn-sm btn-danger">
                                         <i class="bi bi-trash3"></i>
                                     </button>
-                                    <button data-documentId="${docs.document_id}" class="btn btn-sm btn-dark">
+                                    <a href="/app/azure_download/${docsName}/student_documents/" data-documentId="${docs.document_id}"  class="btn btn-sm btn-dark">
                                         <i class="bi bi-download"></i>
-                                    </button>
+                                    </a>
                                 </div>
                             </div>
                         </div>
@@ -394,6 +445,94 @@ class StudentData {
         });
     }
 
+    async getFeeData(studentId){
+        var endPoint = `/StudentFee/get_all_student_installments/?student_id=${studentId}`;
+        var totalUrl = apiUrl + endPoint;
+        await this.ajaxCall("GET", totalUrl, "", "fee", "sm",async(response) => {
+            var fee = response.fee_data[0]
+            var installment = response.student_fee
+            var isFeeFixed = false
+            $("#discount").val(response.discount["discount"])
+            if(installment.length > 0){
+                isFeeFixed = true
+                $("#discount").attr('readonly', 'readonly')
+                $("btnFeeForm").attr('disabled', 'disabled')
+            }
+            await this.displayFeeData(fee,isFeeFixed);
+            await this.showInstallmentData(installment);
+        })
+    }
+
+    async saveActivity(){
+        var activityId = $("#activity_id").val();
+        var postEndPoint = `/Activity/create_activity/`;
+        var updateEndPoint = `/Activityupdate_activity/?actity_id=${activityId}`;
+        var method = activityId ? "PUT" : "POST";
+        var endPoint = activityId ? updateEndPoint : postEndPoint;
+        var totalUrl = apiUrl + endPoint;
+        var payload = {
+            "institution_id":instituteId,
+            "activity_name": $("#activity_title").val(),
+            "activity_description":$("#activity_details").val(),
+            "activity_date":$("#activity_date").val(),
+            "activity_location":$("#activity_place").val(),
+            "is_deleted": false,
+            "student_id": 0
+        }
+        await this.ajaxCall(method, totalUrl, payload, "activityFormArea", "sm",(response) => {
+            $("#activityForm").find("input, textarea").val("");
+            $("#activityForm").modal('hide')
+            this.activityTable = $("#activityTable")
+            var activity = response.response
+            var title = activity.activity_name
+            var desc = activity.activity_description
+            if(activityId){
+                $(`.tr-activity-${activityId}`).find(".activity_name").text(activity.activity_name)
+                $(`.tr-activity-${activityId}`).find(".activity_date").text(activity.activity_date)
+                $(`.tr-activity-${activityId}`).find(".activity_location").text(activity.activity_location)
+                $(`.tr-activity-${activityId}`).find(".activity_desc").html(`<button class="btn btn-dark btn-label right rounded-pill" onClick="showActivityDetailse('${activity.activity_name}','${activity.activity_description}')">
+                <i class="ri-eye-line label-icon align-middle rounded-pill fs-lg ms-2"></i>
+                    View
+                </button>`)
+                raiseSuccessAlert(response.msg);
+            }
+            else{
+                var tr = `
+                    <tr class="tr-activity-${activity.activity_id}">
+                        <td class="activity_name">${activity.activity_name}</td>
+                        <td class="activity_date">${activity.activity_date}</td>
+                        <td class="activity_desc">
+                            <button class="btn btn-dark btn-label right rounded-pill" onClick="onClick="showActivityDetailse('${title}','${desc}')">
+                            <i class="ri-eye-line label-icon align-middle rounded-pill fs-lg ms-2"></i>
+                                View
+                            </button>
+                        </td>
+                        <td class="activity_location">${activity.activity_location}</td>
+                        <td>
+                            <button class="btn btn-sm btn-info" onClick="editActivity(this)" data-activity_id ='${activity.activity_id}'>
+                                <i class="bi bi-pencil-square"></i>
+                            </button>
+                            <button class="btn btn-sm btn-danger" data-activity_id ='${activity.activity_id}' onClick="deleteActivity(this)">
+                                    <i class="bi bi-trash3"></i>
+                            </button>
+                        <td>
+                    </tr>
+                    ` 
+                    $("#activityTable").DataTable().row.add($(tr)).draw()
+                raiseSuccessAlert(response.msg);
+            }
+        });
+    }
+
+    async showStudentActivity(){
+        var endPoint = `/Activity/get_all_activity_by_institute/?institution_id=${instituteId}`;
+        var totalUrl = apiUrl + endPoint;
+        await this.ajaxCall("GET", totalUrl, "", "activites", "sm",(response) => {
+            var activity = response
+            this.displayActivityData(activity);
+        });
+    }
+
     async displayUpcomingExamsData(response){
         var upcomingExams = $("#UpComingExam")
         if(response.length > 0){
@@ -405,9 +544,10 @@ class StudentData {
                     <td>${exam.parent_exam_name}</td>
                     <td>${exam.start_date}</td>
                     <td>${exam.end_date}</td>
+                    <td>${exam.result_date}</td>
                 </tr>
                 `;
-                upcomingExams.append(row);
+                upcomingExams.DataTable().row.add($(row)).draw()
             }
         }
         
@@ -430,18 +570,17 @@ class StudentData {
                     </td>
                 </tr>
                 `;
-                pastExams.append(row);
+                pastExams.DataTable().row.add($(row)).draw()
             }
         }
     }
 
     async displayAssignmentData(response){
-        this.tBody = $("#assignments_details")
+        this.tBody = $("#assginmentTable").find("tbody");
         var submitAssignment = response.submitted_assignments
         var unsubmitAssignment = response.unsubmitted_assignments
         if(submitAssignment.length > 0 || unsubmitAssignment.length > 0){
             this.tBody.empty();
-            
             for (const assignment of submitAssignment) {
                 var desc = assignment.assignment_details
                 var row = `
@@ -466,7 +605,7 @@ class StudentData {
                     </td>
                 </tr>
                 `;
-                this.tBody.append(row);
+                $("#assginmentTable").DataTable().row.add($(row)).draw()
             }
             for (const assignment of unsubmitAssignment) {
                 var desc = assignment.assignment_details
@@ -492,13 +631,13 @@ class StudentData {
                     </td>
                 </tr>
                 `;
-                this.tBody.append(row);
+                $("#assginmentTable").DataTable().row.add($(row)).draw()
             }
         }
     }
 
     async displayAttendanceData(response) {
-        this.tBody = $("#attendance_data");
+        this.tBody = $("#attendanceTable").find("tbody");
         if(response.length){
             this.tBody.empty();
             for (const attendance of response) {
@@ -516,9 +655,99 @@ class StudentData {
                         <td class="bg ${statusClass} text-white">${attendance.attendance_status}</td>
                     </tr>
                 `;
-                this.tBody.append(row);
+                $("#attendanceTable").DataTable().row.add($(row)).draw()
             }
         }
+    }
+
+    async displayActivityData(response){
+        var table = $("#activityTable tbody")
+        if(response.length > 0){
+            table.empty();
+            for (const key in response) {
+                var activity = response[key]
+                var title = activity.activity_name
+                var desc = activity.activity_description
+                var row = `
+                    <tr class="tr-activity-${activity.activity_id}">
+                        <td class="activity_name">${title}</td>
+                        <td class="activity_date">${activity.activity_date}</td>
+                        <td class="activity_desc">
+                            <button class="btn btn-dark btn-label right rounded-pill" onClick="showActivityDetailse('${title}','${desc}')">
+                            <i class="ri-eye-line label-icon align-middle rounded-pill fs-lg ms-2"></i>
+                                View
+                            </button>
+                        </td>
+                        <td class="activity_location">${activity.activity_location}</td>
+                        <td>
+                            <button class="btn btn-sm btn-info" onClick="editActivity(this)" data-activity_id ='${activity.activity_id}'>
+                                <i class="bi bi-pencil-square"></i>
+                            </button>
+                            <button class="btn btn-sm btn-danger" data-activity_id ='${activity.activity_id}' onClick="deleteActivity(this)">
+                                <i class="bi bi-trash3"></i>
+                            </button>
+                        <td>
+                    </tr>`;
+                $("#activityTable").DataTable().row.add($(row)).draw()
+            }
+        }
+    }
+
+    async displayFeeData(response, isFeeFixed) {
+        const {
+            fee_total,
+            fee_admission,
+            fee_discount,
+            total_installments,
+            class_installments
+        } = response;
+    
+        // Set values using jQuery
+        $("#total_fee").val(fee_total);
+        $("#admission_fee").val(fee_admission);
+        // $("#discount").val(fee_discount || 0);
+    
+        // Calculate total installment amount
+        const total_insta_amount = total_installments -  0;
+        $("#total_insta_amount").val(total_insta_amount);
+    
+        // Update installment options
+        this.updateInstallmentOptions(class_installments, isFeeFixed);
+    }
+    
+    async updateInstallmentOptions(installments, isFeeFixed) {
+        const select = $("#installment_type");
+        select.empty();
+        select.append(`<option value="">Select Installment</option>`);
+    
+        for (const [key, installment] of Object.entries(installments)) {
+            const disabledAttribute = isFeeFixed ? "disabled" : "";
+            const option = `<option value="${installment.installment_number}" ${disabledAttribute}>${installment.installment_name}</option>`;
+            select.append(option);
+        }
+    }
+
+    async showInstallmentData(response){
+        var installmentTable = $("#installmentTable");
+        installmentTable.empty();
+        for (const key in response) {
+            var installment = response[key]
+            var color = installment.installment_status === true ? "bg-success" : "bg-danger"
+            var statusMsg = installment.installment_status === true ? "Paid" : "Unpaid"
+            var row = `
+                <tr>
+                    <td>${installment.installment_name}</td>
+                    <td>${installment.installment_due_date}</td>
+                    <td>${installment.installment_amount}</td>
+                    <td>${installment.installment_paid_date}</td>
+                    <td class="${color}">
+                        ${statusMsg}
+                    </td>
+                </tr>
+            `
+            $('#Installment').DataTable().row.add($(row)).draw()
+        }
+        removeLoader("installmentTable","sm")
     }
 
 }
@@ -540,9 +769,9 @@ async function editeDocument(element){
     var documentId = $(element).attr("data-documentId");
     var endPoint = `/StudentsDocuments/get_student_documents_by_id/?document_id=${documentId}`;
     var totalUrl = apiUrl + endPoint;
-    await ajaxRequest("GET", totalUrl, "","body","lg",(response) => {
+    $("#documentForm").modal('show')
+    await ajaxRequest("GET", totalUrl, "","documentFormArea","sm",(response) => {
         var documentData = response.response;
-        $("#documentForm").modal('show')
         $("#document_name").val(documentData.document_name)
         $("#document_id").val(documentData.document_id)
     })
@@ -562,6 +791,33 @@ function openAssignmentDetails(response) {
     assignmentModel.find(".modal-title").text("Assignment Details")
     assignmentModel.find(".modal-desc").text(response)
 }
+// delete student activity
+async function deleteActivity(element){
+    const dataTable = $('#activityTable').DataTable();
+    var activityId = $(element).attr("data-activity_id");
+    var endPoint = `/Activity/delete_activity/?activity_id=${activityId}`;
+    var totalUrl = apiUrl + endPoint;
+
+    await Swal.fire({
+        title: 'Are you sure, do you want to delete this Record?',
+        text: 'This can\'t be reverted!',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            var deleteRow = dataTable.row(`.tr-activity-${activityId}`);
+            deleteRow.remove().draw();
+            ajaxRequest("DELETE", totalUrl, "","activites","sm",(response) => {
+                raiseSuccessAlert(response.msg);
+            })
+        }
+    });
+}
+
+
 // geting all student data
 
 function generatePieChart (id = "",parcenatge= [],labels = [],colors = []) {
@@ -587,88 +843,176 @@ function generatePieChart (id = "",parcenatge= [],labels = [],colors = []) {
     });
 }
 
+
 // calender
-async function loadCalendarDetails(ClassId,sectionId) {
-  var loadCalendarUrl =
-    apiUrl +`/Calender/get_calender_by_class&section/?class_id=${ClassId}&section_id=${sectionId}`;
+async function loadCalendarDetails(class_id, section_id) {
+    var searchUrl = `${apiUrl}/Calender/get_calender_by_class&section/?class_id=${class_id}&section_id=${section_id}`;
 
-  const calendarData = await $.ajax({
-    type: "GET",
-    url: loadCalendarUrl,
-    mode: "cors",
-    crossDomain: true,
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${jwtToken}`,
-    },
-    beforeSend: (e) => {
-      showLoader("tabCalender", "sm");
-    },
-    success: async function (calendarData) {
-      var calendarDetailsContainer = $("#tabCalender");
-      var calendarTable = calendarDetailsContainer.find("#calenderTable");
-      calendarTable.empty();
-      if (calendarData.length === 0) {
-        calendarDetailsContainer.html(
-          '<img src="/assets/img/no_data_found.png" class="no_data_found">'
-        );
-      } else {
-        var data = calendarData.response;
-        var uniqueClassIds = [...new Set(data.map((item) => item.class_id))];
-        var uniqueSectionIds = [
-          ...new Set(data.map((item) => item.section_id)),
-        ];
-        var classSectionRow = $("<tr>");
-        classSectionRow.append(
-          `<td colspan="8" class="col" id="column"><center><b>${uniqueClassIds}  ${uniqueSectionIds}</b></center></td>`
-        );
-        calendarTable.append(classSectionRow);
+    try {
+        const calendarData = await $.ajax({
+            type: 'GET',
+            url: searchUrl,
+            mode: 'cors',
+            crossDomain: true,
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${jwtToken}`,
+            },
+            beforeSend: () => {
+                showLoader('calenderTable', 'sm');
+            },
+            success: function (calendarData) {
 
-        var headerRow = $("<tr class='col' id='column'>");
-        headerRow.append("<th>Time</th>");
+                var calendarTable = $('#calenderTable');
+                calendarTable.empty();
+                var responseData = calendarData.response || calendarData;
 
-        if (Array.isArray(data)) {
-          var uniqueDays = [...new Set(data.map((item) => item.day))];
-          uniqueDays.forEach((day) => {
-            headerRow.append(`<th>${day}</th>`);
-          });
-        }
-        calendarTable.append(headerRow);
-        var timeDayMap = {};
-        data.forEach((item) => {
-          var timeKey = `${item.start_time}-${item.end_time}`;
-          if (!timeDayMap[timeKey]) {
-            timeDayMap[timeKey] = {};
-          }
-          timeDayMap[timeKey][item.day] = {
-            subject: item.subject_id,
-            staff: item.staff_id,
-          };
-        });
+                if (!responseData || (responseData.length === 0)) {
+                    $('.no_data_found').show();
+                    calendarTable.hide();
+                    return;
+                }
+                calendarTable.show();
+                var data = responseData;
+                var className = [...new Set(data.map((item) => item.classes.class_name))];
+                var sectionName = [...new Set(data.map((item) => item.sections.section_name))];
+                var classSectionRow = $('<tr>');
+                classSectionRow.append(
+                    `<td colspan="8" class="col" id="column"><center><b>${className} - ${sectionName}</b></center></td>`
+                );
+                calendarTable.append(classSectionRow);
 
-        for (var timeKey in timeDayMap) {
-          var timeSlotRow = $("<tr class='rowData'>");
-          timeSlotRow.append(`<td class="mod" id="tdData">${timeKey}</td>`);
+                var staticHeaderRow = $('<tr class="col">');
+                staticHeaderRow.append('<th>Time</th>');
+                var daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+                daysOfWeek.forEach(day => {
+                    staticHeaderRow.append(`<th>${day}</th>`);
+                });
+                calendarTable.append(staticHeaderRow);
 
-          uniqueDays.forEach((day) => {
-            var cellData = timeDayMap[timeKey][day];
-            if (cellData) {
-              timeSlotRow.append(
-                `<td id="tableData">${cellData.subject} <br> (${cellData.staff})</td>`
-              );
-            } else {
-              timeSlotRow.append('<td id="tableData"></td>');
+                var timeDayMap = {};
+                data.forEach((item) => {
+                    var timeKey = `${item.start_time}-${item.end_time}`;
+                    if (!timeDayMap[timeKey]) {
+                        timeDayMap[timeKey] = {};
+                    }
+                    timeDayMap[timeKey][item.day] = {
+                        subject: item.subjects.subject_name,
+                        staff: item.staffs.staff_name,
+                        calender_id: item.calender_id
+                    };
+                });
+                for (var timeKey in timeDayMap) {
+                    var timeSlotRow = $('<tr class="rowData">');
+                    timeSlotRow.append(`<td class="mod" id="tdData">${timeKey}</td>`);
+                    daysOfWeek.forEach((day) => {
+                        var cellData = timeDayMap[timeKey][day];
+                        var cell = $('<td class="editable-cell text-center"></td>');
+                        if (cellData && cellData.subject && cellData.staff) {
+                            cell.html(`${cellData.subject} <br> (${cellData.staff})`);
+                            cell.attr('data-id', cellData.calender_id);
+                            cell.on('click', function () {
+                                openEditForm(cellData);
+                            });
+                        }
+                        timeSlotRow.append(cell);
+                    });
+                    calendarTable.append(timeSlotRow);
+                }
             }
-          });
-          calendarTable.append(timeSlotRow);
+        });
+    } catch (error) {
+        $('.no_data_found').show();
+        raiseErrorAlert(error.message || 'An error occurred.');
+    } finally {
+        removeLoader('calenderTable', 'sm');
+    }
+}
+
+// studentActivityForm
+function studentActivityForm(){
+    var isValid = true;
+    var activity_title = $("#activity_title");
+    var activity_description = $("#activity_details");
+    var activity_date = $("#activity_date");
+    var activity_location = $("#activity_place");
+    if(activity_title.val().trim() === ""){
+        activity_title.addClass("is-invalid");
+        isValid = false;
+    }
+    if(activity_description.val().trim() === ""){
+        activity_description.addClass("is-invalid");
+        isValid = false;
+    }
+    if(activity_date.val().trim() === ""){
+        activity_date.addClass("is-invalid");
+        isValid = false;
+    }
+    if(activity_location.val().trim() === ""){
+        activity_location.addClass("is-invalid");
+        isValid = false;
+    }
+    return isValid;
+}
+
+function restField(){
+    $(".is-invalid").on('input', function () {
+        if ($(this).val().trim().length > 2) {
+            $(this).removeClass("is-invalid");
         }
-      }
-    },
-    error: (error) => {
-      raiseErrorAlert(error["detail"]);
-    },
-    complete: (e) => {
-      removeLoader("tabCalender", "sm");
-    },
-  });
+    }); 
+}
+
+// show activity details
+function showActivityDetailse(title,desc){
+    var activityModel = $("#activityDetailse")
+    activityModel.modal('show')
+    activityModel.find(".modal-title .activityName").text(title)
+    activityModel.find(".modal-body .activityDetailse").text(desc)
+}
+function editActivity(element){
+    var activityId = $(element).attr("data-activity_id");
+    var endPoint = `/Activity/get_activity_by_id/?activity_id=${activityId}`;
+    var totalUrl = apiUrl + endPoint;
+    ajaxRequest("GET", totalUrl, "","body","lg",(response) => {
+        var activityData = response.response;
+        $("#activityForm").modal('show')
+        $("#activity_id").val(activityData.activity_id)
+        $("#activity_title").val(activityData.activity_name)
+        $("#activity_details").val(activityData.activity_description)
+        $("#activity_date").val(activityData.activity_date)
+        $("#activity_place").val(activityData.activity_location)
+    })
+}
+
+function showDynamicFee(installment){
+    showLoader("installmentTable","sm")
+    var installmentTable = $("#installmentTable");
+    installmentTable.empty();
+    // var installments = {
+    //     'Monthly':12,
+    //     'Quarterly':4,
+    //     'Half Yearly':2,
+    //     'Yearly':1
+    // }
+    var totalFee = $("#total_insta_amount").val();
+    installmentTable.empty();
+    var noInstallment = parseInt(installment);
+    var installmentAmount = parseInt(totalFee/noInstallment);
+    for (let index = 1; index <= noInstallment; index++) {
+        var dueDate = new Date();
+        dueDate.setMonth(dueDate.getMonth() + index);
+        dueDate = dueDate.toLocaleDateString();
+        var row = `
+            <tr>
+                <td>Installment-${index}</td>
+                <td>${dueDate}</td>
+                <td>${installmentAmount}</td>
+                <td>null</td>
+                <td class="bg-danger">UnPaid</td>
+            </tr>
+        `
+        $('#Installment').DataTable().row.add($(row)).draw()
+    }
+    removeLoader("installmentTable","sm")
 }

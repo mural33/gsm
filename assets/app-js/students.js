@@ -1,5 +1,6 @@
 $("document").ready(function(){
-    $('#studentsTable').on('click', '.btnStudentDelete', async function() {
+    $("#studentsTable").DataTable()
+    $(".btnStudentDelete").on("click",async function() {
     await Swal.fire({
         title: 'Are you sure, you want to delete this Record?',
         text: 'This can\'t be reverted!',
@@ -11,25 +12,21 @@ $("document").ready(function(){
     }).then((result) => {
         if (result.isConfirmed) {
             var studentId = $(this).attr("data-student-id");
+            var isInfo = $(this).attr("data-isinfo");
             deleteStudent(studentId);
-            Swal.fire({
-            title: 'Deleted!',
-            text: 'Your file has been deleted.',
-            icon: 'success',
-            customClass: {
-                title: 'swal-title',
-                content: 'swal-text',
-                confirmButton: 'swal-confirm-button',
-            },
-            });
+            if(isInfo == "true"){
+                window.location.href = window.location.origin +"/app/students/";
+            }
         }
         });
     });
 })
 
 async function deleteStudent(studentId){
-    var studentRow = `tr-student-${studentId}`
-    $(`.${studentRow}`).remove()
+    try{
+        var studentRow = `tr-student-${studentId}`
+        $(`.${studentRow}`).remove()
+    }catch(e){}
     var endpoint = `/Students/delete_student/?student_id=${studentId}`
     const url = `${apiUrl}${endpoint}`
     var response = await $.ajax({
@@ -50,15 +47,17 @@ async function deleteStudent(studentId){
             raiseErrorAlert(error.responseJSON.detail);
         },
         complete:(e) => {
-            if($("#studentTable tr").length == 0){
-                $("#studentTable").html(
-                    `<tr class="">
-                        <td colspan="8" class="text-center">
-                        <img src="/assets/img/no_data_found.png" alt="No Image" class="no_data_found">
-                        </td>
-                    </tr>`
-                )
-            }
+            try{
+                if($("#studentTable tr").length == 0){
+                    $("#studentTable").html(
+                        `<tr class="">
+                            <td colspan="8" class="text-center">
+                            <img src="/assets/img/no_data_found.png" alt="No Image" class="no_data_found">
+                            </td>
+                        </tr>`
+                    )
+                }
+            }catch(e){}
         }
     })
 }

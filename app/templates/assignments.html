@@ -48,7 +48,7 @@
                 </div>
                 <div class="col-md-12">
                     <label for="assignment_title" class="form-label">Assignment Title<span style="color: red;">*</span></label>
-                    <input type="text" class="form-control" id="assignment_title" name="assignment_title" minlength="1" maxlength="100">
+                    <input type="text" class="form-control" placeholder="Enter the Assignment Tittle" id="assignment_title" name="assignment_title" minlength="1" maxlength="100">
                 </div>
                 <div class="col-md-12">
                     <label for="inputCity" class="form-label">Assignment Details <span style="color: red;">*</span></label>
@@ -101,7 +101,7 @@
                 {% for assign in assignment_data %}
                 <tr class="tr-assign-{{assign.id}}">
                     <td>{{ forloop.counter }}</td>
-                    <td class="text-break assignment_title">{{ assign.assignment_title }}</td>
+                    <td class=" text-break assignment_title">{{ assign.assignment_title }}</td>
                     <td class="text-break">
                         <span class="class_id">{{ assign.classes.class_name }}</span>-
                         <span class="section_id">{{ assign.sections.section_name }}</span>

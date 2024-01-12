@@ -37,7 +37,7 @@ class Student:
 
 
 class StudentInfo:
-    student_parent_url = "/Parents/parent/"
+    student_parent_url = "/Parents/get_parents_data_by_student_id/"
     student_transport_url = "student/transport/"
     student_attendance_url = "student/attendance/"
     student_academic_url = "student/academic/"
@@ -77,9 +77,10 @@ class StudentInfo:
         self.total_url = (
             self.api_url
             + self.student_parent_url
-            + f"student_id?student_id={student_id}"
+            + f"?student_id={student_id}"
         )
         response = requests.get(url=self.total_url, headers=self.headers)
+        print(response.json())
         if response.status_code == 200:
             data = response.json()["response"]
             return data

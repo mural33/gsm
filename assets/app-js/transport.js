@@ -29,7 +29,7 @@ function bindGridButtonEvents() {
                 const response = deleteTransport(transportId, jwtToken);
                 if (response.success) {
                     $(this).closest('tr').remove();
-                    raiseSuccessAlert("Transport Record Deleted Successfully");
+                    raiseSuccessAlert("Transport Deleted Successfully");
                 }
             } catch (error) {
                 raiseErrorAlert(error.responseJSON.detail);
@@ -82,7 +82,7 @@ function addTransport() {
                     }
                     $("#id").val("");
                     $('#editModal').addClass("model fade");
-                    raiseSuccessAlert("Transport Record Updated Successfully");
+                    raiseSuccessAlert("Transport Updated Successfully");
                 } else {
                     const newRow = `
                         <tr class="tr-transport-${responseData.transport_id}">
@@ -90,7 +90,7 @@ function addTransport() {
                             <td class="text-break vehicle_number">${responseData.vehicle_number}</td>
                             <td class="text-break vehicle_details">${responseData.vehicle_details}</td>
                             <td class="register_date">${responseData.register_date}</td>
-                            <td class="transport_name">${responseData.transport_name}</td>
+                            <td class="text-break transport_name">${responseData.transport_name}</td>
                             <td>
                                 <button class="btn btn-sm btn-dark rounded-pill" onclick="openstopDetails('stopForm','${responseData.transport_name}','${responseData.transport_id}')" data-id="${responseData.transport_id}"  data-bs-toggle="modal"
                                 data-bs-target="#stopFormModal">View</button>
@@ -112,7 +112,7 @@ function addTransport() {
                     $("#transport_details").append(newRow)
                     bindGridButtonEvents();
                     $('#no_data_found').hide();
-                    raiseSuccessAlert("Transport Record Added Successfully");
+                    raiseSuccessAlert("Transport Added Successfully");
                 }
             }
         },
@@ -157,7 +157,7 @@ async function deleteTransport(recordId, jwtToken) {
             if (deleteRow) {
                 deleteRow.remove();
                 removeLoader("body", "lg");
-                raiseSuccessAlert("Transport Details Deleted Successfully")
+                raiseSuccessAlert("Transport Deleted Successfully")
             }
             if ($('#transport_details tr').length === 1) {
                 $('#no_data_found').show();

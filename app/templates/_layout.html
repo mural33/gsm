@@ -1,11 +1,10 @@
 {% load static %}
-
 <!doctype html>
 <html lang="en" data-layout="horizontal" data-sidebar="dark" data-sidebar-size="lg" data-preloader="disable"
     data-theme="creative" data-bs-theme="light">
-
     <meta charset="utf-8">
     <title>Gurukul - {% block title %}School Automation{% endblock %}</title>
+   
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta content="Minimal Admin & Dashboard Template" name="description">
     <meta content="Themesbrand" name="author">
@@ -30,6 +29,14 @@
     <script src="{% static 'app-js/sweetalert.js' %}"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css">
+    <!-- DataTables JS -->
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
+    {% block js_module %}
+        
+    {% endblock js_module %}
 
 </head>
 <body class="dashboard-topbar-wrapper">
@@ -144,7 +151,7 @@
                         </li>
 
                         <li class="nav-item">
-                            <a href="#" class="nav-link menu-link"> <i class="bi bi-card-heading"></i>
+                            <a href="{% url 'examination' %}" class="nav-link menu-link"> <i class="bi bi-card-heading"></i>
                                 <span data-key="t-file-manager">Examinations</span> </a>
                         </li>
 

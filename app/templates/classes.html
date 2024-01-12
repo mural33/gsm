@@ -187,255 +187,313 @@
           </div>
         </div>
         <div class="tab-pane" id="fees" role="tabpanel">
-          <h6>Fees structure configuration of this class</h6>
-          <div class="text-center">
-            <img src="/assets/img/no_data_found.png" class="no_data_found">
+          <div class="row">
+            <h6>Fees structure configuration of this class</h6>
+          </div>
+          <div class="text-center" id="tabFees">
+            <div class="row">
+              <div class="col-md-12 d-flex gap-2">
+              <div class="col-md-2 form-content feesDiv">
+                <input type="hidden" name="class_id" value="{{ class_id }}" id="cls_id">
+                <label for="total_fee" class="form-label feesLabel">Total Fees</label>
+                <input type="number" class="form-control" id="total_fee" name="fee_total" placeholder="e.g. 20000" readonly />
+              </div>
+              <div class="col-md-2 form-content feesDiv">
+                <label for="fee_admission" class="form-label feesLabel">Admission Fees</label>
+                <input type="number" class="form-control" id="fee_admission" name="fee_admission" placeholder="e.g. 20000" readonly />
+              </div>
+              <div class="col-md-2 form-content feesDiv" id="totalAmount">
+                <label for="install_amount" class="form-label feesLabel">Total Installment Amount</label>
+                <input type="number" class="form-control" id="install_amount" name="installment_amount" placeholder="e.g. 17000" readonly />
+              </div>
+              <div class="col-md-2 form-content feesDiv">
+                <label for="installment_display" class="form-label feesLabel">No. of Installments</label>
+                <input type="number" class="form-control" id="installment_display" name="installment_no" placeholder="e.g. 4" readonly />
+              </div>
+              <div class="col-md-2 form-content feesDiv" id="Total_fees">
+                <label for="installment-dropdown" class="form-label feesLabel" id="Installment">Installment By</label>
+                <select class="custom-select custom-select-lg bg-white form-control" id="installment-dropdown" name="class_installments">
+                  <option hidden>Select one</option>
+                  {% comment %} <option value="M">Monthly</option>
+                  <option value="QY">Quarterly</option>
+                  <option value="HY">Half Yearly</option>
+                  <option value="Y">Yearly</option> {% endcomment %}
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="row" id="installmentTable">
+            <div class="col-md-12">
+            <div class="scroll-container">
+              <div class="content">
+                <div class="responsive-container">
+                  <div class="table-container">
+                    <table class="table table-striped table-hover table-sticky table_students" id="installment_table">
+                      <thead class="thead-dark">
+                        <tr>
+                          <th>Installments</th>
+                          <th>Tentative Due Date</th>
+                          <th>Amount</th>
+                        </tr>
+                      </thead>
+                      <tbody id="feeInstallmentTable">
+                        <tr class="feeInfo">
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+            </div>
+            {% comment %} <div class="col mt-2 text-end">
+              <button type="submit" class="btn btn-primary" id="btnSaveFee">Save</button>
+            </div> {% endcomment %}
           </div>
         </div>
-      </div>
-    </div><!-- end card-body -->
-  </div><!-- end card -->
-</div>
-<!-- ______AddClass Form_____-->
-<div class="modal fade bs-example-modal-sm" id="class_creation_modal" tabindex="-1" role="dialog"
-  aria-labelledby="mySmallModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-sm">
-    <div class="modal-content" id="class-form-area">
-      <div class="modal-header">
-        <h5 class="modal-title" id="mySmallModalLabel">Save Class</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
-        </button>
-      </div>
-      <div class="modal-body">
-        <div class="d-flex">
-          <div class="flex-shrink-0">
-            <i class="ri-checkbox-circle-fill text-success"></i>
+      </div><!-- end card-body -->
+    </div><!-- end card -->
+  </div>
+  <!-- ______AddClass Form_____-->
+  <div class="modal fade bs-example-modal-sm" id="class_creation_modal" tabindex="-1" role="dialog"
+    aria-labelledby="mySmallModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+      <div class="modal-content" id="class-form-area">
+        <div class="modal-header">
+          <h5 class="modal-title" id="mySmallModalLabel">Save Class</h5>
+          <button type="button" class="btn-close btnCloseModel" data-bs-dismiss="modal" aria-label="Close">
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="d-flex">
+            <div class="flex-shrink-0">
+              <i class="ri-checkbox-circle-fill text-success"></i>
+            </div>
+            <div class="flex-grow-1 ms-2">
+              <p class="text-muted mb-0">A class in an educational institution is the dynamic canvas where
+                curiosity is nurtured, knowledge is painted, and futures are crafted.</p>
+            </div>
           </div>
-          <div class="flex-grow-1 ms-2">
-            <p class="text-muted mb-0">A class in an educational institution is the dynamic canvas where
-              curiosity is nurtured, knowledge is painted, and futures are crafted.</p>
+          <div class="d-flex mt-2" id="AddClass">
+            <div class="col-md-12 form-content">
+              <input type="hidden" name="class_id" id="class_id">
+              <label for="class_name" class="form-label">Class Name</label>
+              <input type="text" class="form-control class_name" id="class_name" name="class_name"
+                placeholder="Enter a Class Name" maxlength="1000">
+            </div>
           </div>
         </div>
-        <div class="d-flex mt-2" id="AddClass">
-          <div class="col-md-12 form-content">
-            <input type="hidden" name="class_id" id="class_id">
-            <label for="class_name" class="form-label">Class Name</label>
-            <input type="text" class="form-control class_name" id="class_name" name="class_name"
-              placeholder="Enter a Class Name" maxlength="1000">
-          </div>
+        <div class="modal-footer">
+          <a href="javascript:void(0);" class="btn btn-link link-success fw-medium btnCloseModel" data-bs-dismiss="modal"><i
+              class="ri-close-line me-1 align-middle"></i> Close</a>
+          <button type="submit" class="btn btn-primary" id="btnSave">Save</button>
         </div>
-      </div>
-      <div class="modal-footer">
-        <a href="javascript:void(0);" class="btn btn-link link-success fw-medium" data-bs-dismiss="modal"><i
-            class="ri-close-line me-1 align-middle"></i> Close</a>
-        <button type="submit" class="btn btn-primary" id="btnSave">Save</button>
-      </div>
-    </div><!-- /.modal-content -->
-  </div><!-- /.modal-dialog -->
-</div>
+      </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+  </div>
 
-<!-- ______AddSection Form_____-->
-<div class="modal fade bs-example-modal-sm" id="section_creation_modal" tabindex="-1" role="dialog"
-  aria-labelledby="mySmallModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-sm">
-    <div class="modal-content" id="section-form-area">
-      <div class="modal-header">
-        <h5 class="modal-title" id="mySmallModalLabel">Save Section</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
-        </button>
-      </div>
-      <div class="modal-body">
-        <div class="d-flex">
-          <div class="flex-shrink-0">
-            <i class="ri-checkbox-circle-fill text-success"></i>
+  <!-- ______AddSection Form_____-->
+  <div class="modal fade bs-example-modal-sm" id="section_creation_modal" tabindex="-1" role="dialog"
+    aria-labelledby="mySmallModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+      <div class="modal-content" id="section-form-area">
+        <div class="modal-header">
+          <h5 class="modal-title" id="mySmallModalLabel">Save Section</h5>
+          <button type="button" class="btn-close btnCloseModel" data-bs-dismiss="modal" aria-label="Close">
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="d-flex">
+            <div class="flex-shrink-0">
+              <i class="ri-checkbox-circle-fill text-success"></i>
+            </div>
+            <div class="flex-grow-1 ms-2">
+              <p class="text-muted mb-0">A section serves as a distinct segment within a course or grade, providing a
+                dynamic environment
+                where students explore their interests, acquire knowledge, and shape their future paths.</p>
+            </div>
           </div>
-          <div class="flex-grow-1 ms-2">
-            <p class="text-muted mb-0">A section serves as a distinct segment within a course or grade, providing a
-              dynamic environment
-              where students explore their interests, acquire knowledge, and shape their future paths.</p>
+          <div class="d-flex mt-2" id="AddSection">
+            <div class="col-md-12 form-content">
+              <input type="hidden" name="class_id" id="classes_id" value={{class_id}}>
+              <input type="hidden" name="section_id" id="section_id">
+              <label for="section_name" class="form-label">Section Name</label>
+              <input type="text" class="form-control section_name" id="section_name" name="section_name"
+                placeholder="Enter a Section Name" maxlength="1000">
+            </div>
           </div>
         </div>
-        <div class="d-flex mt-2" id="AddSection">
-          <div class="col-md-12 form-content">
-            <input type="hidden" name="class_id" id="classes_id" value={{class_id}}>
-            <input type="hidden" name="section_id" id="section_id">
-            <label for="section_name" class="form-label">Section Name</label>
-            <input type="text" class="form-control section_name" id="section_name" name="section_name"
-              placeholder="Enter a Section Name" maxlength="1000">
-          </div>
+        <div class="modal-footer">
+          <a href="javascript:void(0);" class="btn btn-link link-success fw-medium btnCloseModel" data-bs-dismiss="modal"><i
+              class="ri-close-line me-1 align-middle"></i> Close</a>
+          <button type="submit" class="btn btn-primary" id="btnSectionSave">Save</button>
         </div>
-      </div>
-      <div class="modal-footer">
-        <a href="javascript:void(0);" class="btn btn-link link-success fw-medium" data-bs-dismiss="modal"><i
-            class="ri-close-line me-1 align-middle"></i> Close</a>
-        <button type="submit" class="btn btn-primary" id="btnSectionSave">Save</button>
-      </div>
-    </div><!-- /.modal-content -->
-  </div><!-- /.modal-dialog -->
-</div>
+      </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+  </div>
 
-<!-- ______AddSubject Form_____-->
-<div class="modal fade bs-example-modal-sm" id="subject_creation_modal" tabindex="-1" role="dialog"
-  aria-labelledby="mySmallModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-sm">
-    <div class="modal-content" id="subject-form-area">
-      <div class="modal-header">
-        <h5 class="modal-title" id="mySmallModalLabel">Save Subject</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
-        </button>
-      </div>
-      <div class="modal-body">
-        <div class="d-flex">
-          <div class="flex-shrink-0">
-            <i class="ri-checkbox-circle-fill text-success"></i>
+  <!-- ______AddSubject Form_____-->
+  <div class="modal fade bs-example-modal-sm" id="subject_creation_modal" tabindex="-1" role="dialog"
+    aria-labelledby="mySmallModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+      <div class="modal-content" id="subject-form-area">
+        <div class="modal-header">
+          <h5 class="modal-title" id="mySmallModalLabel">Save Subject</h5>
+          <button type="button" class="btn-close btnCloseModel" data-bs-dismiss="modal" aria-label="Close">
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="d-flex">
+            <div class="flex-shrink-0">
+              <i class="ri-checkbox-circle-fill text-success"></i>
+            </div>
+            <div class="flex-grow-1 ms-2">
+              <p class="text-muted mb-0">A subject refers to a specific field of study or discipline that is taught as
+                part of a curriculum. It serves as a fundamental unit of organization
+                for academic content, representing a distinct area of knowledge or skill development.</p>
+            </div>
           </div>
-          <div class="flex-grow-1 ms-2">
-            <p class="text-muted mb-0">A subject refers to a specific field of study or discipline that is taught as
-              part of a curriculum. It serves as a fundamental unit of organization
-              for academic content, representing a distinct area of knowledge or skill development.</p>
+          <div class="d-flex mt-2" id="AddSubject">
+            <div class="col-md-12 form-content">
+              <input type="hidden" name="subject_id" id="subject_id">
+              <label for="subject_name" class="form-label">Subject Name</label>
+              <input type="text" class="form-control subject_name" id="subject_name" name="subject_name"
+                placeholder="Enter a Subject Name" maxlength="1000">
+            </div>
           </div>
         </div>
-        <div class="d-flex mt-2" id="AddSubject">
-          <div class="col-md-12 form-content">
-            <input type="hidden" name="subject_id" id="subject_id">
-            <label for="subject_name" class="form-label">Subject Name</label>
-            <input type="text" class="form-control subject_name" id="subject_name" name="subject_name"
-              placeholder="Enter a Subject Name" maxlength="1000">
-          </div>
+        <div class="modal-footer">
+          <a href="javascript:void(0);" class="btn btn-link link-success fw-medium btnCloseModel" data-bs-dismiss="modal"><i
+              class="ri-close-line me-1 align-middle"></i> Close</a>
+          <button type="submit" class="btn btn-primary" id="btnSujectSave">Save</button>
         </div>
-      </div>
-      <div class="modal-footer">
-        <a href="javascript:void(0);" class="btn btn-link link-success fw-medium" data-bs-dismiss="modal"><i
-            class="ri-close-line me-1 align-middle"></i> Close</a>
-        <button type="submit" class="btn btn-primary" id="btnSujectSave">Save</button>
-      </div>
-    </div><!-- /.modal-content -->
-  </div><!-- /.modal-dialog -->
-</div>
-<!-- ______AddGrade Form_____-->
-<div class="modal fade" id="grade_creation_modal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel"
-  aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content" id="grade-form-area">
-      <div class="modal-header">
-        <h5 class="modal-title" id="mySmallModalLabel">Save Grading</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
-        </button>
-      </div>
-      <div class="modal-body" id="AddGrade">
-        <div class="d-flex">
-          <div class="flex-shrink-0">
-            <i class="ri-checkbox-circle-fill text-success"></i>
-          </div>
-          <div class="flex-grow-1 ms-2">
-            <p class="text-muted mb-0"> Grades are used to organize students into
-              cohorts, each following a curriculum appropriate for their developmental stage. </p>
-          </div>
+      </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+  </div>
+  <!-- ______AddGrade Form_____-->
+  <div class="modal fade" id="grade_creation_modal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content" id="grade-form-area">
+        <div class="modal-header">
+          <h5 class="modal-title" id="mySmallModalLabel">Save Grading</h5>
+          <button type="button" class="btn-close btnCloseModel" data-bs-dismiss="modal" aria-label="Close">
+          </button>
         </div>
-        <div class="d-flex mt-2 row">
-          <div class="col-md-6 form-content">
-            <label for="percent_from" class="form-label">Minimum Percentage(%)</label>
-            <input type="number" class="form-control percent_from" id="percent_from" name="percent_from"
-              placeholder="Enter Minimum Percentage" min="0" max="100">
+        <div class="modal-body" id="AddGrade">
+          <div class="d-flex">
+            <div class="flex-shrink-0">
+              <i class="ri-checkbox-circle-fill text-success"></i>
+            </div>
+            <div class="flex-grow-1 ms-2">
+              <p class="text-muted mb-0"> Grades are used to organize students into
+                cohorts, each following a curriculum appropriate for their developmental stage. </p>
+            </div>
           </div>
-          <div class="col-md-6 form-content">
-            <label for="percent_upto" class="form-label">Maximum Percentage(%)</label>
-            <input type="number" class="form-control percent_upto" id="percent_upto" name="percent_upto"
-              placeholder="Enter Maximum Percentage" min="0" max="100">
+          <div class="d-flex mt-2 row">
+            <div class="col-md-6 form-content">
+              <label for="percent_from" class="form-label">Minimum Percentage(%)</label>
+              <input type="number" class="form-control percent_from" id="percent_from" name="percent_from"
+                placeholder="Enter Minimum Percentage" min="0" max="100">
+            </div>
+            <div class="col-md-6 form-content">
+              <label for="percent_upto" class="form-label">Maximum Percentage(%)</label>
+              <input type="number" class="form-control percent_upto" id="percent_upto" name="percent_upto"
+                placeholder="Enter Maximum Percentage" min="0" max="100">
+            </div>
           </div>
-        </div>
 
-        <div class="d-flex mt-2">
-          <div class="col-md-12 form-content">
-            <input type="hidden" name="grade_id" id="grade_id">
-            <input type="hidden" name="id" id="applicable_id">
-            <label for="grade_name" class="form-label">Grade Name</label>
-            <input type="text" class="form-control grade_name" id="grade_name" name="grade_name"
-              placeholder="Enter a Grade Name" maxlength="1000">
+          <div class="d-flex mt-2">
+            <div class="col-md-12 form-content">
+              <input type="hidden" name="grade_id" id="grade_id">
+              <input type="hidden" name="id" id="applicable_id">
+              <label for="grade_name" class="form-label">Grade Name</label>
+              <input type="text" class="form-control grade_name" id="grade_name" name="grade_name"
+                placeholder="Enter a Grade Name" maxlength="1000">
+            </div>
           </div>
         </div>
-      </div>
-      <div class="modal-footer">
-        <a href="javascript:void(0);" class="btn btn-link link-success fw-medium" data-bs-dismiss="modal"><i
-            class="ri-close-line me-1 align-middle"></i> Close</a>
-        <button type="submit" class="btn btn-primary" id="btnGradeSave">Save</button>
-      </div>
-    </div><!-- /.modal-content -->
-  </div><!-- /.modal-dialog -->
-</div>
-<!-- ______AddExam Form_____-->
-<div class="modal fade" id="exam_creation_modal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel"
-  aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content" id="exam-form-area">
-      <div class="modal-header">
-        <h5 class="modal-title" id="mySmallModalLabel">Save Examination</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
-        </button>
-      </div>
-      <div class="modal-body" id="AddExam">
-        <div class="d-flex">
-          <div class="flex-shrink-0">
-            <i class="ri-checkbox-circle-fill text-success"></i>
-          </div>
-          <div class="flex-grow-1 ms-2">
-            <p class="text-muted mb-0"> An examination or test is an educational assessment intended to measure a
-              test-taker's knowledge, skill, aptitude, or classification in many other topics.</p>
-          </div>
+        <div class="modal-footer">
+          <a href="javascript:void(0);" class="btn btn-link link-success fw-medium btnCloseModel" data-bs-dismiss="modal"><i
+              class="ri-close-line me-1 align-middle"></i> Close</a>
+          <button type="submit" class="btn btn-primary" id="btnGradeSave">Save</button>
         </div>
-        <div class="d-flex mt-2 row">
-          <div class="col-md-4 form-content">
-            <label for="start_date" class="form-label">Start Date</label>
-            <input type="date" class="form-control start_date" id="start_date" name="start_date">
-          </div>
-          <div class="col-md-4 form-content">
-            <label for="end_date" class="form-label">End Date</label>
-            <input type="date" class="form-control end_date" id="end_date" name="end_date">
-          </div>
-          <div class="col-md-4 form-content">
-            <label for="result_date" class="form-label">Result Date</label>
-            <input type="date" class="form-control result_date" id="result_date" name="result_date">
-          </div>
+      </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+  </div>
+  <!-- ______AddExam Form_____-->
+  <div class="modal fade" id="exam_creation_modal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content" id="exam-form-area">
+        <div class="modal-header">
+          <h5 class="modal-title" id="mySmallModalLabel">Save Examination</h5>
+          <button type="button" class="btn-close btnCloseExamModel" data-bs-dismiss="modal" aria-label="Close">
+          </button>
         </div>
-        <div class="d-flex mt-2">
-          <div class="col-md-12 form-content">
-            <input type="hidden" name="parent_exam_id" id="parent_exam_id">
-            <input type="hidden" name="exam_id" id="exam_id">
-            <input type="hidden" id="exams_id">
-            <label for="parent_exam_name" class="form-label">Name of the Examination</label>
-            <input type="text" class="form-control parent_exam_name" id="parent_exam_name" name="parent_exam_name"
-              placeholder="Enter a Exam Name" maxlength="1000">
+        <div class="modal-body" id="AddExam">
+          <div class="d-flex">
+            <div class="flex-shrink-0">
+              <i class="ri-checkbox-circle-fill text-success"></i>
+            </div>
+            <div class="flex-grow-1 ms-2">
+              <p class="text-muted mb-0"> An examination or test is an educational assessment intended to measure a
+                test-taker's knowledge, skill, aptitude, or classification in many other topics.</p>
+            </div>
           </div>
-        </div>
-        <div class="d-flex mt-2">
-          <div class="col-md-12 form-content">
-            <label for="classesId" class="form-label">Class</label>
-            <input type="text" class="form-control class_id" id="classesId" name="class_id" readonly>
+          <div class="d-flex mt-2 row">
+            <div class="col-md-4 form-content">
+              <label for="start_date" class="form-label">Start Date</label>
+              <input type="date" class="form-control start_date" id="start_date" name="start_date">
+            </div>
+            <div class="col-md-4 form-content">
+              <label for="end_date" class="form-label">End Date</label>
+              <input type="date" class="form-control end_date" id="end_date" name="end_date">
+            </div>
+            <div class="col-md-4 form-content">
+              <label for="result_date" class="form-label">Result Date</label>
+              <input type="date" class="form-control result_date" id="result_date" name="result_date">
+            </div>
           </div>
-        </div>
-        <div class="d-flex mt-2">
-          <div class="col-md-12 form-content">
-            <table id="subjectTable">
-              <thead>
-                <th class="form-label">Subject</th>
-                <th class="form-label">Full Mark</th>
-                <th class="form-label">Action</th>
-              </thead>
-              <tbody id="subData">
-                <tr id="subRow">
+          <div class="d-flex mt-2">
+            <div class="col-md-12 form-content">
+              <input type="hidden" name="parent_exam_id" id="parent_exam_id">
+              <input type="hidden" name="exam_id" id="exam_id">
+              <input type="hidden" id="exams_id">
+              <label for="parent_exam_name" class="form-label">Name of the Examination</label>
+              <input type="text" class="form-control parent_exam_name" id="parent_exam_name" name="parent_exam_name"
+                placeholder="Enter a Exam Name" maxlength="1000">
+            </div>
+          </div>
+          <div class="d-flex mt-2">
+            <div class="col-md-12 form-content">
+              <label for="classesId" class="form-label">Class</label>
+              <input type="text" class="form-control class_id" id="classesId" name="class_id" readonly>
+            </div>
+          </div>
+          <div class="d-flex mt-2">
+            <div class="col-md-12 form-content">
+              <table id="subjectTable">
+                <thead>
+                  <th class="form-label">Subject</th>
+                  <th class="form-label">Full Mark</th>
+                  <th class="form-label">Action</th>
+                </thead>
+                <tbody id="subData">
+                  <tr id="subRow">
 
-                </tr>
-              </tbody>
-            </table>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
-      </div>
-      <div class="modal-footer">
-        <a href="javascript:void(0);" class="btn btn-link link-success fw-medium" data-bs-dismiss="modal"><i
-            class="ri-close-line me-1 align-middle"></i> Close</a>
-        <button type="submit" class="btn btn-primary" id="btnExamSave">Save</button>
-      </div>
-    </div><!-- /.modal-content -->
-  </div><!-- /.modal-dialog -->
-</div>
-{% endblock %}
+        <div class="modal-footer">
+          <a href="javascript:void(0);" class="btn btn-link link-success fw-medium btnCloseExamModel" data-bs-dismiss="modal"><i
+              class="ri-close-line me-1 align-middle"></i> Close</a>
+          <button type="submit" class="btn btn-primary" id="btnExamSave">Save</button>
+        </div>
+      </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+  </div>
+  {% endblock %}
