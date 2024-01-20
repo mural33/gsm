@@ -1,4 +1,6 @@
 $(document).ready(() => {
+    const dataTable = $('#assignmentTable').DataTable();
+    $(".dataTables_empty").html(`<img src="/assets/img/no_data_found.png" alt="No Image" class="no_data_found">`)
     $("#btnSave").on("click", async (e) => {
         $("#btnSave").removeClass("btn-shake");
         if (validateForm(fields) === false) {
@@ -21,13 +23,15 @@ $(document).ready(() => {
         getSectionsByClass(selectedClassId, "section_id");
     });
     initializeClassSelect();
-});
+
+
 $('#assignmentTable').on('click', '.openAssignmentBtn', function () {
     var assignmentId = $(this).data('id');
     var assignmentDescription = $(this).data('description');
     $('#assignment-view-modal #assignment-modal-body').html(`${assignmentDescription}`);
     $('#assignment-view-modal').modal('show');
 });
+
 async function getSectionsByClass(classId) {
     const classEndPoint = `${apiUrl}/Sections/get_sections_by_class/?class_id=${classId}`;
     $.ajax({
@@ -87,8 +91,8 @@ function addAssignment() {
     const assignmentId = $("#assignment_id").val();
     const assignmentData = {
         "institute_id": instituteId,
-        "class_id": $("#class_id").val(), 
-        "section_id": $("#section_id").val(),  
+        "class_id": $("#class_id").val(),
+        "section_id": $("#section_id").val(),
         "assignment_Date": $("#assignment_Date").val(),
         "assignment_title": $("#assignment_title").val(),
         "assignment_details": $("#assignment_details").val(),
@@ -112,24 +116,23 @@ function addAssignment() {
         success: function (data) {
             $("#assignmentModal").modal("hide");
             if (data) {
-                const responseData = data.response; 
-                    if (isUpdate) {
-                        const tr = document.querySelector(`.tr-assign-${responseData.id}`);
-                        tr.querySelector(".assignment_title").textContent = responseData.assignment_title;
-                        tr.querySelector(".class_id").textContent = responseData.classes.class_name;
-                        tr.querySelector(".section_id").textContent = responseData.sections.section_name;
-                        tr.querySelector(".assignment_Date").textContent = responseData.assignment_Date;
-                        tr.querySelector(".assignment_due_date").textContent = responseData.assignment_due_date;
-                        tr.querySelector(".openAssignmentBtn").setAttribute("data-description", responseData.assignment_details);
-                        $("#assignment_id").val("");
-                        $('#assignmentModal').addClass("model fade");
-                        raiseSuccessAlert("Assignment Updated Successfully");
+                const responseData = data.response;
+                if (isUpdate) {
+                    const tr = dataTable.row($(`.tr-assign-${responseData.id}`)).node();
+                    dataTable.cell(tr, 1).data(`<a href=/app/assignmentInfo/${responseData.assignment_slug}>${responseData.assignment_title}</a>`); 
+                    dataTable.cell(tr, 2).data(`${responseData.classes.class_name}-${responseData.sections.section_name}`);
+                    dataTable.cell(tr, 3).data(responseData.assignment_Date); 
+                    dataTable.cell(tr, 4).data(responseData.assignment_due_date); 
+                    tr.querySelector(".openAssignmentBtn").setAttribute("data-description", responseData.assignment_details);
+                    $("#assignment_id").val("");
+                    $('#assignmentModal').addClass("model fade");
+                    raiseSuccessAlert("Assignment Updated Successfully");
 
                 } else {
                     const newRow = `
                     <tr class="tr-assign-${responseData.id}">
                         <td>${$("#assignments_info tr").length + 1}</td>
-                        <td class="text-break assignment_title">${responseData.assignment_title}</td>
+                        <td class="text-break assignment_title"><a href=/app/assignmentInfo/${responseData.assignment_slug}>${responseData.assignment_title}</a></td>
                         <td class="text-break">
                         <span class="class_id">${responseData.classes.class_name}</span>-
                         <span class="section_id">${responseData.sections.section_name}</span>
@@ -153,9 +156,8 @@ function addAssignment() {
                         </td>
                     </tr>
                 `;
-                $("#assignments_info").append(newRow);
-                $('#no_data_found').hide();
-                    raiseSuccessAlert("Assignment Added Successfully");
+                    dataTable.row.add($(newRow)).draw();
+                    raiseSuccessAlert(data.msg);
                 }
             }
         },
@@ -200,7 +202,7 @@ function editAssignment(assignment_id) {
 }
 
 async function deleteAssignment(assignmentId) {
-    const assignmentRow = `.tr-assign-${assignmentId}`;
+    const assignmentRow = dataTable.row(`.tr-assign-${assignmentId}`);
     Swal.fire({
         title: 'Are you sure, you want to delete this Record?',
         text: 'This can\'t be reverted!',
@@ -227,10 +229,16 @@ async function deleteAssignment(assignmentId) {
                     showLoader("body", "sm");
                 },
                 success: (response) => {
-                    raiseSuccessAlert("Assignment Deleted Successfully");
-                    if ($('#assignments_info tr').length === 1) {
-                        $('#no_data_found').show();
+                    // if ($('#assignments_info tr').length === 1) {
+                    //     $('#no_data_found').show();
+                    // }
+                    if (assignmentRow) {
+                        assignmentRow.remove().draw();
+                        if (dataTable.rows().count() === 0) {
+                            $(".dataTables_empty").html(`<img src="/assets/img/no_data_found.png" alt="No Image" class="no_data_found">`)
+                        }
                     }
+                    raiseSuccessAlert(response.msg);
                 },
                 error: (error) => {
                     raiseErrorAlert(error.responseJSON.detail);
@@ -243,4 +251,4 @@ async function deleteAssignment(assignmentId) {
         }
     });
 }
-
+});

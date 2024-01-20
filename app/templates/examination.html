@@ -6,8 +6,6 @@
 <link href="{% static 'app-css/examination.css' %}" rel="stylesheet" />
 <script src="{% static 'app-js/examination.js' %}"></script>
 
-
-
 <div class="row" id="heading-row">
     <div class="col-sm-12 col-md-8 col-xl-8">
         <h5>Examination</h5>
@@ -22,7 +20,6 @@
         </div>
     </div>
 </div>
-
 <div class="modal fade bs-example-modal-md" id="addeditExamModal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-centered">
         <div class="modal-content" id="ExamFormArea">
@@ -64,7 +61,7 @@
                     <div class="col-md-12">
                         <label class="form-label" for="class_id">Class</label>
                         <select id="class_id" class="form-select" name="class_id">
-                            <option selected value="">Select Class</option>
+                            <option selected value="" >Select Class</option>
                         </select>
                     </div>
                 </div> 
@@ -95,9 +92,12 @@
                 {% for exam in exam_data %}
                     <tr class="tr-exam-{{exam.parent_exam_id}}" data-exams-id="{{exam.parent_exam_id}}">
                         <td class="text-break">
-                            <span class="start_date">{{exam.start_date}}</span>-
-                            <span class="end_date">{{exam.end_date}}</span></td>
-                        <td class=" text-break parent_exam_name">{{ exam.parent_exam_name }}</td>
+                            <span class="start_date" data-date="{{exam.start_date}}">{{exam.start_date}}</span> - 
+                            <span class="end_date" data-date="{{exam.end_date}}">{{exam.end_date}}</span>
+                        </td>
+                        
+                        <td class=" text-break parent_exam_name">
+                            <a href="{% url 'examinationinfo' exam.parent_exam_slug %}">{{ exam.parent_exam_name }}</a></td>
                         <td class=" text-break result_date">{{exam.result_date}}</td>
                         <td class=" text-break class_id" data-class-id="{{exam.classes.class_id}}">{{exam.classes.class_name}}</td>
                         <td>
@@ -116,6 +116,4 @@
     </div>
 </div>
 </section>
-
-
 {% endblock %}

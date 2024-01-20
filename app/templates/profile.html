@@ -1,0 +1,78 @@
+{% extends '_layout.html' %} 
+{% block title %} My Profile {% endblock %} 
+{% load static %} 
+{% block content %}
+<script src="{% static 'app-js/profile.js' %}"></script>
+<link rel="stylesheet" href="{% static 'app-css/profile.css' %}">
+<div class="row">
+    <div class="row">
+        <div class="col-md-8">
+            <h4 class="mb-4">My Profile</h4>
+        </div>
+    </div>
+    <div class="card" id="userDetails">
+    <div class="card-body">
+    <input type="hidden" id="user_id" value="{{user_data.0.user_id}}">
+
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="mb-3">
+                <input type="file" id="profilePicInput" accept=".jpg, .jpeg" name="profilePicInput" class="form-control visually-hidden" title="Load Profile Picture"/>
+                <label for="profilePicInput" class="file-label">
+                    <div class="profile-pic-container">
+                        <img src="{{user_data.0.user_photo_url}}" alt="" id="profilePic" class="profile-pic"/>
+                        <i class="fas fa-pen edit-icon"></i>
+                    </div>
+                </label>
+                <input type="hidden" name="userPhoneNumber" value="">
+            </div>
+
+            <div class="mb-3">
+                <label for="fullName" class="form-label">Full Name</label>
+                <input type="text" name="fullName" id="fullName" class="form-control" placeholder="e.g. Enter full name" value="{{user_data.0.user_name}}"/>
+                
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="email" class="form-label">Email ID</label>
+                    <input type="email" id="email" class="form-control" placeholder="Enter email" value="{{email}}" readonly/>
+                </div>
+                <div class="col-md-6">
+                    <label for="phoneNumber" class="form-label">Phone Number</label>
+                    <input type="text" id="phoneNumber" class="form-control" minlength="10" maxlength="10" value="{{user_data.0.user_phone_number}}" />
+                </div>
+            </div>
+
+            <div class="text-center">
+                <button type="submit" class="btn btn-primary rounded-pill float-end" id="profileSave">Save Profile</button>
+            </div>
+                
+            <div class="row mb-3" id="passwordDetails">
+                <div class="col-md-8">
+                    <h4 class="mb-4 mt-4">Change Password</h4>
+                </div>
+
+                <div class="col-md-6">
+                    <label for="currentPassword" class="form-label">Current Password</label>
+                    <input type="password" id="currentPassword" class="form-control" placeholder="e.g. Enter current password" />
+                </div>
+
+                <div class="col-md-6">
+                    <label for="newPassword" class="form-label">New Password</label>
+                    <input type="password" id="newPassword" class="form-control" placeholder="e.g. Enter new password" />
+                </div>
+
+                <div class="col-md-12 mt-3">
+                    <button type="submit" class="btn btn-primary rounded-pill float-end" id="changePassword">Change Password</button>
+                </div>
+            </div>
+            
+
+        </div>
+    </div>
+    </div>
+    </div>
+</div>
+
+{% endblock %}

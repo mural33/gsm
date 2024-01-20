@@ -9,6 +9,9 @@ body{
      max-width: 100%;
     }
 }
+.navbar-brand-box{
+    text-align: left;
+}
 .form_section{
     display: none;
     position:absolute;

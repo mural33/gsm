@@ -1,6 +1,6 @@
 {% load static %}
 <!doctype html>
-<html lang="en" data-layout="horizontal" data-sidebar="dark" data-sidebar-size="lg" data-preloader="disable"
+<html lang="en" data-layout="vertical" data-sidebar="dark" data-sidebar-size="lg" data-preloader="disable"
     data-theme="creative" data-bs-theme="light">
     <meta charset="utf-8">
     <title>Gurukul - {% block title %}School Automation{% endblock %}</title>
@@ -34,6 +34,8 @@
     <!-- DataTables JS -->
     <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
     <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     {% block js_module %}
         
     {% endblock js_module %}
@@ -53,6 +55,7 @@
     <input type="hidden" name="" id="apiUrl" value='{{url}}'>
     <input type="hidden" name="" id="jwtToken" value='{{jwt_token}}'>
     <input type="hidden" name="" id="instituteId" value='{{institute_id}}'>
+    <input type="hidden" name="" id="subscriptionUrl" value='{{subscriptionUrl}}'>
     {% csrf_token %}
     <!-- Begin page -->
     <div id="layout-wrapper">
@@ -161,7 +164,7 @@
                         </li>
                         
                         <li class="nav-item">
-                            <a href="#" class="nav-link menu-link"> <i class="bi bi-cash-coin"></i>
+                            <a href="{% url 'fees' %}" class="nav-link menu-link"> <i class="bi bi-cash-coin"></i>
                                 <span data-key="t-file-manager">Fees</span> </a>
                         </li>
 
@@ -189,6 +192,11 @@
                         <li class="nav-item">
                             <a href="{% url 'accounts' %}" class="nav-link menu-link"> <i class="bi bi-cash-stack"></i>
                                 <span data-key="t-file-manager">Accounts</span> </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a href="{% url 'settings' %}" class="nav-link menu-link"> <i class="bi bi-gear"></i>
+                                <span data-key="t-kanaban-board">Settings</span> </a>
                         </li>
 
                         <li class="nav-item">
@@ -482,7 +490,7 @@
                             <div class="dropdown-menu dropdown-menu-end">
                                 <!-- item-->
                                 <h6 class="dropdown-header">Welcome User!</h6>
-                                <a class="dropdown-item fs-sm" href="#"><i
+                                <a class="dropdown-item fs-sm" href="/app/profile/"><i
                                         class="bi bi-person-circle text-muted align-middle me-1"></i> <span
                                         class="align-middle">Profile</span></a>
                                 <a class="dropdown-item fs-sm" href="#"><i

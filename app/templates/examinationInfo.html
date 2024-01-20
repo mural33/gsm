@@ -1,11 +1,15 @@
 {% extends '_layout.html' %}
 {% block title %} ExaminationInfo{% endblock %}
 {% load static %}
+{% block js_module %}
+    <script src=" https://cdn.jsdelivr.net/npm/read-excel-file@5.7.1/bundle/read-excel-file.min.js "></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="{% static 'app-js/examinfo.js' %}"></script>
+    <link href="{% static 'app-css/examination.css' %}" rel="stylesheet" />
+{% endblock js_module %}
 {% block content %}
 
-<link href="{% static 'app-css/examination.css' %}" rel="stylesheet" />
-
-
+<div id="parentData" data-examinfo='{"classId":{{exam_data.class_id}},"parentId":{{exam_data.parent_exam_id}} }'></div>
 <div class="row" id="heading-row">
     <div class="col-sm-12 col-md-9 col-xl-11 d-flex align-items-center" style="padding: 1rem">
         <a href="{% url 'examination' %}">
@@ -36,193 +40,97 @@
                             </a>
                         </li>
                     </ul>
+                    <!-- tablinks -->
+                    <!-- summary tab started -->
                     <div class="tab-content text-muted">
                         <div class="tab-pane active" id="summary" role="tabpanel">
                             <div class="row">
-                                <div class="col-md-6">
-                                    <h5 class="my-2">Summary</h5>
+                                <div class="col-md-12">
+                                    <p class="">Summary</p>
                                 </div>
                             </div>
-                            <div class="text-center">
-                                <div class="container">
-                                    <div class="row d-flex mt-2" id="">
-                                        <div class="resdiv" style="background-color:#ff793f">
-                                            <div>
-                                                <!-- Placeholder for Total -->
-                                                0
-                                            </div>
-                                            <div>
-                                                Total
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="chartbardiv" style="height: 20rem;">
+                                                <canvas id="resultChart"></canvas>
                                             </div>
                                         </div>
-                                        <div class="resdiv" style="background-color:#1dd1a1">
-                                            <div>
-                                                <!-- Placeholder for Pass -->
-                                                100%
-                                            </div>
-                                            <div>
-                                                Pass
-                                            </div>
+                                        <div class="col-md-6">
+                                            <table id="tableRank" class="table table-striped table-hover table-sticky table_students table-center">
+                                                <thead class="thead-dark">
+                                                    <tr>
+                                                        <th>Rank</th>
+                                                        <th>Students</th>
+                                                        <th>Roll Number</th>
+                                                        <th>%</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    
+                                                </tbody>
+                                            </table>
                                         </div>
-                                        <div class="resdiv" style="background-color:red">
-                                            <div>
-                                                <!-- Placeholder for Fail -->
-                                                0%
-                                            </div>
-                                            <div style="padding-top: 6px;">
-                                                Fail
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="row mx-0 my-2">
-                                        <table class="table table-striped table-hover table-sticky" id="staffPayroll">
-                                            <thead class="thead-dark">
-                                                <tr>
-                                                    <th>Student Name</th>
-                                                    <th>Secured Marks</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody class="tbl__bdy" id="">
-                                                <tr>
-                                                    <td>haritha</td>
-                                                    <td>500</td>
-                                                </tr>
-                                                <tr>
-                                                    <td>murali</td>
-                                                    <td>400</td>
-                                                </tr>
-                                                <tr>
-                                                    <td>Ayanesh</td>
-                                                    <td>350</td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
                                     </div>
                                 </div>
+                                <div class="col-md-4"></div>
                             </div>
                         </div>
+                        <!-- summary tab End -->
                         <div class="tab-pane" id="resultEntry" role="tabpanel">
-                            <div class="row mt-3">
-                                <div class="col-md-12">
-                                    <h5 class="my-2">Result Entry Details</h5>
-                                </div>
-                                <div class="col-md-12">
-                                    <div class="row mt-3 d-flex justify-content-between">
-                                        <div class="col-md-2">
-                                            <div class="form-group">
-                                                <select id="class_id" class="form-select" name="class_id">
-                                                    <option value="" selected>Select Class</option>
-                                                    <option value="">class 1</option>
-                                                    <option value="">class 2</option>
-                                                    <option value="">class 3</option>
-                                                </select>
-                                            </div>
+                            <div class="row">
+                                <h6>Reslut</h6>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6" id="uploadExcelColumn">
+                                    <div class="row text-center">
+                                        <div class="col-md-12 my-2">
+                                            <a href="{% url 'generate_excel_file_for_result' exam_data.parent_exam_id %}" class="btn btn-primary">
+                                                Download CSV file format for result entry
+                                                <i class="bi bi-download mx-2"></i>
+                                            </a>
                                         </div>
-                                        <div class="col-md-2">
-                                            <div class="form-group">
-                                                <select id="section_id" class="form-select" name="section_id">
-                                                    <option value="" selected>Select Section</option>
-                                                    <option value=""> section A</option>
-                                                    <option value=""> section B</option>
-                                                    <option value=""> section C</option>
-                                                </select>
-                                            </div>
+                                        <div class="col-md-12 my-2">
+                                            <input type="file" name="" class="form-control" accept=".xlsx" id="excelFilePath">
                                         </div>
-                                        <div class="col-md-2">
-                                            <!-- Search button -->
-                                            <button type="button" class="btn btn-success rounded-pill"
-                                                style="height: 38px;">Search</button>
-                                        </div>
-                                        <div class="col-md-6 text-end">
-                                            <button
-                                                class="btn btn-outline-primary rounded-pill btn-icon tripledots-dropdown-toggle"
-                                                data-bs-toggle="dropdown" aria-expanded="false">
-                                                <i class="bi bi-three-dots-vertical"></i>
+                                        <div class="col-md-12 my-2">
+                                            <button class="btn btn-success" id="btnFileSubmit">
+                                                Upload CSV file format for result entry
+                                                <i class="bi bi-upload mx-2"></i>
                                             </button>
-                                            <div class="input-group">
-                                                <ul class="dropdown-menu">
-                                                    <li><a class="dropdown-item" href="#"><i
-                                                                class="bi bi-upload me-2"></i> Import Bulk</a></li>
-                                                    <li><a class="dropdown-item" href="#"><i
-                                                                class="bi bi-download me-2"></i> Export CSV</a></li>
-                                                </ul>
-                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                                <div class="col-md-6" id="resultTableColumn">
+                                    <div class="row">
+                                        <div class="col-md-12 my-2">
+                                            <h6>
+                                                Reslut Entry has been made for <span class="text-success student_count">20</span> out of <span class="text-danger total_student_count">55</span>
+                                            </h6>
+                                        </div>
+                                        <div class="col-md-12 my-2" id="resultRefresh">
 
-
-
-                            <!-- Additional content for Result Entry tab goes here -->
-                            <div class="row mx-0 my-2">
-                                <table class="table table-striped table-hover table-sticky" id="staffPayroll">
-                                    <thead class="thead-dark">
-                                        <tr>
-                                            <th>Name</th>
-                                            <th>Roll Number</th>
-                                            <th>Telugu</th>
-                                            <th>Hindhi</th>
-                                            <th>English</th>
-                                            <th>Maths</th>
-                                            <th>Physics</th>
-                                            <th>Chemistry</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="tbl__bdy" id="">
-                                        <tr>
-                                            <td>shiva</td>
-                                            <td>1</td>
-                                            <td>70</td>
-                                            <td>80</td>
-                                            <td>60</td>
-                                            <td>80</td>
-                                            <td>70</td>
-                                            <td>90</td>
-                                        </tr>
-                                        <tr>
-                                            <td>vamshi</td>
-                                            <td>2</td>
-                                            <td>70</td>
-                                            <td>80</td>
-                                            <td>60</td>
-                                            <td>80</td>
-                                            <td>70</td>
-                                            <td>90</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Haritha</td>
-                                            <td>3</td>
-                                            <td>70</td>
-                                            <td>65</td>
-                                            <td>90</td>
-                                            <td>80</td>
-                                            <td>70</td>
-                                            <td>90</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Murali</td>
-                                            <td>4</td>
-                                            <td>77</td>
-                                            <td>65</td>
-                                            <td>60</td>
-                                            <td>65</td>
-                                            <td>78</td>
-                                            <td>90</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Ayanesh</td>
-                                            <td>5</td>
-                                            <td>70</td>
-                                            <td>60</td>
-                                            <td>50</td>
-                                            <td>80</td>
-                                            <td>75</td>
-                                            <td>85</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                                        </div>
+                                        <div class="col-md-12 my-2">
+                                            <table id="resultTable" class="table table-striped table-hover table-sticky table_students table-center">
+                                                <thead class="thead-dark">
+                                                    <tr>
+                                                        <th>Student Name</th>
+                                                        <th>Student Name</th>
+                                                        <th>Obtained Marks</th>
+                                                        <th>%</th>
+                                                        <th>Grade</th>
+                                                        <th></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -230,7 +138,4 @@
             </div>
         </div>
     </div>
-
-
-
     {% endblock %}

@@ -1,5 +1,5 @@
 $(document).ready(function () {
-    var dataTable = $('#accountsTable').DataTable({ order: [[0, 'desc']] });
+    var dataTable = $('#accountsTable').DataTable({ order: [] });
     $(".dataTables_empty").html(`<img src="/assets/img/no_data_found.png" alt="No Image" class="no_data_found">`)
     updateSummaryCards();
     applyTransactionTypeColor();
@@ -89,9 +89,7 @@ async function calculateUpdatedSummary(paymentType, newAmount) {
     var newAmount = parseFloat(newAmount)
     if (!Number.isNaN(currentAmount) && !Number.isNaN(newAmount)) {
         $(`#${cardId[paymentType]}`).text((currentAmount + newAmount).toFixed(2));
-        console.log('Updated amount:', (currentAmount + newAmount))                    //TBD
     } else {
-        console.error('Invalid currentAmount or newAmount:', currentAmount, newAmount); //TBD
     }
 }
 
@@ -159,7 +157,8 @@ async function accountsSubmitForm() {
                     <td class="transaction_type">${responseData.transaction_type}</td>
                     <td class="net_balance">${responseData.net_balance}</td>
                 </tr>`;
-            dataTable.row.add($(newAccountsRow)).draw(); //pagination
+            $(newAccountsRow).prependTo("#accountsTable tbody");
+            dataTable.row.add($(newAccountsRow)).draw();
             calculateUpdatedSummary(accountsData["payment_type"], accountsData["transaction_amount"])
             raiseSuccessAlert(data.msg);
         },
@@ -187,7 +186,6 @@ async function applyFilter() {
         const showRow = (paymentType === '' || rowPaymentType === paymentType) &&
             (!fromDate || new Date(rowTransactionDate) >= new Date(fromDate)) &&
             (!toDate || new Date(rowTransactionDate) <= new Date(toDate));
-
         row.toggle(showRow);
     });
 }

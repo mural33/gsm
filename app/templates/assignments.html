@@ -1,6 +1,6 @@
 {% extends '_layout.html' %}
 {% load static %}
-{% block title %} Assignment Management {% endblock %}
+{% block title %} Assignments {% endblock %}
 {% block content %}
 <link href="{% static 'app-css/assignments.css' %}" rel="stylesheet">
 
@@ -97,11 +97,10 @@
             </thead>
  
             <tbody class='tbl__bdy' id="assignments_info">
-                {% if assignment_data %}
                 {% for assign in assignment_data %}
                 <tr class="tr-assign-{{assign.id}}">
                     <td>{{ forloop.counter }}</td>
-                    <td class=" text-break assignment_title">{{ assign.assignment_title }}</td>
+                    <td class=" text-break assignment_title"><a href={% url "assignmentInfo" assign.assignment_slug %}>{{ assign.assignment_title }}</a></td>
                     <td class="text-break">
                         <span class="class_id">{{ assign.classes.class_name }}</span>-
                         <span class="section_id">{{ assign.sections.section_name }}</span>
@@ -123,13 +122,6 @@
                     </td>
                 </tr>
                 {% endfor %}
-                {% else %}
-                <tr>
-                    <td colspan="9" class="text-center" id="no_data_found">
-                        <img src="{% static 'img/no_data_found.png' %}" alt="No Data Found" class="no_data_found" id="no_data_found">
-                    </td>
-                </tr>
-            {% endif %}
             </tbody>
         </table>
     </div>

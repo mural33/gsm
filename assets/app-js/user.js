@@ -1,133 +1,298 @@
 // ____Add/Edit User____
+$(document).ready(function () {
+    $('#userTable').DataTable();
+    $(".dataTables_empty").html(`<img src="/assets/img/no_data_found.png" alt="No Image" class="no_data_found">`)
 
-// var API_ENDPOINT = "https://gsm-fastapi.azurewebsites.net/"
+    $("#btnSaveUser").click(async function (e) {
+        $("#btnSaveUser").removeClass("btn-shake")
+        e.preventDefault();
+        if (validateAddUserForm() === false) {
+          $("#btnSaveUser").addClass("btn-shake")
+          return false;
+        } else {
+          await addUser();
+        }
+      });
 
-let isEditMode = false;
-document.addEventListener("DOMContentLoaded", () => {
+      $("#btnEditUser").click(async function (e) {
+        $("#btnEditUser").removeClass("btn-shake")
+        e.preventDefault();
+        if (validateEditUserForm() === false) {
+          $("#btnEditUser").addClass("btn-shake")
+          return false;
+        } else {
+          await updateUser();
+        }
+      });
+      $("#btnResetPwd").click(async function (e) {
+        $("#btnResetPwd").removeClass("btn-shake")
+        e.preventDefault();
+        if (validateForm(resetPwd) === false) {
+          $("#btnResetPwd").addClass("btn-shake")
+          return false;
+        } else {
+          await resetPassword();
+        }
+      });
 
-    let form = document.getElementById('user-form')
-    form.addEventListener('submit', function (event) {
-        event.preventDefault();
-        console.log("inside");
-        const formData = new FormData(document.getElementById('user-form'));
-        const data = {
-            "institute_id": 1010,
-            "user_id": formData.get("id"),
-            "user_name": formData.get("user_name"),
-            "user_role": formData.get("user_role"),
-            "user_photo_url": "https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png",
-            "user_email": formData.get("user_email"),
-            "user_password": formData.get("user_password"),
-            "user_phone_number": formData.get("user_phone_number"),
-            "is_deleted": false,
-        };
+      $(document).on("click", ".btnPasswordReset", async function (e) {
+        e.preventDefault();
+        let userId = $(this).data("user-id");
+        let userName = $(this).closest("tr").find(".user_name").text();
+        let userEmail = $(this).closest("tr").find(".user_email").text();
+        await getDataForResetPassword(userId, userName, userEmail);
+    });
+    
+      $(document).on("click", ".btnEditUser", async function (e) {
+        e.preventDefault();    
+        let userId = $(this).data("user-id")
+        await editUser(userId);
+      });
+      $(document).on("click", ".btnDeleteUser", async function (e) {
+        e.preventDefault();    
+        let userId = $(this).data("user-id")
+        await deleteUser(userId);
+      }); 
 
-        console.log("data from form:", data);
-        const jwtToken = document.querySelector('#jwt_card').getAttribute('data-jwt-tokens');
-        console.log("jwtToken", jwtToken)
-        console.log("create update check id", data.user_id)
-        console.log('updated id', data);
-        const url = isEditMode ? `https://gsm-fastapi.azurewebsites.net/Users/update_user/?user_id=${data.user_id}` : `https://gsm-fastapi.azurewebsites.net/Users/create_user/`;
-        console.log(url);
-        const method = isEditMode ? 'PUT' : 'POST';
-        console.log(method)
-        fetch(url, {
-            method: method,
+      $("#resetBtn").on("click", function() {
+        const generatedPassword = generateRandomPassword(8); 
+        $("#resetPassword").val(generatedPassword);
+        $("#resetConfirmPassword").val(generatedPassword);
+    });  
+});
+async function validateAddUserForm() {
+    const validRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+    const validPhoneRegex = /^[6-9][0-9]{9}$/;
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/;
 
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${jwtToken}`
+    function validateInput(input, regex, min, max, errorMessageId, errorMessage) {
+        const value = input.val().trim();
+        const errorMessageElement = $("#" + errorMessageId);
 
-            },
-            body: JSON.stringify(data),
-        })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok.');
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (isEditMode) {
-                    console.log("inside");
-                    const updatedData = data['response'];
-                    console.log("updatedData", updatedData);
-                    const tr = document.querySelector(`.tr-user-${updatedData.user_id}`);
+        if (regex && (value.length < min || value.length > max || !regex.test(value))) {
+            input.addClass("is-invalid");
+            input.focus();
+            errorMessageElement.text(errorMessage);
+            return false;
+        } else if (!regex && (value.length < min || value.length > max)) {
+            input.addClass("is-invalid");
+            input.focus();
+            errorMessageElement.text(errorMessage);
+            return false;
+        } else {
+            input.removeClass("is-invalid");
+            errorMessageElement.text("");
+            return true;
+        }
+    }
+    function validatePassword(password) {
+        if (password.length < 8) {
+            return false;
+        }
+        if (!passwordRegex.test(password)) {
+            return false;
+        }
 
-                    console.log(tr);
-                    for (const key in updatedData) {
-                        try {
-                            tr.querySelector(`.${key}`).textContent = updatedData[key];
-                            closeForm(event, 'userForm')
-                            document.getElementById('user-form').reset();
-                            isEditMode = false;
-                        } catch {
+        return true;
+    }
+    let user_name = $("#user_name");
+    let user_email = $("#user_email");
+    let user_phone_number = $("#user_phone_number");
+    let user_role = $("#user_role");
+    let user_password = $("#user_password");
 
-                        }
+    let isNameValid = validateInput(user_name, null, user_name.attr("minLength"), user_name.attr("maxLength"), "user_name_error", "Invalid Name");
+    let isRoleValid = user_role.val() !== "";
+    let isEmailValid = validateInput(user_email, validRegex, user_email.attr("minLength"), user_email.attr("maxLength"), "user_email_error", "Invalid Email");
+    let isPhoneValid = validateInput(user_phone_number, validPhoneRegex, user_phone_number.attr("minLength"), user_phone_number.attr("maxLength"), "user_phone_number_error", "Invalid Phone");
+    let isPasswordValid = validatePassword(user_password, passwordRegex, user_password.attr("minLength"), user_password.attr("maxLength"), "user_password_error", "Invalid Role");
+
+    return isNameValid && isRoleValid && isEmailValid && isPhoneValid && isPasswordValid;
+}
+async function validateEditUserForm() {
+    const validRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+    const validPhoneRegex = /^[6-9][0-9]{9}$/;
+
+    function validateInput(input, regex, min, max, errorMessageId, errorMessage) {
+        const value = input.val().trim();
+        const errorMessageElement = $("#" + errorMessageId);
+
+        if (regex && (value.length < min || value.length > max || !regex.test(value))) {
+            input.addClass("is-invalid");
+            input.focus();
+            errorMessageElement.text(errorMessage);
+            return false;
+        } else if (!regex && (value.length < min || value.length > max)) {
+            input.addClass("is-invalid");
+            input.focus();
+            errorMessageElement.text(errorMessage);
+            return false;
+        } else {
+            input.removeClass("is-invalid");
+            errorMessageElement.text("");
+            return true;
+        }
+    }
+
+    let userName = $("#userName");
+    let userEmail = $("#userEmail");
+    let user_phoneNumber = $("#user_phoneNumber");
+    let userRole = $("#userRole");
+
+    let isNameEditValid = validateInput(userName, null, userName.attr("minLength"), userName.attr("maxLength"), "userName_error", "Invalid Name");
+    let isRoleEditValid = userRole.val() !== "";
+    let isEmailEditValid = validateInput(userEmail, validRegex, userEmail.attr("minLength"), userEmail.attr("maxLength"), "userEmail_error", "Invalid Email");
+    let isPhoneEditValid = validateInput(user_phoneNumber, validPhoneRegex, user_phoneNumber.attr("minLength"), user_phoneNumber.attr("maxLength"), "user_phoneNumber_error", "Invalid Phone");
+
+    return isNameEditValid && isRoleEditValid && isEmailEditValid && isPhoneEditValid;
+}
+let userFields=['user_name','user_email','user_phone_number','user_role','user_password']
+async function addUser() {
+    const data = {
+        institute_id: instituteId,
+        user_name: $("#user_name").val(),
+        user_email: $("#user_email").val(),
+        user_phone_number: $("#user_phone_number").val(),
+        user_role: $("#user_role").val(),
+        user_password: $("#user_password").val(),
+    };
+    const userUrl = apiUrl + "/Users/create_user/";
+    console.log(userUrl);
+    await $.ajax({
+        type: "POST",
+        url: userUrl,
+        mode: "cors",
+        crossDomain: true,
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${jwtToken}`,
+        },
+        data: JSON.stringify(data),
+        beforeSend: (e) => {
+            showLoader("userFormArea", "sm");
+        },
+        success: async function (data) {
+            if (data && data.response) {
+                $("#user_creation_modal").modal("hide");
+                var responseData = data.response;
+  
+                    var tableBody = $("#user_details");
+                    var noDataImage = tableBody.find('.no_data_found-tr');
+                    if (noDataImage.length > 0) {
+                      noDataImage.remove();
                     }
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'User updated Successfully!',
-                        position: 'top-end',
-                        toast: true,
-                        showConfirmButton: false,
-                        timer: 3000,
-                        padding: '1rem',
-                        customClass: {
-                            title: 'small-title',
-                        },
-                    });
-                } else {
-                    const tableBody = document.querySelector('.tbl__bdy');
-
-                    const response = data.response;
-                    console.log("response", response);
-
-                    const newRow = `
-                    
-                    <td class="user_name">${response.user_name}</td>
-                    <td class="user_email">${response.user_email}</td>
-                    <td class="user_phone_number">${response.user_phone_number}</td>
-                    <td class="user_role">${response.user_role}</td>
+                    var newRow = `
+                    <tr class="tr-user-${responseData.user_id}" id="userId-${responseData.user_id}">
+                    <td class="user_name">${responseData.user_name}</td>
+                    <td class="user_email">${responseData.user_email}</td>
+                    <td class="user_phone_number">${responseData.user_phone_number}</td>
+                    <td class="user_role">${responseData.user_role}</td>
                     <td>
-                <button type="button" class="btn btn-sm btn-info" onclick="EditButton(this,event)" data-id="${response.user_id}">
+                    <button type="button" class="btn btn-sm btn-dark btnPasswordReset" data-user-id="${responseData.user_id}">
+                    <i class="bi bi-lock-fill"></i></button>
+                <button type="button" class="btn btn-sm btn-info btnEditUser" data-user-id="${responseData.user_id}">
                     <i class="bi bi-pencil-square"></i>
-                <button type="button" class="btn  btn-sm btn-danger" onclick="DeleteButton(this)" data-id="${response.user_id}">
+                <button type="button" class="btn btn-sm btn-danger btnDeleteUser" data-user-id="${responseData.user_id}">
                     <i class="bi bi-trash3"></i>
             </td>
-                  </tr>   
-                    `;
-
-                    tableBody.innerHTML += newRow;
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'User added successfully!',
-                        position: 'top-end',
-                        toast: true,
-                        showConfirmButton: false,
-                        timer: 3000,
-                        padding: '1rem',
-                        customClass: {
-                            title: 'small-title',
-                        },
-                    });
-                    closeForm(event, 'userForm')
-                    document.getElementById('user-form').reset();
-                    isEditMode = false;
-                }
-            })
-            .catch(error => {
-                console.error('Fetch error:', error);
-            });
+                  </tr>`;               
+                    $('#userTable').DataTable().row.add($(newRow)).draw();  
+                    raiseSuccessAlert(data.msg);
+                    resetForm(userFields);
+            }
+        },
+        error: (error) => {
+            raiseErrorAlert(error.responseJSON.detail);
+        },
+        complete: (e) => {
+            removeLoader("userFormArea", "sm");
+        },
     });
-});
+}
+let userEditFields=['userName','userEmail','user_phoneNumber','userRole']
+async function editUser(userId){
+    $("#user_edit_modal").modal("show");
+    const editUserUrl = apiUrl + "/Users/get_user_by_id/?user_id=" + userId;
+    await $.ajax({
+      type: "GET",
+      url: editUserUrl,
+      mode: "cors",
+      crossDomain: true,
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${jwtToken}`,
+      },
+      beforeSend: (e) => {
+        showLoader("userEditFormArea", "sm");
+      },
+      success: (data) => {
+        console.log(data);
+        if (data) {
+          $("#user_id").val(data.user_id);
+          $("#userName").val(data.user_name);
+          $("#userEmail").val(data.user_email);
+          $("#user_phoneNumber").val(data.user_phone_number);
+          $("#userRole").val(data.user_role);        
+        }
+      },
+      error: (error) => {
+        raiseErrorAlert(error.responseJSON.detail);
+      },
+      complete: (e) => {
+        removeLoader("userEditFormArea", "sm");
+      },
+    });
+}
+async function updateUser(){
+    const data = {
+        institute_id: instituteId,
+        user_id: $("#user_id").val(),
+        user_name: $("#userName").val(),
+        user_email: $("#userEmail").val(),
+        user_phone_number: $("#user_phoneNumber").val(),
+        user_role: $("#userRole").val(),
+    };
+    const userUpdateUrl = apiUrl + "/Users/update_user_partial/?user_id=" + data.user_id ;
+    await $.ajax({
+        type: "PATCH",
+        url: userUpdateUrl,
+        mode: "cors",
+        crossDomain: true,
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${jwtToken}`,
+        },
+        data: JSON.stringify(data),
+        beforeSend: (e) => {
+            showLoader("userEditFormArea", "sm");
+        },
+        success: async function (data) {
+            if (data && data.response) {
+                $("#user_edit_modal").modal("hide");
+                var responseData = data.response;
+                    const existingRow = $("tr[id='userId-" + responseData.user_id + "']");
+                    if (existingRow.length) {
+                      existingRow.find('td:eq(0)').text(responseData.user_name);
+                      existingRow.find('td:eq(1)').text(responseData.user_email);
+                      existingRow.find('td:eq(2)').text(responseData.user_phone_number);
+                      existingRow.find('td:eq(3)').text(responseData.user_role);
+                    }
+                    raiseSuccessAlert(data.msg);
+                    $("#id").val("");
+                    resetForm(userEditFields);
+            }
+        },
+        error: (error) => {
+            raiseErrorAlert(error.responseJSON.detail);
+        },
+        complete: (e) => {
+            removeLoader("userEditFormArea", "sm");
+        },
+    });
+}
 
-// Delete operation
-
-function DeleteButton(element) {
-    event.preventDefault();
-    const jwtToken = document.querySelector('#jwt_card').getAttribute('data-jwt-tokens');
-    console.log(jwtToken, "fff");
+async function deleteUser(userId) {
+    const deleteUserUrl = apiUrl + "/Users/delete_user/?user_id=" + userId;
     Swal.fire({
         title: 'Are you sure, you want to delete this Record?',
         text: 'This can\'t be reverted!',
@@ -136,95 +301,98 @@ function DeleteButton(element) {
         confirmButtonColor: '#3085d6',
         cancelButtonColor: '#d33',
         confirmButtonText: 'Yes, delete it!'
-    }).then((result) => {
+    }).then(async (result) => {
         if (result.isConfirmed) {
-            const id = element.getAttribute('data-id');
-            console.log(" each id", id)
-            const url = `https://gsm-fastapi.azurewebsites.net/Users/delete_user/?user_id=${id}`;
-
-
-            fetch(url, {
-                method: 'DELETE',
+            const data = await $.ajax({
+                type: "DELETE",
+                url: deleteUserUrl,
+                mode: "cors",
+                crossDomain: true,
                 headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${jwtToken}` // Include the JWT token here
-                }
-            })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok.');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    console.log('Data Deleted from API:', data);
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${jwtToken}`,
+                },
+                beforeSend: (e) => {
+                    showLoader("userTable", "sm");
+                },
+                success: async function (data) {
+                    const dataTable = $('#userTable').DataTable();
+                    const deletedRow = dataTable.row(`#userId-${userId}`);
+                    if (deletedRow) {
+                        deletedRow.remove().draw();
 
-                    const DeleteRow = document.querySelector(`.tr-user-${id}`);
-                    if (DeleteRow) {
-                        DeleteRow.remove();
-                    } else {
-                        console.log('Row not found in the table');
-                    }
-                    Swal.fire({
-                        position: 'top-end',
-                        icon: 'success',
-                        title: 'User Deleted Successfully',
-                        toast: true,
-                        showConfirmButton: false,
-                        timer: 4000,
-                        timerProgressBar: true,
-                        customClass: {
-                            popup: 'small-sweetalert',
-                            title: 'small-sweetalert-title',
-                            content: 'small-sweetalert-content'
+                        if (dataTable.rows().count() === 0) {
+                            $('#user_details').html(`
+                                <tr class="no_data_found-tr">
+                                    <td colspan="5" class="text-center">
+                                        <img src="/assets/img/no_data_found.png" alt="No Image" class="no_data_found">
+                                    </td>
+                                </tr>
+                            `);
                         }
-                    });
-
-
-                })
-                .catch(error => {
-                    console.log('Fetch error:', error);
-                });
+                        raiseSuccessAlert(data.msg);
+                    } else {
+                        raiseErrorAlert("Row not found in DataTable.");
+                    }
+                },
+                error: (error) => {
+                    raiseErrorAlert(error.responseJSON.detail);
+                },
+                complete: (e) => {
+                    removeLoader("userTable", "sm");
+                },
+            });
         }
     });
 }
-// Edit operation
 
-function EditButton(element, event) {
-    document.getElementById("id").value = "";
-    document.getElementById("user_name").value = "";
-    document.getElementById("user_email").value = "";
-    document.getElementById("user_phone").value = "";
-    document.getElementById("user_role").value = "Admin";
-
-    const jwtToken = document.querySelector('#jwt_card').getAttribute('data-jwt-tokens');
-    const id = element.getAttribute('data-id');
-    const url = `https://gsm-fastapi.azurewebsites.net/Users/get_user_by_id/?user_id=${id}`;
-
-    fetch(url, {
-        method: 'GET',
+async function getDataForResetPassword(userId, userName, userEmail) {
+    $("#user_id").val(userId);
+    $("#userResetName").val(userName);
+    $("#userResetEmail").val(userEmail);
+    $("#resetPassword").val("");  
+    $("#resetConfirmPassword").val("");
+    $("#user_resetPassword_modal").modal("show");
+}
+function generateRandomPassword(length) {
+    const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    let password = "";
+    for (let i = 0; i < length; i++) {
+        const randomIndex = Math.floor(Math.random() * charset.length);
+        password += charset.charAt(randomIndex);
+    }
+    return password;
+}
+let resetPwd=['resetPassword','resetConfirmPassword']
+async function resetPassword(){
+    const data = {
+        user_id: $("#user_id").val(),
+        user_password : $("#resetPassword").val(),
+    };
+    const resetPasswordUrl = apiUrl + "/Users/update_user_password/?user_id=" + data.user_id + "&user_password=" + encodeURIComponent(data.user_password);
+    await $.ajax({
+        type: "PATCH",
+        url: resetPasswordUrl,
+        mode: "cors",
+        crossDomain: true,
         headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${jwtToken}`
-        }
-    })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok.');
-            }
-            return response.json();
-        })
-        .then(data => {
-            response = data;
-            document.getElementById("id").value = response.user_id;
-            document.getElementById("user_name").value = response.user_name;
-            document.getElementById("user_email").value = response.user_email;
-            document.getElementById("user_phone").value = response.user_phone_number;
-            document.getElementById("user_role").value = response.user_role;
-            isEditMode = true;
-
-        })
-        .catch(error => {
-            console.log('Fetch error:', error);
-        });
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${jwtToken}`,
+        },
+        data: JSON.stringify(data),
+        beforeSend: (e) => {
+            showLoader("userResetPasswordArea", "sm");
+        },
+        success: async function (data) {
+                $("#user_resetPassword_modal").modal("hide");
+                    raiseSuccessAlert(data.msg);
+                    resetForm(resetPwd);
+        },
+        error: (error) => {
+            raiseErrorAlert(error.responseJSON.detail);
+        },
+        complete: (e) => {
+            removeLoader("userResetPasswordArea", "sm");
+        },
+    });
 }

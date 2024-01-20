@@ -1,0 +1,274 @@
+{% extends '_layout.html' %} 
+{% block title %} Settings {% endblock %} 
+{% load static %} 
+{% block content %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<link rel="stylesheet" href="{% static 'app-css/settings.css' %}" />
+<script src="{% static 'app-js/settings.js' %}"></script>
+
+
+<div class="row" id="heading-row">
+    <div class="col-sm-12 col-md-9 col-xl-12 d-flex align-items-center" style="padding: 1rem">
+        <div class="mx-2">
+            <h5>Settings</h5>
+            <quote>Embrace change, configure your settings for organizational growth, and subscribe to progress with simplicity.</quote>
+        </div>
+    </div>
+    <div class="col-md-12">
+        <div class="card">
+        <div class="card-body">
+            <div>
+                <!-- tablinks -->
+                <ul
+                    class="nav nav-pills arrow-navtabs nav-success bg-light mb-3"
+                    role="tablist"
+                >
+                    <li class="nav-item col-md-2">
+                    <a
+                        class="nav-link active"
+                        data-bs-toggle="tab"
+                        href="#myAccount"
+                        role="tab"
+                    >
+                        <span class="d-block d-sm-none"
+                        ><i class="ti ti-home"></i
+                        ></span>
+                        <span class="d-none d-sm-block">My Account</span>
+                    </a>
+                    </li>
+                    <li class="nav-item col-md-2">
+                    <a class="nav-link" data-bs-toggle="tab" href="#subscription" role="tab">
+                        <span class="d-block d-sm-none"
+                        ><i class="ti ti-user-circle"></i
+                        ></span>
+                        <span class="d-none d-sm-block">Subscription</span>
+                    </a>
+                    </li>
+                    <li class="nav-item col-md-2">
+                    <a
+                        class="nav-link"
+                        data-bs-toggle="tab"
+                        href="#education"
+                        role="tab"
+                    >
+                        <span class="d-block d-sm-none"
+                        ><i class="ti ti-mail"></i
+                        ></span>
+                        <span class="d-none d-sm-block">Education years</span>
+                    </a>
+                    </li>
+                    <li class="nav-item col-md-2">
+                    <a
+                        class="nav-link"
+                        data-bs-toggle="tab"
+                        href="#alerts"
+                        role="tab"
+                    >
+                        <span class="d-block d-sm-none"
+                        ><i class="ti ti-mail"></i
+                        ></span>
+                        <span class="d-none d-sm-block">Alerts</span>
+                    </a>
+                    </li>
+                    <li class="nav-item col-md-2">
+                    <a
+                        class="nav-link"
+                        data-bs-toggle="tab"
+                        href="#branding"
+                        role="tab"
+                    >
+                        <span class="d-block d-sm-none"
+                        ><i class="ti ti-mail"></i
+                        ></span>
+                        <span class="d-none d-sm-block">Branding</span>
+                    </a>
+                    </li>
+                </ul>
+                <!-- Tab panes -->
+                <div class="tab-content text-muted">
+                    <div class="tab-pane active" id="myAccount" role="tabpanel">
+                        <h5 class="text-center">My Account</h5>
+                        <input type="hidden" id="institution_id" name="institution_id" value="{{ institution_data.id }}">
+                        <input type="hidden" id="subscribers_id" name="subscribers_id" value="{{ institution_data.subscribers_id }}">
+                        <input type="hidden" id="date_of_registration" name="date_of_registration" value="{{ institution_data.date_of_registration }}">
+                        <div class="row d-flex align-items-center justify-content-center">
+                            <div class="col-md-8 mb-2 d-flex">
+                                <p>
+                                    <span class="d-block">Subscriber ID</span>
+                                    <span class="fs-13 fw-100 text-black">{{ institution_data.subscribers_id }}</span>
+                                </p>
+                                <p class="mx-4">
+                                    <span class="d-block">Registration Date</span>
+                                    <span class="fs-13 fw-100 text-black">{{ institution_data.date_of_registration }}</span>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="row d-flex align-items-center justify-content-center">
+                            <div class="col-md-8 mb-2">
+                              <div class="form-label">Organization Name</div>
+                                    <input type="text" class="form-control fs-14"  id="institute_name" name="institute_name" value="{{ institution_data.institute_name }}">
+                            </div>
+                            
+                            <div class="col-md-8 mb-2">
+                              <div class="form-label">Address Line</div>
+                                <textarea type="text" class="form-control" id="institute_address" name="institute_address"
+                                    placeholder="e.g. 1st Floor, Plot - 4-2-23, Pioneer Estate Colony Neknampur, Alkapoor, Manikonda Jagir, Telangana">{{ institution_data.institute_address }}</textarea>
+                            </div>
+                            <div class="col-md-8 mb-2">
+                              <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-label">Tag Line</div>
+                                        <input type="text" class="form-control" id="institute_tag_line" name="institute_tag_line" value="{{ institution_data.institute_tag_line }}">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-label">Website</div>
+                                        <input type="text" class="form-control" id="institute_website" name="institute_website" value="{{ institution_data.institute_website }}">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-8 mb-2">
+                              <div class="row">
+                                    <div class="col-md-6">
+                                        <label for="institute_pincode" class="form-label">Pincode</label>
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" id="institute_pincode" name="institute_pincode" value="{{ institution_data.institute_pincode }}">
+                                            <button class="btn btn-primary" type="button" id="searchButton">Search</button>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-label">City</div>
+                                        <input type="text" class="form-control" id="institute_city" name="institute_city" value="{{ institution_data.institute_city }}">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-8 mb-2">
+                              <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-label">State</div>
+                                        <input type="text" class="form-control" id="institute_state" name="institute_state" value="{{ institution_data.institute_state }}">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-label">Country</div>
+                                        <input type="text" class="form-control" id="institute_country" name="institute_country" value="{{ institution_data.institute_country }}">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-8 mb-2">
+                              <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-label">Contact Person</div>
+                                        <input type="text" class="form-control" id="point_of_contact" name="point_of_contact" value="{{ institution_data.point_of_contact }}">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-label">Affiliation</div>
+                                        <input type="text" class="form-control" id="affiliation" name="affiliation" value="{{ institution_data.affiliation }}">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-8 mb-2">
+                              <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-label">Mobile Number</div>
+                                        <input type="text" class="form-control" id="institute_phone" name="institute_phone" minlength="10" maxlength="10" value="{{ institution_data.institute_phone }}">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-label">Email</div>
+                                        <input type="text" class="form-control" id="institute_email" name="institute_email" value="{{ institution_data.institute_email }}">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-8 mt-3">
+                                <button type="submit" class="btn btn-primary rounded-pill float-end" id="instituteUpdateBtn">Save</button>
+                            </div>
+                        </div>
+                    </div> 
+                <div class="tab-pane" id="subscription" role="tabpanel">
+                    
+                    <div class="d-flex align-items-center justify-content-center">
+                       <h5 class="mb-3 mt-4 fs-6 text-center">Current Subscription Plan: <span class="current-plan-text text-success">${planName} Package</span></h5>
+                        <button class="btn btn-success btn-label rounded-pill right mt-2 ms-4" data-bs-toggle="modal" data-bs-target="#subscriptionModal">
+                        Upgrade <i class="bi bi-arrow-up-circle align-middle fs-lg ms-2"></i>
+                    </button>
+
+
+
+                    </div>
+                        <h5 class="mb-4">Subscription History</h5>
+                        <div class="row">
+                            <table class="table table-striped table-hover table-sticky" id="subscriptionTable">
+                                <thead class="thead-dark">
+                                    <tr>
+                                        <th>Date Of Transaction </th>
+                                        <th>Plan Name</th>
+                                        <th>Valid Till</th>
+                                        <th>Amount</th>
+                                        <th>Payment Status</th>
+                                        <th>Payment Mode</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="tbl__bdy" id="subscriptionDetails">
+                                    
+                                </tbody>
+                            </table>
+                        </div><br />
+                    </div>
+
+                <div class="tab-pane" id="education" role="tabpanel">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Education Years</h6>
+                        </div>
+                    </div>
+                </div>
+            <div class="tab-pane" id="alerts" role="tabpanel">
+                <div class="row">
+                  <div class="col-md-6">
+                      <h6>Alerts</h6>
+                  </div>
+                </div>
+            </div>
+            <div class="tab-pane" id="branding" role="tabpanel">
+              <div class="row">
+                  <div class="col-md-9">
+                      <h6>Branding</h6>
+                  </div>
+              </div>
+              </div>
+          </div>
+        </div>
+        <!-- end card-body -->
+      </div>
+      <!-- end card -->
+    </div>
+  </div>
+</div>
+
+<!-- Modal for Subscription Options -->
+<div class="modal fade" id="subscriptionModal" tabindex="-1" role="dialog" aria-labelledby="subscriptionModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="subscriptionModalLabel">Subscription Plans</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                
+            </div>
+            <div class="modal-body">
+                <div class="container">
+                    <div class="row row-cols-1 row-cols-lg-4 g-5">
+                        <div class="col-lg-4">
+                            
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

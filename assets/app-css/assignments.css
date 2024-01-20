@@ -37,3 +37,15 @@
 #assignmentTable td:nth-child(7) {
     width: 15%; 
 }
+#btnSubmitAssignment{
+    height: 2.5rem;
+}
+#btnSubmitAssignment[disabled],.disabled-button {
+    background-color: grey !important;
+    border: 1px solid grey !important;
+    cursor: not-allowed !important;
+    pointer-events: auto !important;
+}
+#statusList{
+    width: auto;
+}

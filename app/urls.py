@@ -2,6 +2,7 @@ from django.urls import path
 from .views import dashboard, students, register_student,\
 staffs, register_staff,staff_info, edit_staff, login, logout, registration, classes,fees, user, assignments, transportation, notice, notice_create,notice_edit, calendar,edit_student,examination,examinationInfo
 from . import views
+from django.views.generic import TemplateView
 
 urlpatterns = [
     path('', login, name='login'),
@@ -22,6 +23,7 @@ urlpatterns = [
     path('classes/', classes, name='classes'),
     path('user/', user, name='user'),
     path('assignments/', assignments, name='assignments'),
+    path('assignmentInfo/<str:assignment_slug>/', views.assignmentInfo, name='assignmentInfo'),
     path('transportation/', transportation, name='transportation'),
     path('notice/', notice, name='notice'),
     path('notice_create/', notice_create, name='notice_create'),
@@ -33,5 +35,11 @@ urlpatterns = [
     path('azure_download/<str:file_name>/<str:location>/', views.azure_download, name='azure_download'),
     path('fees/',fees,name='fees'),
     path('examination/',examination,name='examination'),
-    path('examinationInfo/',examinationInfo,name="examinationinfo")
+    path('examinationInfo/<slug:exam_slug>',examinationInfo,name="examinationinfo"),
+    path('generate_excel_file_for_result/<int:parent_exam_id>',views.generate_excel_file_for_result,name="generate_excel_file_for_result"),
+    path('settings/', views.settings, name='settings'),
+    path('profile/', views.profile, name='profile'),
+    path('success/', TemplateView.as_view(template_name='success.html'), name='success'),
+    path('error/', TemplateView.as_view(template_name='error.html'), name='error'),
+    path('create_order/', views.create_order, name='create_order')
 ]

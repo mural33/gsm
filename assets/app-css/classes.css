@@ -122,12 +122,11 @@
     border: 1px solid '' !important;
     cursor: pointer !important;
 }
-#installment-dropdown {
+#installment_dropdown {
     padding-top: 7px;
     padding-left: 1.7rem;
     height: 2.5rem;
     font-size: 1rem;
-    -webkit-appearance: menulist;
 }
 .scroll-container {
     width: 100%;
@@ -147,4 +146,25 @@
   color: #000;
   font-size: 1rem;
   }
-
+#btnUpdateFee,#btnFeeChange{
+    height: 2.5rem;
+    margin-top: 0.5rem;
+}
+  div.dataTables_wrapper div.dataTables_info {
+    padding-top: .85em;
+    margin-right: 14rem;
+    max-width: 10rem; 
+  }
+  div.dataTables_wrapper div.dataTables_length label {
+    font-weight: normal;
+    text-align: left;
+    white-space: nowrap;
+    margin-right: 29rem;
+    margin-top: 0.7rem;
+  }
+  div.dataTables_wrapper div.dataTables_filter input {
+    margin-left: .5em;
+    display: inline-block;
+    width: auto;
+    margin-top: 10px;
+  }

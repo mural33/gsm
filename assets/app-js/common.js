@@ -6,7 +6,7 @@ $(document).ready(()=>{
     apiUrl = $("#apiUrl").val();
     jwtToken = $("#jwtToken").val();
     instituteId = $("#instituteId").val();
-    
+    subscriptionUrl = $("#subscriptionUrl").val();
     $(".btnCloseModel").on("click", function(e){
         const parentModel = $(this).closest(".modal"); 
         parentModel.modal("hide");
@@ -54,6 +54,13 @@ function raiseInfoAlert(msg) {
         "extendedTimeOut": "2000"
     };
     toastr.info(msg, 'Information');
+}
+function showInvalidPincodeAlert() {
+    Swal.fire({
+        icon: 'error',
+        title: 'Invalid Pincode',
+        text: 'Please enter a valid pincode.',
+    });
 }
 // form reset
 function resetForm(fields) {
@@ -186,6 +193,53 @@ async function downloadFile(fileName,location) {
         return "";
     }
 }
-
-
-
+function ajaxRequest(type, url, data,loaderId,loaderSize,successCallback) {
+    $.ajax({
+        type: type,
+        url: url,
+        data: JSON.stringify(data),
+        mode: "cors",
+        crossDomain: true,
+        headers: {
+            "Authorization": `Bearer ${jwtToken}`,
+            "Content-Type": "application/json",
+        },
+        contentType: "application/json",
+        dataType: "json",
+        beforeSend: () => {
+            showLoader(loaderId,loaderSize);
+        },
+        success: (response) => {
+            successCallback(response);
+        },
+        error: (error) => {
+            raiseErrorAlert(error.responseJSON);
+        },
+        complete: () => {
+            removeLoader(loaderId, loaderSize);
+        }
+    });
+}
+// Fetching Details based on pincode
+function fetchDetailsBasedOnPincode(pincode, stateInput, cityInput, countryInput) {
+    $.ajax({
+        type: 'GET',
+        url: 'https://api.postalpincode.in/pincode/' + pincode,
+        success: function(response) {
+            if (response && Array.isArray(response) && response.length > 0 &&
+                response[0].PostOffice && Array.isArray(response[0].PostOffice) && response[0].PostOffice.length > 0) {
+                var state = response[0].PostOffice[0].State;
+                var city = response[0].PostOffice[0].District;
+                var country = response[0].PostOffice[0].Country;    
+                stateInput.val(state);
+                cityInput.val(city);
+                countryInput.val(country);
+            } else {
+                showInvalidPincodeAlert();
+            }
+        },
+        error: function(error) {
+            raiseErrorAlert(error);
+        }
+    });
+}

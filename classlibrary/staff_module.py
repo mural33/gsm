@@ -1,7 +1,6 @@
 import requests
 import asyncio
 
-
 class Staff:
     def __init__(self, api_url="", slug="", jwt=""):
         self.api_url = api_url

@@ -1,4 +1,8 @@
 $(document).ready(function () {
+    $('#noticeTable').DataTable({
+        'order': [],
+    })
+    $(".dataTables_empty").html(`<img src="/assets/img/no_data_found.png" alt="No Image" class="no_data_found">`)
     $('.openBtn').on('click', function () {
         var noticeId = $(this).data('id');
         var noticeTitle = $(this).data('title');

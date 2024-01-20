@@ -58,7 +58,6 @@
                     <div class="col-md-12">
                         <label class="form-label">Applicable Class</label>
                         <select id="class_id" class="form-select" name="class_id" data-class-id="{{ grade.class_id }}" multiple aria-label="multiple select example">
-                            <option selected value="">Select Multiple Classes</option>
                             {% for class in class_data %}
                                 <option value="{{ class.class_id }}">{{ class.class_name }}</option>
                             {% endfor %}

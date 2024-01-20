@@ -15,7 +15,6 @@ $(document).ready(e => {
             addDocument();
         }
     })
-       
     let staffInfo = JSON.parse($("#staffInfo").val());
     let staffData = new StaffData();
     staffData.getStaffAttendance(staffInfo.staffId);
@@ -23,7 +22,6 @@ $(document).ready(e => {
     callPieChart();
     
 });
-
 function callPieChart(absent, present, leave) {
     var existingChart = Chart.getChart("staffPieChart");
     if (existingChart) {
@@ -32,7 +30,6 @@ function callPieChart(absent, present, leave) {
     // Create a new pie chart
     generatePieChart("staffPieChart", [present, absent, leave], ["Present", "Absent", "Leave"], ["#28a745", "#dc3545", "#ffc107"]);
 }
-
 let payrollFieldNames = [
     'payment_date','payroll_type','salary_amount','payment_mode',
     'payroll_details'
@@ -122,7 +119,6 @@ async function openPayrollForm(element){
         isUpdate = true
     })
 } 
-
 // base ajax request function
 async function ajaxRequest(type, url, data,loaderId,loaderSize,successCallback) {
     await $.ajax({
@@ -151,7 +147,6 @@ async function ajaxRequest(type, url, data,loaderId,loaderSize,successCallback) 
         }
     });
 }
-
 async function deletePayroll(payrollId){
     await Swal.fire({
         title: 'Are you sure, do you want to delete this Record?',
@@ -209,7 +204,7 @@ async function addDocument() {
         raiseSuccessAlert(response.msg)
         if (isUpdate) {
             var updatedRow = $(`.card-staff-${documentId}`);
-            updatedRow.find(".card-title").text(`${document_name}`)
+            updatedRow.find(".card-title").text(`${documentData.document_name}`);
         } else {
             displayNewDocument(documentData);
         }
@@ -288,7 +283,6 @@ async function deleteDocument(element) {
     });
 }
 
-
 async function openDocumentForm(element) {
     var documentId = $(element).attr("data-document-id");
     $("#documentForm").modal('show');
@@ -309,7 +303,6 @@ async function openDocumentForm(element) {
         
     }); 
 }
-
 function generatePieChart (id = "",parcenatge= [],labels = [],colors = []) {
     var data = {
         labels:labels,
@@ -318,21 +311,17 @@ function generatePieChart (id = "",parcenatge= [],labels = [],colors = []) {
             backgroundColor: colors
         }]
     };
-    // Configuration options
     var options = {
         responsive: true,
         maintainAspectRatio: false
     };
-    // Get the canvas element
     var ctx = document.getElementById(`${id}`).getContext('2d');
-    // Create the pie chart
     var myPieChart = new Chart(ctx, {
         type: 'pie',
         data: data,
         options: options
     });
 }
-
 async function deleteStaff(element) {
     var staffId = element.getAttribute("data-id");
     await Swal.fire({
@@ -362,37 +351,7 @@ async function deleteStaff(element) {
             window.location.href = `/app/staffs/`;
         }
     });
-    
 }
-
-function deleteStaff(element) {
-    var staffId = element.getAttribute("data-id");
-    var confirmation = confirm("Are you sure you want to delete this staff?");
-    
-    if (confirmation) {
-        $.ajax({
-            type: "DELETE",
-            url: `https://gsm-fastapi.azurewebsites.net/Staff/delete_staff/?staff_id=${staffId}`,
-            headers: {
-                'Authorization': `Bearer ${jwtToken}`,
-                'Content-Type': 'application/json',
-            },
-            success: function(response) {
-                // Optional: Remove the staff entry from the UI
-                // $(element).closest('.col-sm-12').remove();
-                alert("Staff deleted successfully!");
-                // Reload the page after successful deletion
-                window.location.href = `/app/staffs/`;
-                
-            },
-            error: function(xhr, textStatus, errorThrown) {
-                alert("Error deleting staff.");
-                console.log(xhr.responseText);
-            }
-        });
-    }
-}
-
 // Staff attendance 
 class StaffData {
     

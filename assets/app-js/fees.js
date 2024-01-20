@@ -1,4 +1,6 @@
 $(document).ready(async function () {
+    $('#feeTable').DataTable();
+    $(".dataTables_empty").html(`<img src="/assets/img/no_data_found.png" alt="No Image" class="no_data_found">`)
     await loadInstallments();
     await loadClass();
     $('.installment_dropdown').each(function () {
@@ -9,10 +11,6 @@ $(document).ready(async function () {
     });
 
     $('#fee_total, #fee_admission').on('input', await updateInstallAmount);
-    $("#btnSaveInstall").click(async function (e) {
-        e.preventDefault();
-        await addInstallment();
-    });
 
     $("#btnSaveFees").click(async function (e) {
         $("#btnSaveFees").removeClass("btn-shake")
@@ -37,41 +35,6 @@ $(document).ready(async function () {
         await deleteFees(feeId);
       });   
 });
-
-async function addInstallment() {
-    const data = {
-        installment_name: $("#installment_name").val(),
-        installment_number: $("#installment_number").val(),
-    };
-    const url = apiUrl + "/Fees/create_installment/";
-    await $.ajax({
-        type: "POST",
-        url: url,
-        mode: "cors",
-        crossDomain: true,
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${jwtToken}`,
-        },
-        data: JSON.stringify(data),
-        beforeSend: (e) => {
-            showLoader("installmentFormArea", "sm");
-        },
-        success: async function (data) {
-            $("#addInstallmentmodal").modal("hide");
-            if (data) {
-                await loadInstallments();
-                raiseSuccessAlert("Installment Added Successfully.");
-            }
-        },
-        error: (error) => {
-            raiseErrorAlert(error["responseJSON"]["detail"]);
-        },
-        complete: (e) => {
-            removeLoader("installmentFormArea", "sm");
-        },
-    });
-}
 
 async function loadInstallments() {
     const installmentUrl = apiUrl + "/Fees/get_all_installments/";
@@ -133,7 +96,6 @@ async function addFees() {
         installment_id: $("#installment_dropdown").val(),
         total_installments: $("#install_amount").val(),
     };
-    console.log(data);
     const feeUrl = editFees ? apiUrl + "/Fees/update_fees/?fee_id=" + data.fee_id : apiUrl + "/Fees/create_fees/";
     const requestsType = editFees ? "PUT" : "POST";
     await $.ajax({
@@ -165,11 +127,11 @@ async function addFees() {
                       existingRow.find('td:eq(1)').text(responseData.fee_total);
                       existingRow.find('td:eq(2)').text(responseData.fee_admission);
                       existingRow.find('td:eq(3)').text(responseData.total_installments);
-                      existingRow.find('td:eq(4)').html(`<select class="installment_dropdown" data-fee-id="${responseData.fee_id}">${installmentHTML}</select>`);
+                      existingRow.find('td:eq(4)').html(`<select class="form-select installment_dropdown" data-fee-id="${responseData.fee_id}">${installmentHTML}</select>`);
                       existingRow.find('td:eq(5)').text();
                     }
                     updatePerInstallmentAmount($(`#feeId-${responseData.fee_id} .installment_dropdown`));               
-                    raiseSuccessAlert("Fees Updated Successfully");
+                    raiseSuccessAlert(data.msg);
                     $("#fee_id").val("");
                 } else {
                     var tableBody = $("#feesdetails");
@@ -189,7 +151,7 @@ async function addFees() {
                         <td>${responseData.fee_admission}</td>
                         <td>${responseData.total_installments}</td>
                         <td>
-                            <select class="installment_dropdown" data-fee-id="${responseData.fee_id}">
+                            <select class="form-select installment_dropdown" data-fee-id="${responseData.fee_id}">
                                 ${installmentHTML}
                             </select>
                         </td>
@@ -201,7 +163,7 @@ async function addFees() {
                     </tr>`;               
                     $('#feeTable').DataTable().row.add($(newRow)).draw();  
                     updatePerInstallmentAmount($(`#feeId-${responseData.fee_id} .installment_dropdown`));               
-                    raiseSuccessAlert("Fees Added Successfully.");
+                    raiseSuccessAlert(data.msg);
                 }
             }
             resetForm(feesFields);
@@ -284,7 +246,7 @@ async function deleteFees(feeId) {
                     "Authorization": `Bearer ${jwtToken}`,
                 },
                 beforeSend: (e) => {
-                    showLoader("body", "sm");
+                    showLoader("feeTable", "sm");
                 },
                 success: async function (data) {
                     const dataTable = $('#feeTable').DataTable();
@@ -311,7 +273,7 @@ async function deleteFees(feeId) {
                     raiseErrorAlert(error["responseJSON"]["detail"]);
                 },
                 complete: (e) => {
-                    removeLoader("body", "sm");
+                    removeLoader("feeTable", "sm");
                 },
             });
         }
@@ -321,5 +283,6 @@ function updatePerInstallmentAmount(element) {
     var installmentNumber = $(element).find('option:selected').data('installment-id');
     var totalInstallmentAmount = $(element).closest('tr').find('td:eq(3)').text();
     var perInstallmentAmount = totalInstallmentAmount / installmentNumber;
+    perInstallmentAmount =parseInt(perInstallmentAmount);
     $(element).closest('tr').find('.per-installment-amount').text(perInstallmentAmount);
   }

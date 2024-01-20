@@ -18,7 +18,9 @@ import asyncio
 from .azure_blob import upload_to_blob,download_blob
 from django.http import FileResponse
 from django.utils.encoding import smart_str
-
+import razorpay
+import uuid
+from GSM_Webapp.settings import RAZOR_KEY_ID, RAZOR_KEY_SECRET
 API_URL = settings.API_ENDPOINT
 Subscription_URL = settings.SUBSCRIPTION_URL
 
@@ -51,7 +53,6 @@ def azure_download(request, file_name, location):
     except Exception as e:
         # Handle other exceptions as needed
         return HttpResponse(f"Error: {str(e)}", status=500)
-
 
 def calendar(request):
     calender_obj = Data(API_URL)
@@ -196,16 +197,21 @@ def login(request):
             response.set_cookie(
                 key="institute_id", value=auth_response.json().get("institution_id", "")
             )
+            response.set_cookie(key="email", value=email)
             institite_id = auth_response.json().get("institution_id")
             institite_url = (
-                f"{API_URL}/Institute/Institute/?institute_id={institite_id}"
+                f"{API_URL}/Institute/get_institute_by_id/?institute_id={institite_id}"
             )
-            institite_response = requests.get(institite_url)
-            subscriber_id = institite_response.json().get("subscribers_id")
-            Account_url = (
-                f"{Subscription_URL}api/AccountValidation?subscriber_id={subscriber_id}"
-            )
+            header = {
+                "accept": "application/json",
+                "Authorization": f"Bearer {auth_response.json().get('access_token', '')}"
+            }
+            institute_response = requests.get(url=institite_url, headers=header)
+            subscriber_id = institute_response.json().get("subscribers_id")
+            response.set_cookie(key="subscribers_id", value=subscriber_id)
+            Account_url = f"{Subscription_URL}api/AccountValidation?subscriber_id={subscriber_id}"
             Account_response = requests.get(Account_url)
+            print(Account_response.json(), "Account_response")
             data = Account_response.json()
             if len(data) > 0:
                 organization_name = data[0].get("OrganizationName")
@@ -222,6 +228,10 @@ def logout(request):
     response = HttpResponseRedirect(reverse("registration"))
     response.delete_cookie("access_token")
     response.delete_cookie("institute_id")
+    response.delete_cookie("email")
+    response.delete_cookie("organization_name")
+    response.delete_cookie("message")
+    response.delete_cookie("subscribers_id")
     messages.success(request, "You have been successfully logged out.")
     return response
 
@@ -255,17 +265,20 @@ def classes(request):
 
 def user(request):
     user_obj = Data(API_URL)
-    user_url = "/Users/get_users_by_institute/?institute_id=1010"
-    params = {"institute_id": 1010}
+    institite_id = request.COOKIES.get("institute_id")
+    user_url = f"/Users/get_users_by_institute/?institute_id={institite_id}"
+    params = {"institute_id": institite_id}
     access_token = request.COOKIES.get("access_token")
     user_data = user_obj.get_data_by_institute_id(
         url=user_url, params=params, jwt=access_token
     )
     payload = {
         "user_data": user_data, 
-        "jwtToken": access_token,
+        "jwt_token": access_token,
+        "url": API_URL,
         "organization_name": request.COOKIES.get("organization_name"),
         "message": request.COOKIES.get("message"),
+        "institute_id": institite_id,
         }
     return render(request, "user.html", payload)
 
@@ -287,6 +300,24 @@ def assignments(request):
         "institute_id": institute_id,
     }
     return render(request, "assignments.html", payload)
+def assignmentInfo(request,assignment_slug):
+    access_token = request.COOKIES.get("access_token")
+    institute_id = request.COOKIES.get("institute_id")
+    assignmentInfo_obj = Data(API_URL)
+    assignmentInfo_url = f"/Assignments/get_assignment_by_field/assignment_slug/{assignment_slug}/"
+    params = {"institute_id": 1010}
+    assignmentInfo_data = assignmentInfo_obj.get_data_by_institute_id(
+        url=assignmentInfo_url, params=params, jwt=access_token
+    )  
+    payload = {
+        "assignmentInfo_data": assignmentInfo_data,
+        "jwt_token": access_token,
+        "url": API_URL,
+        "organization_name": request.COOKIES.get("organization_name"),
+        "message": request.COOKIES.get("message"),
+        "institute_id": institute_id,
+    }
+    return render(request, "assignmentinfo.html", payload)
 
 def transportation(request):
     access_token = request.COOKIES.get("access_token")
@@ -455,7 +486,7 @@ def staff_info(request, staff_slug):
             "message": request.COOKIES.get("message"),
         }
     return render(request, "staff_info.html", payload)
-# gradeing
+
 def gradings(request):
     institute_id = request.COOKIES.get('institute_id')
     params = {"institute_id": institute_id}
@@ -549,19 +580,102 @@ def examination(request):
     }
     return render(request, "examination.html", payload)
 
-
-def examinationInfo(request):
+def examinationInfo(request,exam_slug):
     class_obj = Data(API_URL)
     institite_id = request.COOKIES.get("institute_id")
     params = {"institute_id": institite_id}
     access_token = request.COOKIES.get("access_token")
-    exam_data = class_obj.get_data_by_institute_id(
-        params=params, jwt=access_token
-    )
+    url = f"/ParentExams/get_parent_exam_by_slug?parent_exam_slug={exam_slug}"
+    exam_data = class_obj.get_data_by_institute_id(url=url,params=params, jwt=access_token)
     payload = {
-        "exam_data": exam_data,
+        "exam_data": exam_data.get("response",{}),
         "jwt_token": access_token,
         "url": API_URL,
         "institute_id": institite_id,
     }
     return render(request, "examinationInfo.html", payload)
+ 
+ 
+# create download of excel file
+ 
+def generate_excel_file_for_result(request, parent_exam_id):
+    access_token = request.COOKIES.get("access_token")
+    exam = ExamInfo(base_url=API_URL, jwt=access_token, exam_id=parent_exam_id)
+    data = asyncio.run(exam.call_functions())
+    df = data["data"]
+    file_name = data["file_name"]
+    excel_file = BytesIO()
+    df.to_excel(excel_file, index=False, engine="xlsxwriter")
+    excel_file.seek(0)
+ 
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = f'attachment; filename={file_name}.xlsx'
+    response.write(excel_file.read())
+ 
+    return response
+
+client = razorpay.Client(auth=("RAZOR_KEY_ID", "RAZOR_KEY_SECRET"))
+import uuid
+def generate_order_id(user_id):
+    unique_id = str(uuid.uuid4()).replace('-', '')[:10]  
+    order_id = f"{user_id}_{unique_id}"
+    return order_id
+
+
+
+client = razorpay.Client(auth=(RAZOR_KEY_ID, RAZOR_KEY_SECRET))
+def create_order(request):
+    institute_id = request.COOKIES.get("institute_id")
+    order_id = generate_order_id(institute_id) 
+    data = {
+        'amount': request.GET.get("amount"),  
+        'currency': 'INR',  
+        'receipt': 'receipt_order_{}'.format(order_id),
+        'payment_capture': 1  
+    }
+    try:
+        order = client.order.create(data=data)
+        return JsonResponse({'order_id': order['id']})
+    except Exception as e:
+        return JsonResponse({'error': str(e)})
+    return JsonResponse({'order_id': order['id']})
+
+def settings(request):
+    institution_obj = Data(API_URL)
+    access_token = request.COOKIES.get("access_token")
+    institute_id = request.COOKIES.get("institute_id")
+    institution_url = f"/Institute/get_institute_by_id/?institute_id={institute_id}"
+    params = {"institute_id": institute_id}
+    institution_data = institution_obj.get_data_by_institute_id(
+        url=institution_url, params=params, jwt=access_token
+    )
+    payload = {
+        "institution_data": institution_data,
+        "subscribers_id": institution_data["subscribers_id"],
+        "url": API_URL,
+        "jwt_token": access_token,
+        "institute_id": institute_id,
+        "organization_name": request.COOKIES.get("organization_name"),
+        "message": request.COOKIES.get("message"),
+        "subscriptionUrl" : Subscription_URL,
+    }
+    return render(request, "settings.html", payload)
+
+def profile(request):
+    email = request.COOKIES.get("email")
+    access_token = request.COOKIES.get("access_token")
+    institute_id = request.COOKIES.get("institute_id")
+    user_url = f"{API_URL}/Users/get_users_by_field/user_email/{email}/"
+    header = {"accept": "application/json", "Authorization": f"Bearer {access_token}"}
+    user_response = requests.get(url=user_url, headers=header)
+    user_data = user_response.json()
+    payload = {
+        "url": API_URL,
+        "jwt_token": access_token,
+        "institute_id": institute_id,
+        "email": email,
+        "organization_name": request.COOKIES.get("organization_name"),
+        "message": request.COOKIES.get("message"),
+        "user_data": user_data,
+    }
+    return render(request, "profile.html",payload)
