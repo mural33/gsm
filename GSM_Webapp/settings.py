@@ -28,11 +28,13 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 # ALLOWED_HOSTS = ['localhost', 'http://127.0.0.1:8002/students/']
-CSRF_TRUSTED_ORIGINS = ['https://gsm-webapp.azurewebsites.net','https://gsmwebtest.azurewebsites.net',"https://gurukul-web-prod-si-as.azurewebsites.net"]
+CSRF_TRUSTED_ORIGINS = [
+    "https://gurukul-web-prod-si-as.azurewebsites.net",
+    "https://gurukulwebtest.azurewebsites.net" # Testing Account
+    ]
 CORS_ALLOWED_ORIGINS = [
-    "https://gsm-webapp.azurewebsites.net", # Example: Allow your frontend development server
-    "https://gsmwebtest.azurewebsites.net",
-    "https://gurukul-web-prod-si-as.azurewebsites.net"
+    "https://gurukul-web-prod-si-as.azurewebsites.net",
+    "https://gurukulwebtest.azurewebsites.net" # Testing Account
 ]
 
 # Application definition
