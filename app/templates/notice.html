@@ -14,13 +14,13 @@
         <div class="row">
             <div class="col text-end">
                 <a href="/app/notice_create" class="btn btn-success btn-label rounded-pill right">
-                    <i class="bi bi-plus-circle label-icon align-middle fs-lg ms-2"></i>Create Notice</a>                
+                    <i class="bi bi-plus-circle label-icon align-middle fs-lg ms-2"></i>Create Notice</a> 
+                    <button type="button" class="btn btn-dark btn-sm rounded-pill" data-bs-toggle="modal" data-bs-target="#noticeFilter"><i
+                        class="bi bi-funnel-fill "></i></button>               
             </div>
         </div>
     </div>
 </div>
-
-<section data-jwt-tokens="{{ jwt_token }}" id="jwt_card"></section>
 <div class="row">
     <div class="col-xl-12">
 <table class="table table-striped table-hover table-sticky table_students" id="noticeTable">
@@ -39,15 +39,15 @@
     <tbody class="tbl__bdy" id="notice_details">
         {% if notices %}
             {% for notice in notices %}
-            <tr class="tr-notice-{{notice.notice_id}}">
+            <tr class="tr-notice-{{notice.notice_id}} notice-row">
                 <td>{{forloop.counter}}</td>
                 <td class="notice_title">{{notice.notice_title}}</td>
-                <td class="notice_date">{{notice.notice_date}}</td>
-                <td class="due_date">{{notice.due_date}}</td>
+                <td class="notice_date" data-notice-date="{{notice.notice_date}}">{{notice.notice_date}}</td>
+                <td class="due_date" data-due-date="{{notice.due_date}}">{{notice.due_date}}</td>
                 <td>    
                     <button type="button" class="btn btn-sm btn-dark rounded-pill openBtn" data-bs-toggle="modal" data-bs-target="#notice-view-modal" data-id="{{notice.notice_id}}" data-title="{{notice.notice_title}}" data-description="{{notice.notice_description}}">View</button>
                 </td>
-                <td class="recipient">{{notice.recipient}}</td>
+                <td class="recipient" data-recipient="{{notice.recipient}}">{{notice.recipient}}</td>
                 <td class="announced_by">{{notice.notice_announced_by}}</td>
                 <td>
                     <a href="{% url 'notice_edit' notice.notice_id %}" data-id="{{notice.notice_id}}" class="btnNoticeEdit btn btn-sm btn-info"><i class="bi bi-pencil-square"></i></a>
@@ -80,6 +80,47 @@
             </div><!-- /.modal-content -->
         </div><!-- /.modal-dialog -->
 </div>
+
+<div class="modal fade" id="noticeFilter" tabindex="-1" aria-labelledby="assignmentModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" id="noticefilter">
+            <div class="modal-header">
+                <h5 class="modal-title" id="noticeModalLabel">Filter Notice</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="row mt-2">
+                        <div class="col-md-4">
+                            <label for="noticeDate" class="form-label">Notice Date</label>
+                            <input type="date" class="form-control" id="noticeDate" name="noticeDate">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="dueDate" class="form-label"> Due Date</label>
+                            <input type="date" class="form-control" id="dueDate" name="dueDate">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="recipient" class="form-label">Recipient</label>
+                            <select id="recipient" class="form-select" name="recipient">
+                                <option value="" selected >Select</option>
+                                <option value="All">All</option>
+                                <option value="All Staffs Only">All Staffs Only</option>
+                                <option value="All Students Only">All Students Only</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a href="javascript:void(0);" class="btn btn-link link-success fw-medium" data-bs-dismiss="modal">
+                    <i class="ri-close-line me-1 align-middle"></i> Close
+                </a>
+                <button type="button" class="btn btn-primary" id="btnFilterNotice" name="btnFilterNotice">Filter</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 <script src="{% static 'app-js/notice.js' %}"></script>
 

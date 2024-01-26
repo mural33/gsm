@@ -55,10 +55,35 @@ $(document).ready(function () {
       }); 
 
       $("#resetBtn").on("click", function() {
-        const generatedPassword = generateRandomPassword(8); 
+        const generatedPassword = generateRandomPassword(10); 
         $("#resetPassword").val(generatedPassword);
-        $("#resetConfirmPassword").val(generatedPassword);
     });  
+    $("#togglePasswordField").on("click",function(){
+        const passwordField = $("#user_password");
+        const showPassword = $("#seePassword");
+
+        if (passwordField.attr("type") === "password") {
+            passwordField.attr("type", "text");
+            showPassword.removeClass("bi-eye").addClass("bi-eye-slash");
+        } else {
+            passwordField.attr("type", "password");
+            showPassword.removeClass("bi-eye-slash").addClass("bi-eye");
+        }
+    });
+    
+    $("#togglePassword").on("click", function() {
+        const passwordInput = $("#resetPassword");
+        const eyeIcon = $("#eyeIcon");
+    
+        if (passwordInput.attr("type") === "password") {
+            passwordInput.attr("type", "text");
+            eyeIcon.removeClass("bi-eye").addClass("bi-eye-slash");
+        } else {
+            passwordInput.attr("type", "password");
+            eyeIcon.removeClass("bi-eye-slash").addClass("bi-eye");
+        }
+    });
+    
 });
 async function validateAddUserForm() {
     const validRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
@@ -191,9 +216,9 @@ async function addUser() {
                     <button type="button" class="btn btn-sm btn-dark btnPasswordReset" data-user-id="${responseData.user_id}">
                     <i class="bi bi-lock-fill"></i></button>
                 <button type="button" class="btn btn-sm btn-info btnEditUser" data-user-id="${responseData.user_id}">
-                    <i class="bi bi-pencil-square"></i>
+                    <i class="bi bi-pencil-square"></i></button>
                 <button type="button" class="btn btn-sm btn-danger btnDeleteUser" data-user-id="${responseData.user_id}">
-                    <i class="bi bi-trash3"></i>
+                    <i class="bi bi-trash3"></i></button>
             </td>
                   </tr>`;               
                     $('#userTable').DataTable().row.add($(newRow)).draw();  
@@ -351,7 +376,6 @@ async function getDataForResetPassword(userId, userName, userEmail) {
     $("#userResetName").val(userName);
     $("#userResetEmail").val(userEmail);
     $("#resetPassword").val("");  
-    $("#resetConfirmPassword").val("");
     $("#user_resetPassword_modal").modal("show");
 }
 function generateRandomPassword(length) {
@@ -363,7 +387,7 @@ function generateRandomPassword(length) {
     }
     return password;
 }
-let resetPwd=['resetPassword','resetConfirmPassword']
+let resetPwd=['resetPassword']
 async function resetPassword(){
     const data = {
         user_id: $("#user_id").val(),

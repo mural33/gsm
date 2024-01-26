@@ -1,5 +1,7 @@
 $(document).ready(async function () {
-    $('#feeTable').DataTable();
+    $('#feeTable').DataTable({
+        "order":[]
+    });
     $(".dataTables_empty").html(`<img src="/assets/img/no_data_found.png" alt="No Image" class="no_data_found">`)
     await loadInstallments();
     await loadClass();
@@ -80,7 +82,10 @@ async function loadClass() {
             responseData.forEach(option => {
                 classDropdown.append(`<option value="${option.class_id}">${option.class_name}</option>`);
             });
-        }
+        },
+        error: (error) => {
+            raiseErrorAlert(error.responseJSON.detail);
+        },
     });
 }
 let feesFields=['fee_total','fee_admission','installment_dropdown','getClassId','installment_display','install_amount']

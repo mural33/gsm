@@ -1,5 +1,16 @@
 $(document).ready(function () {
   hideContent();
+  $("#promotion_type").change(function(){
+    var selectedValue = $(this).val();
+    var numberOfPromotionInput = document.getElementById('number_of_promotion');
+    if (selectedValue === 'course_vise') {
+      numberOfPromotionInput.value = '1';
+      numberOfPromotionInput.readOnly = true;
+    } else {
+      numberOfPromotionInput.value = '';
+      numberOfPromotionInput.readOnly = false;
+    }
+  });
   $("#class_list").change(function () {
     var selectedClassId = $(this).val();
     var selectedClassName = "Select Class";
@@ -47,7 +58,7 @@ $(document).ready(function () {
   $("#btnSave").click(async function (e) {
     $("#btnSave").removeClass("btn-shake")
     e.preventDefault();
-    if (validateClassModuleForm("class") === false) {
+    if (validateClassForm() === false) {
       $("#btnSave").addClass("btn-shake")
       return false;
     } else {
@@ -78,10 +89,20 @@ $(document).ready(function () {
           var responseData = data.response;
           $("#class_id").val(responseData.class_id);
           $("#class_name").val(responseData.class_name);
+          if (responseData.certification_duration !== null) {
+            const [certificationNo, certificationUnit] = responseData.certification_duration.split(' ');
+            $("#certification_no").val(certificationNo);
+            $("#certification_duration").val(certificationUnit);
+          } else {
+            $("#certification_no").val('0');
+            $("#certification_duration").val('');
+          }
+          $("#promotion_type").val(responseData.promotion_type);
+          $("#number_of_promotion").val(responseData.total_number_of_promotion);
         }
       },
       error: (error) => {
-        raiseErrorAlert(error["responseJSON"]["detail"]);
+        raiseErrorAlert(error.responseJSON.detail);
       },
       complete: (e) => {
         removeLoader("class-form-area", "sm");
@@ -125,7 +146,7 @@ $(document).ready(function () {
             raiseSuccessAlert(response.msg);
           },
           error: (error) => {
-            raiseErrorAlert(error["responseJSON"]["detail"]);
+            raiseErrorAlert(error.responseJSON.detail);
           },
           complete: (e) => {
             removeLoader("body", "sm");
@@ -139,7 +160,7 @@ $(document).ready(function () {
   $("#btnSectionSave").click(async function (e) {
     $("#btnSectionSave").removeClass("btn-shake")
     e.preventDefault();
-    if (validateClassModuleForm("section") === false) {
+    if (validateSectionSubjectForm("section") === false) {
       $("#btnSectionSave").addClass("btn-shake")
       return false;
     } else {
@@ -151,7 +172,7 @@ $(document).ready(function () {
   $("#btnSujectSave").click(async function (e) {
     $("#btnSujectSave").removeClass("btn-shake")
     e.preventDefault();
-    if (validateClassModuleForm("subject") === false) {
+    if (validateSectionSubjectForm("subject") === false) {
       $("#btnSujectSave").addClass("btn-shake")
       return false;
     } else {
@@ -201,22 +222,69 @@ async function fetchDropdownValue(selectedClassId, selectedClassName) {
   $("#selected_class_name").text(
     selectedClassName === "Select Class" ? "None" : selectedClassName
   );
+  await loadClassOverview(selectedClassId);
   await loadSectionDetails(selectedClassId);
   await loadSubjectDetails(selectedClassId);
   await loadStudentDetails(selectedClassId);
   await loadGradeDetails(selectedClassId);
   await loadExams(selectedClassId);
   await loadCalendarDetails(selectedClassId);
-  await loadFeeDetails(selectedClassId)
+  await loadFeeDetails(selectedClassId);
+}
+function validateClassForm() {
+  var isValid = true;
+  const fields = ["class_name", "certification_no", "certification_duration", "promotion_type", "number_of_promotion"];
+
+  for (const field of fields) {
+    const element = $(`#${field}`);
+    if (element.length === 0) {
+      continue;
+    }
+    const value = element.val().trim();
+
+    if (field === 'class_name' && value.length < 3) {
+      element.focus().addClass("is-invalid");
+      isValid = false;
+      raiseErrorAlert(`Class name must be at least 3 characters long`);
+    } else if (value === "") {
+      element.focus().addClass("is-invalid");
+      isValid = false;
+    } else if (field === 'certification_no' && isNaN(value)) {
+      element.focus().addClass("is-invalid");
+      isValid = false;
+      raiseErrorAlert(`Certification number must be a valid number`);
+    } else if (field === 'number_of_promotion' && isNaN(value)) {
+      element.focus().addClass("is-invalid");
+      isValid = false;
+      raiseErrorAlert(`Total number of promotion must be a valid number`);
+    } else {
+      element.focus().removeClass("is-invalid");
+    }
+  }
+  return isValid;
 }
 
+function resetClassFormFields() {
+  const fields = ["class_name", "certification_no", "certification_duration","promotion_type","number_of_promotion"]
+  for (const field of fields) {
+    const element = $(`#${field}`);
+    if (element.length > 0) {
+      element.val("");
+      element.removeClass("is-invalid");
+    }
+  }
+}
 // _______ADD/EDIT Class_______
 async function addClass() {
   let isUpdate = $("#class_id").val() !== "";
+  const certificationDuration = $("#certification_no").val() + " " + $("#certification_duration").val();
   const data = {
     institute_id: instituteId,
     class_id: $("#class_id").val(),
     class_name: $("#class_name").val(),
+    certification_duration : certificationDuration,
+    promotion_type : $("#promotion_type").val(),
+    total_number_of_promotion : $("#number_of_promotion").val(),
     is_deleted: false,
   };
   const url = isUpdate ? apiUrl + "/Classes/" + data.class_id : apiUrl + "/Classes/create_class/";
@@ -245,6 +313,7 @@ async function addClass() {
           );
           selectedOption.text(responseData.class_name);
           $("#selected_class_name").text(responseData.class_name);
+          loadClassOverview(responseData.class_id);
           $("#class_id").val("");
           raiseSuccessAlert(data.msg);
         } else {
@@ -255,11 +324,11 @@ async function addClass() {
          await addSectionInClass(responseData.class_id)
           raiseSuccessAlert(data.msg);
         }
-        resetFormFields("class");
+        resetClassFormFields();
       }
     },
     error: (error) => {
-      raiseErrorAlert(error["responseJSON"]["detail"]);
+      raiseErrorAlert(error.responseJSON.detail);
     },
     complete: (e) => {
       removeLoader("class-form-area", "sm");
@@ -294,10 +363,11 @@ async function addSectionInClass(classId){
   });
 }
 
-function validateClassModuleForm(formType) {
+function validateSectionSubjectForm(formType) {
   function capitalizeFirstLetter(str) {
     return str.charAt(0).toUpperCase() + str.slice(1);
   }
+
   var isValid = true;
   const fields = [`${formType}_name`];
 
@@ -307,23 +377,25 @@ function validateClassModuleForm(formType) {
       continue;
     }
     const value = element.val().trim();
+
     if (value === "") {
       element.focus().addClass("is-invalid");
       isValid = false;
-    } else if (value.length < 3) {
+    } else if (field === 'certification_no' && isNaN(value)) {
       element.focus().addClass("is-invalid");
       isValid = false;
-      raiseErrorAlert(
-        `${capitalizeFirstLetter(
-          formType
-        )} name must be at least 3 characters long`
-      );
-    }else{
+      raiseErrorAlert(`${capitalizeFirstLetter(formType)} certification number must be a valid number`);
+    } else if (field === 'number_of_promotion' && isNaN(value)) {
+      element.focus().addClass("is-invalid");
+      isValid = false;
+      raiseErrorAlert(`${capitalizeFirstLetter(formType)} total number of promotion must be a valid number`);
+    } else {
       element.focus().removeClass("is-invalid");
     }
   }
   return isValid;
 }
+
 function resetFormFields(formType) {
   const fields = [`${formType}_name`];
   for (const field of fields) {
@@ -333,6 +405,63 @@ function resetFormFields(formType) {
       element.removeClass("is-invalid");
     }
   }
+}
+// _______GET ClassDetails_______
+async function loadClassOverview(selectedClassId) {
+  var loadClassUrl = apiUrl + "/Classes/class_id/?class_id=" + selectedClassId;
+
+  const classData = await $.ajax({
+    type: "GET",
+    url: loadClassUrl,
+    mode: "cors",
+    crossDomain: true,
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${jwtToken}`,
+    },
+    beforeSend: (e) => {
+      showLoader("tabOverview", "sm");
+    },
+    success: async function (classData) {
+      var overviewContainer = $("#tabOverview");
+
+      if (classData.status === "200" && classData.response) {
+        const responseData = classData.response;
+        const promotionTypeMappings = {
+          'year_vise': 'Years Wise',
+          'course_vise': 'Course Wise',
+          'semister_vise': 'Semester Wise',
+        };
+        const promotionTypeHeadings = {
+          'year_vise': 'Years',
+          'course_vise': 'Course',
+          'semister_vise': 'Semester',
+        };
+        overviewContainer.find('.certification-duration').text(responseData.certification_duration);
+
+        const mappedPromotionType = promotionTypeMappings[responseData.promotion_type] || responseData.promotion_type;
+        overviewContainer.find('.promotion-type').text(mappedPromotionType);
+
+        const totalPromotionHeading = promotionTypeHeadings[responseData.promotion_type]
+          ? `Total ${promotionTypeHeadings[responseData.promotion_type]}`
+          : 'Total No. of Promotion';
+
+        overviewContainer.find('.total-promotion-heading').text(totalPromotionHeading);
+
+        overviewContainer.find('.total-promotion').text(responseData.total_number_of_promotion);
+
+        overviewContainer.find('.no-data-found').remove();
+      } else {
+        overviewContainer.empty().html('<img src="/assets/img/no_data_found.png" class="no-data-found">');
+      }
+    },
+    error: (error) => {
+      raiseErrorAlert(error.responseJSON.detail);
+    },
+    complete: (e) => {
+      removeLoader("tabOverview", "sm");
+    },
+  });
 }
 // _______GET Section_______
 async function loadSectionDetails(selectedClassId) {
@@ -379,7 +508,7 @@ async function loadSectionDetails(selectedClassId) {
       }
     },
     error: (error) => {
-      raiseErrorAlert(error);
+      raiseErrorAlert(error.responseJSON.detail);
     },
     complete: (e) => {
       removeLoader("tabSection", "sm");
@@ -426,7 +555,7 @@ async function addSection() {
       }
     },
     error: (error) => {
-      raiseErrorAlert(error["responseJSON"]["detail"]);
+      raiseErrorAlert(error.responseJSON.detail);
     },
     complete: (e) => {
       removeLoader("section-form-area", "sm");
@@ -460,7 +589,7 @@ async function editSection(element) {
       }
     },
     error: (error) => {
-      raiseErrorAlert(error["responseJSON"]["detail"]);
+      raiseErrorAlert(error.responseJSON.detail);
     },
     complete: (e) => {
       removeLoader("section-form-area", "sm");
@@ -502,7 +631,7 @@ async function deleteSection(element) {
           await loadSectionDetails(class_Id);
         },
         error: (error) => {
-          raiseErrorAlert(error["responseJSON"]["detail"]);
+          raiseErrorAlert(error.responseJSON.detail);
         },
         complete: (e) => {
           removeLoader("body", "sm");
@@ -561,7 +690,7 @@ async function loadSubjectDetails(selectedClassId) {
       }
     },
     error: (error) => {
-      raiseErrorAlert(error);
+      raiseErrorAlert(error.responseJSON.detail);
     },
     complete: (e) => {
       removeLoader("tabSubject", "sm");
@@ -612,7 +741,7 @@ async function addSubject() {
       }
     },
     error: (error) => {
-      raiseErrorAlert(error["responseJSON"]["detail"]);
+      raiseErrorAlert(error.responseJSON.detail);
     },
     complete: (e) => {
       removeLoader("subject-form-area", "sm");
@@ -646,7 +775,7 @@ async function editSubject(element) {
       }
     },
     error: (error) => {
-      raiseErrorAlert(error["responseJSON"]["detail"]);
+      raiseErrorAlert(error.responseJSON.detail);
     },
     complete: (e) => {
       removeLoader("subject-form-area", "sm");
@@ -688,7 +817,7 @@ async function deleteSubject(element) {
           await loadSubjectDetails(classsId);
         },
         error: (error) => {
-          raiseErrorAlert(error["responseJSON"]["detail"]);
+          raiseErrorAlert(error.responseJSON.detail);
         },
         complete: (e) => {
           removeLoader("body", "sm");
@@ -713,7 +842,6 @@ async function loadStudentDetails(selectedClassId) {
       showLoader("tabStudent", "sm");
     },
     success: async function (studentData) {
-
       var studentDetailsContainer = $("#tabStudent");
       var studentTableBody = studentDetailsContainer.find("#classStudentTable");
       studentTableBody.empty();
@@ -723,13 +851,22 @@ async function loadStudentDetails(selectedClassId) {
           '<img src="/assets/img/no_data_found.png" class="no_data_found">'
         );
       } else {
+        var promotionType = studentData[0].classes.promotion_type;
         var studentTableHtml = '<table class="table table-striped table-hover table-sticky table_students" id="classStudent">' +
           '<thead class="thead-dark">' +
           '<tr>' +
-          '<th>Photo</th>' +
+          '<th>DP</th>' +
           '<th>Student Name</th>' +
           '<th>Roll Number</th>' +
-          '<th>Class </th>' +
+          '<th>Class </th>';
+        if (promotionType === 'year_vise') {
+          studentTableHtml += '<th>Years</th>';
+        } else if (promotionType === 'course_vise') {
+          studentTableHtml += '<th>Course</th>';
+        } else if (promotionType === 'semister_vise') {
+          studentTableHtml += '<th>Semester</th>';
+        }
+        studentTableHtml +=
           '<th>Section</th>' +
           '<th>Gender</th>' +
           '<th>Blood Group</th>' +
@@ -739,14 +876,23 @@ async function loadStudentDetails(selectedClassId) {
 
         for (var i = 0; i < studentData.length; i++) {
           var student = studentData[i];
+          var additionalInfo = '';
+          if (promotionType === 'year_vise') {
+            additionalInfo = student.current_position + ' Years';
+          } else if (promotionType === 'course_vise') {
+            additionalInfo = student.current_position + ' Course';
+          } else if (promotionType === 'semister_vise') {
+            additionalInfo = student.current_position + ' Semester';
+          }
           var studentHtml =
             '<tr class="tr-student-' + student.student_id + '">' +
             "<td>" + "<img src=" + student.photo + " class='studetImage'>" + "</td>" +
-            '<td class="student_name">' + 
-           "<a href='/student/" + student.slug + "'>" + student.student_name + "</a>" +
+            '<td class="student_name">' +
+            "<a href='/student/" + student.slug + "'>" + student.student_name + "</a>" +
             "</td>" +
             '<td class="roll_number">' + student.roll_number + "</td>" +
             '<td class="class_id">' + student.classes.class_name + "</td>" +
+            '<td class="additional_info">' + additionalInfo + "</td>" +
             '<td class="section_id">' + student.sections.section_name + "</td>" +
             '<td class="gender">' + student.gender + "</td>" +
             '<td class="blood_group">' + student.blood_group + "</td>" +
@@ -759,7 +905,7 @@ async function loadStudentDetails(selectedClassId) {
       }
     },
     error: (error) => {
-      raiseErrorAlert(error);
+      raiseErrorAlert(error.responseJSON.detail);
     },
     complete: (e) => {
       removeLoader("tabStudent", "sm");
@@ -811,7 +957,7 @@ async function loadGradeDetails(selectedClassId) {
       }
     },
     error: (error) => {
-      raiseErrorAlert(error);
+      raiseErrorAlert(error.responseJSON.detail);
     },
     complete: (e) => {
       removeLoader("tabGrading", "sm");
@@ -862,7 +1008,7 @@ async function addGrade() {
       }
     },
     error: (error) => {
-      raiseErrorAlert(error["responseJSON"]["detail"]);
+      raiseErrorAlert(error.responseJSON.detail);
     },
     complete: (e) => {
       removeLoader("grade-form-area", "sm");
@@ -939,7 +1085,7 @@ async function editGrading(element) {
       }
     },
     error: (error) => {
-      raiseErrorAlert(error["responseJSON"]["detail"]);
+      raiseErrorAlert(error.responseJSON.detail);
     },
     complete: (e) => {
       removeLoader("grade-form-area", "sm");
@@ -981,7 +1127,7 @@ async function deleteGrading(element) {
           await loadGradeDetails(classsesId);
         },
         error: (error) => {
-          raiseErrorAlert(error["responseJSON"]["detail"]);
+          raiseErrorAlert(error.responseJSON.detail);
         },
         complete: (e) => {
           removeLoader("body", "sm");
@@ -1068,7 +1214,7 @@ async function loadCalendarDetails(selectedClassId) {
       }
     }
   } catch (error) {
-    raiseErrorAlert(error);
+    raiseErrorAlert(error.responseJSON.detail);
   } finally {
     removeLoader("tabCalender", "sm");
   }
@@ -1213,7 +1359,7 @@ async function loadExams(selectedClassId) {
       }
     },
     error: (error) => {
-      raiseErrorAlert(error);
+      raiseErrorAlert(error.responseJSON.detail);
     },
     complete: (e) => {
       removeLoader("tabExam", "sm");
@@ -1340,7 +1486,7 @@ async function addExam() {
       }
     },
     error: (error) => {
-      raiseErrorAlert(error["responseJSON"]["detail"]);
+      raiseErrorAlert(error.responseJSON.detail);
     },
     complete: (e) => {
       removeLoader("exam-form-area", "sm");
@@ -1475,7 +1621,7 @@ async function editExam(element) {
       });
     },
     error: (error) => {
-      raiseErrorAlert(error["responseJSON"]["detail"]);
+      raiseErrorAlert(error.responseJSON.detail);
     },
   });
 }
@@ -1517,7 +1663,7 @@ async function deleteExam(element) {
                   raiseSuccessAlert(data.msg);
               },
               error: (error) => {
-                  raiseErrorAlert(error["responseJSON"]["detail"]);
+                  raiseErrorAlert(error.responseJSON.detail);
               },
               complete: (e) => {
                   removeLoader("body", "sm");
@@ -1599,7 +1745,7 @@ async function loadInstallment() {
       });
     },
     error: (error) => {
-      raiseErrorAlert(error);
+      raiseErrorAlert(error.responseJSON.detail);
     },
     complete: (e) => {
       removeLoader("tabFees", "sm");
@@ -1628,6 +1774,7 @@ async function loadFeeDetails(selectedClassId) {
       var btnFeeChange = $("#btnFeeChange");
       var btnUpdateFee = $("#btnUpdateFee");
       var installmentNo = $("#installmentNo");
+      var tableConatiner = $(".table-container");
 
       if (feeData.length === 0) {
         feeInfoContainer.html('<tr><td colspan="3"><img src="/assets/img/no_data_found.png" class="no_data_found"></td></tr>');
@@ -1640,7 +1787,6 @@ async function loadFeeDetails(selectedClassId) {
         btnFeeChange.hide();
         btnUpdateFee.hide();
         installmentNo.hide();
-        singleSelectDropdown.show();
         multiSelectDropdown.hide();
         text.hide();
       } else {
@@ -1684,6 +1830,7 @@ async function loadFeeDetails(selectedClassId) {
           text.show();
           btnFeeChange.hide();
           btnUpdateFee.show();
+          tableConatiner.hide();
         });
         
         btnUpdateFee.off().on("click",async function (e) {
@@ -1703,11 +1850,12 @@ async function loadFeeDetails(selectedClassId) {
           text.hide();
           btnFeeChange.show();
           btnUpdateFee.hide();
+          tableConatiner.show();
         });
       }
     },
     error: (error) => {
-      raiseErrorAlert(error);
+      raiseErrorAlert(error.responseJSON.detail);
     },
     complete: (e) => {
       removeLoader("tabFees", "sm");

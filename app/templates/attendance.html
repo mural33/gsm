@@ -1,0 +1,409 @@
+{% extends '_layout.html' %}
+{% block title %} Attendance {% endblock %}
+{% load static %}
+{% block content %}
+
+<link href="{% static 'app-css/attendance.css' %}" rel="stylesheet">
+<script src="{% static 'app-js/attendance.js' %}"></script>
+<!-- Include Chart.js from CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+<div class="row" id="heading-row">
+    <div class="col-sm-12 col-md-9 col-xl-11 d-flex align-items-center" style="padding: 1rem">
+        <div class="mx-2">
+            <h5>Attendance</h5>
+            <quote>Teachers light the way, but for the flame of knowledge to burn bright, the attendance of eager minds
+                is the spark that ignites brilliance in every classroom.
+            </quote>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="attedanceModal" tabindex="-1" aria-labelledby="attendanceModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" id="attendance">
+            <div class="modal-header">
+                <h5 class="modal-title" id="attedanceModalLabel"> Student Attendance</h5>
+                <button type="button" class="btn-close btnCloseModel" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="d-flex mt-3">
+                    <div class="flex-shrink-0">
+                        <i class="ri-checkbox-circle-fill text-success"></i>
+                    </div>
+                    <div class="flex-grow-1 ms-2">
+                        <p class="text-muted mb-0">Attendance matters, every day, every class!</p>
+                    </div>
+                </div>
+                <!-- <input type="hidden" id="id" name="id"> -->
+                <div class="col-md-12">
+                    <label class="form-label" for="attendanceDate">Date</label>
+                    <input type="date" class="form-control" id="attendance_dates" name="attendance_dates">
+                </div>
+                <div class="row mt-2">
+                    <div class="col-md-6">
+                        <label class="form-label" for="class_id">Class</label>
+                        <select id="class_id" class="form-select" name="class_id">
+                            <option selected value="">Select Class</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="semister_id" class="form-label">Semister</label>
+                        <select id="semister_id" class="form-select" name="semister_id">
+                            <option value="" selected>Select Semister</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="mt-2"></div>
+                <table class="table" id="student_table">
+                    <thead>
+                        <!-- Table headers will be added dynamically using JavaScript -->
+                    </thead>
+                    <tbody id="student_body">
+                        <!-- Student data rows will be added dynamically using JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <a href="javascript:void(0);" class="btn btn-link link-success fw-medium btnCloseModel" data-bs-dismiss="modal">
+                    <i class="ri-close-line me-1 align-middle"></i> Close
+                </a>
+                <button type="button" class="btn btn-primary" id="btnSave" name="btnSave">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="col-xl-12 col-lg-12 col-md-12">
+    <div class="card">
+        <div class="card-body">
+            <div>
+                <!-- tablinks -->
+                <ul class="nav nav-pills arrow-navtabs nav-success bg-light mb-3" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" data-bs-toggle="tab" href="#studentAttendance" role="tab">
+                            <span class="d-block d-sm-none"><i class="ti ti-home"></i></span>
+                            <span class="d-none d-sm-block">Student Attendance</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" href="#staffAttedance" role="tab">
+                            <span class="d-block d-sm-none"><i class="ti ti-user-circle"></i></span>
+                            <span class="d-none d-sm-block">Staff Attendance</span>
+                        </a>
+                    </li>
+                </ul>
+                <div class="tab-content text-muted">
+                    <div class="tab-pane active" id="studentAttendance" role="tabpanel">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h5 class="my-2">Student Attendance</h5>
+                                <div class="row">
+                                    <div class="col text-end">
+                                        <button type="button"
+                                            class="btn btn-success btn-label rounded-pill right" id="btnStudentOpenForm"
+                                            data-bs-toggle="modal" data-bs-target="#attedanceModal">
+                                            <i
+                                                class="bi bi-plus-circle label-icon align-middle fs-lg ms-2"></i>Take
+                                            Attendance
+                                        </button>
+                                        <button type="button" class="btn btn-dark btn-sm rounded-pill" data-bs-toggle="modal" data-bs-target="#studentAttendanceFilter"><i
+                                            class="bi bi-funnel-fill "></i></button>
+                                    </div>
+                                </div>
+
+                                <!-- Grouping the pie chart in one div -->
+                                <div class="container">
+                                    <div class="row">
+                                        <!-- Pie Chart Section -->
+                                        <div class="col-md-12">
+                                            <div class="d-flex" id="studentpiechat">
+                                                <canvas id="studentAttendancePieChat" class="mb-4"></canvas>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <table class="table mt-2" id="studentAttendanceTab">
+                                    <thead>
+                                        <th>Date</th>
+                                        <th>Student Name</th>
+                                        <th>Roll No</th>
+                                        <th>Class</th>
+                                        <th>Status</th>
+                                        <th>Action</th>
+                                    </thead>
+                                    <tbody class="studentAttendance">
+                                        <!-- Rows will be dynamically added here -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="staffAttedance" role="tabpanel">
+                        <h5> Staff Attendance</h5>
+                        <div class="row">
+                            <div class="col text-end">
+                                <button type="button" id="btnOpenStaffForm" class="btn btn-success btn-label rounded-pill right"
+                                    >
+                                    <i class="bi bi-plus-circle label-icon align-middle fs-lg ms-2"></i>Take
+                                    Attendance
+                                </button>
+                                <button type="button" class="btn btn-dark btn-sm rounded-pill" data-bs-toggle="modal" data-bs-target="#staffAttendanceFilter"><i
+                                    class="bi bi-funnel-fill "></i></button>
+                                <div class="input-group">
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" href="#"><i class="bi bi-upload me-2"></i>
+                                                Import Bulk</a></li>
+                                        <li><a class="dropdown-item" href="#"><i
+                                                    class="bi bi-download me-2"></i> Export CSV</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Grouping the pie chart in one div -->
+                        <div class="container">
+                            <div class="row">
+                                <!-- Pie Chart Section -->
+                                <div class="col-md-12 justify-content-center">
+                                    <div class="d-flex" id="staffpiechat">
+                                        <canvas id="staffAttendancePieChart" class="mb-4"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <table class="table" id="staffAttendanceTab">
+                            <thead>
+                                <th>Date</th>
+                                <th>Staff Name</th>
+                                <th>staff Id</th>
+                                <th>status</th>
+                                <th>Action</th>
+                            </thead>
+                            <tbody class="staffAttendance">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="editstudentModalForm" tabindex="-1" role="dialog" aria-labelledby="editModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editModalLabel">Edit Attendance</h5>
+                <button type="button" class="btn-close btnCloseModel" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="id" name="id">
+                <div class="col-md-12">
+                    <label class="form-label" for="attendance_date">Date</label>
+                    <input type="date" class="form-control" id="attendance_date" name="attendance_date" readonly>
+                </div>
+                <div class="col-md-12">
+                    <label for="form_class_id" class="form-label">Class</label>
+                    <input type="text" class="form-control" id="form_class_id" name="form_class_id" readonly>
+                </div>
+                <div class="col-md-12">
+                    <label for="student_id" class="form-label">Student Name</label>
+                    <input type="text" class="form-control" id="student_id" name="student_id" readonly>
+                </div>
+                <div class="col-md-12">
+                    <label for="roll_number" class="form-label">Roll Number</label>
+                    <input type="text" class="form-control" id="roll_number" name="roll_number" readonly>
+                </div>
+                <div>
+                    <label for="attendance_status">Attendance Status</label>
+                    <div class="form-check">
+                        <input type="radio" name="attendance_status" id="present"
+                            value="Present">
+                        <label class="form-check-label" for="present" style="color: green;">
+                            Present
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input type="radio" name="attendance_status" id="absent"
+                            value="Absent" >
+                        <label class="form-check-label" for="absent" style="color: red;">
+                            Absent
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a href="javascript:void(0);" class="btn btn-link link-success fw-medium btnCloseModel" data-bs-dismiss="modal">
+                    <i class="ri-close-line me-1 align-middle"></i> Close
+                </a>
+                <button type="button" class="btn btn-primary" id="updateBtnsave" name="updateBtnsave">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="studentAttendanceFilter" tabindex="-1" aria-labelledby="assignmentModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" id="studentfilter">
+            <div class="modal-header">
+                <h5 class="modal-title" id="attendanceModalLabel">Filter Attendance</h5>
+                <button type="button" class="btn-close btnCloseModel" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="d-flex mt-2 row">
+                    <div class="col-md-4 form-content">
+                        <label for="startDate" class="form-label">Start Date</label>
+                        <input type="date" class="form-control" id="startDate" name="startDate">
+                    </div>
+                    <div class="col-md-4 form-content">
+                        <label for="enddate" class="form-label">End Date</label>
+                        <input type="date" class="form-control" id="endDate" name="endDate">
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-md-6">
+                            <label class="form-label" for="classdrop">Class</label>
+                            <select id="classdrop" class="form-select" name="classdrop">
+                                <option selected value="">Select Class</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="filter_semister_id" class="form-label">Semister</label>
+                            <select id="filter_semister_id" class="form-select" name="filter_semister_id">
+                                <option value="" selected>Select Semister</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a href="javascript:void(0);" class="btn btn-link link-success fw-medium btnCloseModel" data-bs-dismiss="modal">
+                    <i class="ri-close-line me-1 align-middle"></i> Close
+                </a>
+                <button type="button" class="btn btn-primary" id="filterButton" name="filterButton">Filter</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="attedenceStaffModal" tabindex="-1" aria-labelledby="attendanceModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" id="assignment">
+            <div class="modal-header">
+                <h5 class="modal-title" id="attedanceModalLabel"> Staff Attendance</h5>
+                <button type="button" class="btn-close btnCloseModel" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="d-flex mt-3">
+                    <div class="flex-shrink-0">
+                        <i class="ri-checkbox-circle-fill text-success"></i>
+                    </div>
+                    <div class="flex-grow-1 ms-2">
+                        <p class="text-muted mb-0">Team success relies on your timely presence</p>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <label class="form-label" for="attendanceDate">Date<span style="color: red;">*</span></label>
+                    <input type="date" class="form-control" id="attendanceDate">
+                </div>
+                <div class="mt-2"></div>
+                <table class="table" id="staff_table">
+                    <thead>
+                        <th>Employee Number</th>
+                        <th>Name</th>
+                        <th>Status</th>
+                    </thead>
+                    <tbody id="staff_body">
+                        <!-- Student data rows will be added dynamically using JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <a href="javascript:void(0);" class="btn btn-link link-success fw-medium btnCloseModel" data-bs-dismiss="modal">
+                    <i class="ri-close-line me-1 align-middle"></i> Close
+                </a>
+                <button type="button" class="btn btn-primary" id="staffBtnSave" name="staffBtnSave">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="staffAttendanceFilter" tabindex="-1" aria-labelledby="assignmentModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" id="studentfilter">
+            <div class="modal-header">
+                <h5 class="modal-title" id="attendanceModalLabel">Filter Attendance</h5>
+                <button type="button" class="btn-close btnCloseModel" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="d-flex mt-2 row">
+                    <div class="col-md-4 form-content">
+                        <label for="start_Date" class="form-label">Start Date</label>
+                        <input type="date" class="form-control" id="start_Date" name="start_Date">
+                    </div>
+                    <div class="col-md-4 form-content">
+                        <label for="end_date" class="form-label">End Date</label>
+                        <input type="date" class="form-control" id="end_Date" name="end_Date">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a href="javascript:void(0);" class="btn btn-link link-success fw-medium btnCloseModel" data-bs-dismiss="modal">
+                    <i class="ri-close-line me-1 align-middle"></i> Close
+                </a>
+                <button type="button" class="btn btn-primary" id="staffFillterButton" name="staffFillterButton">Filter</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="editstaffModalForm" tabindex="-1" role="dialog" aria-labelledby="editModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editModalLabel">Edit staff Attendance</h5>
+                <button type="button" class="btn-close btnCloseModel" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="staff_id" name="staff_id">
+                <div class="col-md-12">
+                    <label class="form-label" for="attendance_date">Date</label>
+                    <input type="date" class="form-control" id="staff_attendance_date" name="staff_attendance_date" readonly>
+                </div>
+                <div class="col-md-12">
+                    <label for="staffs_id" class="form-label">Staff Name</label>
+                    <input type="text" class="form-control" id="staffs_id" name="staffs_id" readonly>
+                </div>
+                <div class="col-md-12">
+                    <label for="employee_id" class="form-label">EmPloyee Id</label>
+                    <input type="text" class="form-control" id="employee_id" name="employee_id" readonly>
+                </div>
+                <div>
+                    <label for="attendance_status">Attendance Status</label>
+                    <div class="form-check">
+                        <input type="radio" name="staff_attendance_status" id="staff_present" value="Present">
+                        <label class="form-check-label" for="present" style="color: green;">
+                            Present
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input type="radio" name="staff_attendance_status" id="staff_absent" value="Absent">
+                        <label class="form-check-label" for="absent" style="color: red;">
+                            Absent
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a href="javascript:void(0);" class="btn btn-link link-success fw-medium btnCloseModel" data-bs-dismiss="modal">
+                    <i class="ri-close-line me-1 align-middle"></i> Close
+                </a>
+                <button type="button" class="btn btn-primary" id="updateStaffBtnsave" name="updateStaffBtnsave">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}

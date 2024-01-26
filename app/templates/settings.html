@@ -45,45 +45,6 @@
                         <span class="d-none d-sm-block">Subscription</span>
                     </a>
                     </li>
-                    <li class="nav-item col-md-2">
-                    <a
-                        class="nav-link"
-                        data-bs-toggle="tab"
-                        href="#education"
-                        role="tab"
-                    >
-                        <span class="d-block d-sm-none"
-                        ><i class="ti ti-mail"></i
-                        ></span>
-                        <span class="d-none d-sm-block">Education years</span>
-                    </a>
-                    </li>
-                    <li class="nav-item col-md-2">
-                    <a
-                        class="nav-link"
-                        data-bs-toggle="tab"
-                        href="#alerts"
-                        role="tab"
-                    >
-                        <span class="d-block d-sm-none"
-                        ><i class="ti ti-mail"></i
-                        ></span>
-                        <span class="d-none d-sm-block">Alerts</span>
-                    </a>
-                    </li>
-                    <li class="nav-item col-md-2">
-                    <a
-                        class="nav-link"
-                        data-bs-toggle="tab"
-                        href="#branding"
-                        role="tab"
-                    >
-                        <span class="d-block d-sm-none"
-                        ><i class="ti ti-mail"></i
-                        ></span>
-                        <span class="d-none d-sm-block">Branding</span>
-                    </a>
-                    </li>
                 </ul>
                 <!-- Tab panes -->
                 <div class="tab-content text-muted">
@@ -108,6 +69,12 @@
                             <div class="col-md-8 mb-2">
                               <div class="form-label">Organization Name</div>
                                     <input type="text" class="form-control fs-14"  id="institute_name" name="institute_name" value="{{ institution_data.institute_name }}">
+                            </div>
+
+                            <div class="col-md-8 mb-2">
+                                <label for="institute_logo" class="form-label">Organization Logo</label>
+                                <input type="file" accept=".pdf,.jpg,.jpeg" placeholder="Seletct File"
+                                    class="form-control" id="institute_logo" name="institute_logo">
                             </div>
                             
                             <div class="col-md-8 mb-2">
@@ -187,10 +154,9 @@
                     
                     <div class="d-flex align-items-center justify-content-center">
                        <h5 class="mb-3 mt-4 fs-6 text-center">Current Subscription Plan: <span class="current-plan-text text-success">${planName} Package</span></h5>
-                        <button class="btn btn-success btn-label rounded-pill right mt-2 ms-4" data-bs-toggle="modal" data-bs-target="#subscriptionModal">
-                        Upgrade <i class="bi bi-arrow-up-circle align-middle fs-lg ms-2"></i>
-                    </button>
-
+                       <button type="button" class="btn btn-success btn-label rounded-pill right mt-2" data-bs-toggle="modal"
+                       data-bs-target="#subscriptionModal" id="upgradeBtn">
+                       <i class="bi bi-arrow-up-circle label-icon align-middle fs-lg ms-2"></i>Upgrade</button>
 
 
                     </div>
@@ -215,28 +181,7 @@
                         </div><br />
                     </div>
 
-                <div class="tab-pane" id="education" role="tabpanel">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <h6>Education Years</h6>
-                        </div>
                     </div>
-                </div>
-            <div class="tab-pane" id="alerts" role="tabpanel">
-                <div class="row">
-                  <div class="col-md-6">
-                      <h6>Alerts</h6>
-                  </div>
-                </div>
-            </div>
-            <div class="tab-pane" id="branding" role="tabpanel">
-              <div class="row">
-                  <div class="col-md-9">
-                      <h6>Branding</h6>
-                  </div>
-              </div>
-              </div>
-          </div>
         </div>
         <!-- end card-body -->
       </div>

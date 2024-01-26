@@ -11,6 +11,9 @@ $(document).ready(() => {
     bindGridButtonEvents();
 });
 
+let dataTable = $('#transportTable').DataTable();
+$(".dataTables_empty").html(`<img src="/assets/img/no_data_found.png" alt="No Image" class="no_data_found">`)
+
 function bindGridButtonEvents() {
     $(".btnEdit").off("click");
     $(".btnEdit").each(function () {
@@ -102,17 +105,14 @@ function addTransport() {
                                 <button class="btn btn-sm btn-dark rounded-pill" data-bs-toggle="modal"  data-bs-target="#staffModal" onclick="showStaffDetails(this)" data-trans-id="${responseData.transport_id}">View</button>
                                 </td>
                             <td>
-                            <button type="button" class="btn  btn-sm btn-info btnEdit" id="btnEdit" data-id="${responseData.transport_id}">
-                                <i class="bi bi-pencil-square"></i></button>
-                            <button type="button" class="btn btn-sm btn-danger btndelete" id="deleteButton" data-id="${responseData.transport_id}">
-                                <i class="bi bi-trash3"></i></button>
+                            <button type="button" data-id="${responseData.transport_id}" class="btn  btn-sm btn-info btnEdit" id="btnEdit"><i class="bi bi-pencil-square"></i></button>
+                            <button type="button" class="btn btn-sm btn-danger btndelete" id="deleteButton" data-id="${responseData.transport_id}"><i class="bi bi-trash3"></i></button>
                         </td>
                         </tr>
                     `;
-                    $("#transport_details").append(newRow)
                     bindGridButtonEvents();
-                    $('#no_data_found').hide();
-                    raiseSuccessAlert("Transport Added Successfully");
+                    dataTable.row.add($(newRow)).draw();
+                    raiseSuccessAlert(data.msg);
                 }
             }
         },
@@ -127,48 +127,47 @@ function addTransport() {
 }
 
 async function deleteTransport(recordId, jwtToken) {
+    const deletetransRow = dataTable.row(`.tr-transport-${recordId}`);
     const deleteEndpoint = `/Transports/delete_transport/?transport_id=${recordId}`;
     const deleteUrl = `${apiUrl}${deleteEndpoint}`;
-    try {
-        const confirmation = await Swal.fire({
-            title: 'Are you sure, you want to delete this Record?',
-            text: 'This can\'t be reverted!',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, delete it!'
-        });
-        if (confirmation.isConfirmed) {
-            const response = await $.ajax({
-                type: "DELETE",
-                url: deleteUrl,
-                headers: {
-                    "Authorization": `Bearer ${jwtToken}`,
-                    "Content-Type": "application/json",
-                },
-                contentType: "application/json",
-                dataType: "json",
-                beforeSend: (e) => {
-                    showLoader("body", "lg");
-                },
-            });
-            const deleteRow = document.querySelector(`.tr-transport-${recordId}`);
-            if (deleteRow) {
-                deleteRow.remove();
+    const confirmation = await Swal.fire({
+        title: 'Are you sure, you want to delete this Record?',
+        text: 'This can\'t be reverted!',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!'
+    });
+    if (confirmation.isConfirmed) {
+        const response = await $.ajax({
+            type: "DELETE",
+            url: deleteUrl,
+            headers: {
+                "Authorization": `Bearer ${jwtToken}`,
+                "Content-Type": "application/json",
+            },
+            contentType: "application/json",
+            dataType: "json",
+            beforeSend: (e) => {
+                showLoader("body", "lg");
+            },
+            success: (response) => {
+                if (deletetransRow) {
+                    deletetransRow.remove().draw();
+                    if (dataTable.rows().count() === 0) {
+                        $(".dataTables_empty").html(`<img src="/assets/img/no_data_found.png" alt="No Image" class="no_data_found">`)
+                    }
+                }
+                raiseSuccessAlert(response.msg);
+            },
+            error: (error) => {
+                raiseErrorAlert(error.responseJSON.detail);
+            },
+            complete: (e) => {
                 removeLoader("body", "lg");
-                raiseSuccessAlert("Transport Deleted Successfully")
             }
-            if ($('#transport_details tr').length === 1) {
-                $('#no_data_found').show();
-            }
-            
-            return response;
-        } else {
-            
-        }
-    } catch (error) {
-        raiseErrorAlert("Error during deletion");
+        });
     }
 }
 
@@ -201,12 +200,14 @@ function editTransport(transportId) {
             throw error;
         });
 }
-function openstopDetails(formId, transportName, transport_id) {
+
+async function openstopDetails(formId, transportName, transport_id) {
     $("#transportNameContent").html(`<h3>${transportName}</h3>`);
     $("#" + formId).css("display", "block");
     $("#add-stopage-btn").val(transport_id);
     displayStopages(transport_id);
 }
+
 function closestopDetails() {
     $("#stopForm").css("display", "none");
 }
@@ -272,20 +273,20 @@ function displayStopages(transport_id) {
         success: function (data) {
             const stoppageContainer = $('#stopagesList');
             stoppageContainer.empty();
-            if(data.length > 0){
-            data.forEach(stopdata => {
-                const stop = `<div class="mt-2 d-flex align-items-center" id="stopage_id_${stopdata['stop_id']}">
+            if (data.length > 0) {
+                data.forEach(stopdata => {
+                    const stop = `<div class="mt-2 d-flex align-items-center" id="stopage_id_${stopdata['stop_id']}">
                             <input type="text" class="form-control" value="${stopdata["stop_name"]}">
                             <a href="#" onclick="deleteStoppage(this)" data-stop-id="${stopdata['stop_id']}">
                                 <i class="bi bi-trash3" style="color: red; padding: 16px;"></i>
                             </a>
                         </div>`;
-                stoppageContainer.append(stop);
-            });
-        }else {
-            stoppageContainer.html('<div class="mt-2"><img src="/assets/img/no_data_found.png" class="no_data_found"></div>');
-        }
-        
+                    stoppageContainer.append(stop);
+                });
+            } else {
+                stoppageContainer.html('<div class="mt-2"><img src="/assets/img/no_data_found.png" class="no_data_found"></div>');
+            }
+
         },
         error: function (error) {
             raiseErrorAlert('Error:');
@@ -423,7 +424,6 @@ function displayAssignedStudents(transportId) {
         }
     });
 }
-
 
 function deleteStudent(button) {
     var roll_number = $(button).attr('data-student-id').trim();
@@ -575,4 +575,3 @@ function deleteStaff(button) {
         }
     });
 }
-

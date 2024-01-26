@@ -1,18 +1,20 @@
 from django.urls import path
-from .views import dashboard, students, register_student,\
-staffs, register_staff,staff_info, edit_staff, login, logout, registration, classes,fees, user, assignments, transportation, notice, notice_create,notice_edit, calendar,edit_student,examination,examinationInfo
+from .views import dashboard, students, student_alumni,register_student,\
+staffs, register_staff,staff_info, edit_staff, logout,classes,fees, user, assignments, transportation, notice, notice_create,notice_edit, calendar,edit_student,examination,examinationInfo
 from . import views
 from django.views.generic import TemplateView
 
 urlpatterns = [
-    path('', login, name='login'),
-    path('registration/', registration, name='registration'),
+    # path('', login, name='login'),
+    # path('registration/', registration, name='registration'),
     path('logout/', logout, name='logout'),
     path('dashboard/', dashboard, name='dashboard'),
     # --------------student urls-----------------
     path('students/', students, name='students'),
+    path("student/studentsPromotion/",views.promote_students, name="students_promotion"),
     path('register_student/', register_student, name='register_student'),
     path('student/edit_student/<slug:student_slug>/',edit_student, name='edit_student'),
+    path('student_alumni/',student_alumni,name='student_alumni'),
     path("student/<slug:student_slug>/",views.student_info, name="student_info"),
     # --------------staff urls-----------------
 
@@ -41,5 +43,12 @@ urlpatterns = [
     path('profile/', views.profile, name='profile'),
     path('success/', TemplateView.as_view(template_name='success.html'), name='success'),
     path('error/', TemplateView.as_view(template_name='error.html'), name='error'),
-    path('create_order/', views.create_order, name='create_order')
+    path('create_order/', views.create_order, name='create_order'),
+    path('attendance/',views.attendance,name='attendance'),
+    path('staffIdCard/<slug:staff_slug>', views.staffIdCard, name='staffIdCard'),
+    path('studentIdCard/<slug:student_slug>', views.studentIdCard, name='studentIdCard'),
+    path('', views.signin, name='signin'),
+    path('signup/', views.signup, name='signup'),
+    path('forgetPassword/', views.forgetPassword, name='forgetPassword'),
+    path('reports/', views.reports, name='reports'),
 ]

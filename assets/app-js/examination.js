@@ -11,15 +11,53 @@ $(document).ready(function () {
             await addParentExam();
         }
     });
-    $("#class_id").on("change", async () => {
-        const selectedClassId = $("#class_id").val();
-        await fetchSubjectsAndFullMarks(selectedClassId);
+    $("#class_id").on("change", async function() {
+        const selectedClassId = $(this).val();
+        if (selectedClassId) {
+            var selectedOptions = $(this).find(`option[value="${selectedClassId}"]`);
+            var ExampromotionType = selectedOptions.data("promotion");
+            var ExamtotalPromotions = selectedOptions.data("total_number_of_promotion"); 
+            loadSemisterOrYear(ExamtotalPromotions, ExampromotionType, "semister_id");
+        }
     });
+    
+    $("#semister_id").on("change", async function() {
+        const selectedSemesterId = $(this).val();
+        const selectedClassId = $("#class_id").val();
+        if (selectedSemesterId && selectedClassId) {
+            await fetchSubjectsAndFullMarks(selectedClassId, selectedSemesterId);
+        }
+    });
+    $("#filter_class_id").on("change", function () {
+        const filterClassId = $(this).val();
+            if (filterClassId) {
+                var selectedOptions = $(this).find(`option[value="${filterClassId}"]`);
+                var exampromotionType = selectedOptions.data("promotion");
+                console.log(exampromotionType)
+                var examtotalPromotions = selectedOptions.data("total_number_of_promotion");
+                console.log(examtotalPromotions)
+                loadSemisterOrYear(examtotalPromotions, exampromotionType, "filter_semister_id");
+            }
+    });
+    
     $('#examTable').on('click', '.btnEditExam', async function () { 
         const parentExamId = $(this).data('id');
         const $row = $(this).closest('tr');
-        const start_date = $row.find('.start_date').text();
-        const end_date = $row.find('.end_date').text();
+        let start_date, end_date;
+    
+        // Check if the start and end dates are within span elements
+        const $startDateSpan = $row.find('.start_date');
+        const $endDateSpan = $row.find('.end_date');
+    
+        if ($startDateSpan.length && $endDateSpan.length) {
+            start_date = $startDateSpan.data('date');
+            end_date = $endDateSpan.data('date');
+        } else {
+            // If not within span elements, assume they are directly within the td
+            const dateRangeText = $row.find('.sorting_1').text();
+            [start_date, end_date] = dateRangeText.split(' - ');
+        }
+    
         const resultDate = $row.find('.result_date').text();
         const examName = $row.find('.parent_exam_name').text();
         const classId = $row.find('.class_id').attr("data-class-id");
@@ -28,16 +66,20 @@ $(document).ready(function () {
         $('#end_date').val(end_date);
         $('#result_date').val(resultDate);
         $('#parent_exam_name').val(examName);
-        $("#class_id").val(classId);
+        $('#class_id').val(classId).prop('disabled', true);
         $('#addeditExamModal').modal('show');
-        editChildExam(parentExamId)
+        editChildExam(parentExamId);
     });
+    
+
     $('#examTable').on('click', '.btndelete', async function () {
         var examId = $(this).attr("data-id");
         await deleteExamination(examId);
     });
     initializeClassSelect();
-})
+    $('#btnFilterExam').on('click',filterExamination);
+});
+
 
 
 function validateExamForm() {
@@ -69,7 +111,7 @@ function validateExamForm() {
 
 
 function resetExamForm() {
-    const fields = ["start_date", "end_date", "result_date", "parent_exam_name", "class_id"];
+    const fields = ["start_date", "end_date", "result_date", "parent_exam_name", "class_id","semister_id"];
     for (const field of fields) {
         const element = $(`#${field}`);
         if (element.length > 0) {
@@ -78,11 +120,20 @@ function resetExamForm() {
         }
     }
 }
+function resetAttendanceForm() {
+    const fields = ["class_id", "attendance_dates"];
+    for (const field of fields) {
+        const element = $(`#${field}`);
+        element.val("");  // Clear the value
+        element.removeClass("is-invalid");  // Remove any error styling
+    }
+}
 
 
 async function addParentExam() {
     let editExams = $("#parent_exam_id").val() !== "";
     classesId = $("#class_id").val();
+    $('#class_id').prop('disabled', false);
     const data = {
         institute_id: instituteId,
         class_id: classesId,
@@ -119,16 +170,29 @@ async function addParentExam() {
                         var fullMarksValue = element.querySelector(".fullMarks").value;
                         var examId = element.querySelector(".fullMarks").getAttribute("data-child-id")
                         updateChildExams(examId, responseData.parent_exam_id, subjectId, fullMarksValue);
-                    })
+                    })                    
                     const existingRow = $("tr[data-exams-id='" + responseData.parent_exam_id + "']");
+
                     if (existingRow.length) {
-                        existingRow.find('td:eq(0)').text(responseData.start_date + ' - ' + responseData.end_date);
-                        existingRow.find('td:eq(1)').text(responseData.parent_exam_name);
+                        existingRow.find('td:eq(0)').html(`
+                            <span class="start_date" data-date="${responseData.start_date}" data-start-date="${responseData.start_date}">
+                                ${responseData.start_date}
+                            </span> - 
+                            <span class="end_date" data-date="${responseData.end_date}" data-exam-enddate="${responseData.end_date}">
+                                ${responseData.end_date}
+                            </span>
+                        `);
+                        existingRow.find('td:eq(1)').html(`
+                            <a href="/app/examinationInfo/${responseData.parent_exam_slug}">
+                                ${responseData.parent_exam_name}
+                            </a>
+                        `);
                         existingRow.find('td:eq(2)').text(responseData.result_date);
-                        existingRow.find('td:eq(3)').text(responseData.class_id);
+                        existingRow.find('td:eq(3)').text(`${responseData.classes.class_name}`);
                     }
                     raiseSuccessAlert("Examination Updated Successfully");
                     $("#parent_exam_id").val("");
+                    
                 } else {
                     var tableBody = $('#examination_details');
                     var noDataImage = tableBody.find('.no_data_found-tr');
@@ -137,13 +201,18 @@ async function addParentExam() {
                     }
                     addChildExams(responseData.parent_exam_id);
                     const examNewRow = `
-                    <tr class="tr-exam-${responseData.parent_exam_id}" data-exams-id=${responseData.parent_exam_id}>
+                    <tr class="tr-exam-${responseData.parent_exam_id} exam-row" data-exams-id="${responseData.parent_exam_id}" data-start-date="${responseData.start_date}" data-exam-enddate="${responseData.end_date}" data-exam-class="${responseData.class_id}">
                     <td class="text-break">
-                    <span class="start_date">${responseData.start_date}</span>- 
-                    <span class="end_date">${responseData.end_date}</span></td>
-                    <td class=" text-break parent_exam_name">${responseData.parent_exam_name}</td>
+                        <span class="start_date" data-date="${responseData.start_date}" data-start-date="${responseData.start_date}">${responseData.start_date}</span> - 
+                        <span class="end_date" data-date="${responseData.end_date}" data-exam-enddate="${responseData.end_date}">${responseData.end_date}</span>
+                    </td>
+                    <td class="text-break parent_exam_name">
+                    <a href="/app/examinationInfo/${responseData.parent_exam_slug}">${responseData.parent_exam_name}</a>
+                </td>
+                
                     <td class="result_date">${responseData.result_date}</td>
-                    <td class=" text-break class_id" data-class-id="${responseData.class_id}" >${responseData.class_id}</td>
+                    <td class=" text-break class_id" data-class-id="${responseData.class_id}" data-exam-class="${responseData.class_id}" data-promotion='${responseData.promotion_type}'
+                    data-total_number_of_promotion='${responseData.total_number_of_promotion}'>${responseData.classes.class_name}</td>
                     <td>
                         <button type="button" class="btn btn-sm btn-info btnEditExam" data-id="${responseData.parent_exam_id}">
                             <i class="bi bi-pencil-square"></i>
@@ -231,30 +300,68 @@ async function updateChildExams(examId, parentExamsId, subjectId, fullMarksValue
         complete: (e) => {
             removeLoader("ExamFormArea", "sm");
             resetSubjectsTable()
-            
+
         },
     });
 }
 
 function initializeClassSelect() {
     const classurl = `${apiUrl}/Classes/get_classes_by_institute/?institite_id=${instituteId}`;
-    $.ajax({
-        url: classurl,
-        method: 'GET',
-        headers: {
-            "Authorization": `Bearer ${jwtToken}`,
-            "Content-Type": "application/json",
-        },
-        success: (response) => {
-            for (const class_id of response) {
-                $("#class_id").append(`<option value="${class_id.class_id}">${class_id.class_name}</option>`);
-            }
-        },
-        error: function (error) {
-            raiseErrorAlert(error.responseJSON.detail);
-        },
-    });
+    try {
+        $.ajax({
+            url: classurl,
+            method: 'GET',
+            headers: {
+                "Authorization": `Bearer ${jwtToken}`,
+                "Content-Type": "application/json",
+            },
+            success: (response) => {
+                for (const class_id of response) {
+                    $("#class_id").append(`<option value="${class_id.class_id}" data-promotion='${class_id.promotion_type}' data-total_number_of_promotion='${class_id.total_number_of_promotion}'>${class_id.class_name}</option>`);
+                    $("#filter_class_id").append(`<option value="${class_id.class_id}"  data-promotion='${class_id.promotion_type}' data-total_number_of_promotion='${class_id.total_number_of_promotion}'>${class_id.class_name}</option>`);
+                }
+            },
+            error: function (error) {
+                raiseErrorAlert(error.responseJSON.detail);
+            },
+        });
+    } catch (error) {
+        console.error("Error in initializeClassSelect:", error);
+    }
 }
+
+async function  loadSemisterOrYear(examdDurationTime, exampromotionType, examtnpId) {
+    var examtnp = $(`#${examtnpId}`);
+    var ExamlabelElement = $("label[for='" + examtnpId + "']");
+
+    var exampromotionTypeMap = {
+        "semister_vise": "Semester",
+        "year_vise": "Year",
+    };
+
+    if (exampromotionTypeMap[exampromotionType] === undefined) {
+        examtnp.html("");
+        ExamlabelElement.text("Semester/Year");
+        examtnp.append(`<option value="">Not Applicable</option>`);
+        return;
+    }
+
+    console.log("Label Element:", ExamlabelElement);
+    ExamlabelElement.text(exampromotionTypeMap[exampromotionType]);
+
+    examtnp.html("");
+    examtnp.append(`<option value="">All ${exampromotionTypeMap[exampromotionType]}</option>`);
+
+    for (let index = 0; index < examdDurationTime; index++) {
+        var option = `<option value="${index + 1}">${index + 1} ${exampromotionTypeMap[exampromotionType]}</option>`;
+        examtnp.append(option);
+    }
+
+    console.log("Label Content:", ExamlabelElement);
+}
+
+
+
 
 function fetchSubjectsAndFullMarks(classId) {
     const subjectUrl = `${apiUrl}/Subjects/get_subjects_by_class/?class_id=${classId}`;
@@ -443,3 +550,61 @@ function resetSubjectsTable() {
     subjectTable.empty();
 
 }
+
+
+async function filterExamination() {
+    const examTable = $("#examTable").DataTable();
+    const startdate = $('#startdate').val();
+    const enddate = $('#enddate').val();
+    const selectedClass = $('#filter_class_id').val();
+    const selectedPromotions = $('#filter_semister_id').val();
+    console.log(selectedPromotions)
+
+    DataTable.ext.search = [];
+    DataTable.ext.search.push(function (settings, data, dataIndex) {
+        let row = examTable.row(dataIndex).nodes().to$();
+        let filterexamclass = parseInt(selectedClass);
+        let filterStartDate = new Date(startdate); 
+        let filterEndDate = new Date(enddate);
+        let filterPromotions = parseInt(selectedPromotions); // Convert to integer for comparison
+        console.log(filterPromotions)
+
+        let examclass = parseInt(row.find(".class_id").data("exam-class"));
+        let examstartdate = new Date(row.find(".start_date").data("start-date"));
+        let examenddate = new Date(row.find(".end_date").data('exam-enddate'));
+        let examPromotions = 2
+        console.log("Exam Promotions Data:", examPromotions);
+
+        $("#examinationFilter").modal("hide");
+
+        if (
+            (isNaN(filterexamclass) || filterexamclass === examclass) &&
+            (isNaN(filterStartDate) || filterStartDate <= examstartdate) &&
+            (isNaN(filterEndDate) || filterEndDate >= examenddate) &&
+            (isNaN(filterPromotions) || filterPromotions === examPromotions)
+        ) {
+            return true;
+        } else {
+            return false;
+        }
+    });
+
+    examTable.draw();
+
+    resetFillterForm();
+}
+
+
+
+
+function resetFillterForm() {
+    const fields = ["startdate", "enddate","filter_class_id"];
+    for (const field of fields) {
+        const element = $(`#${field}`);
+        if (element.length > 0) {
+            element.val("");
+            element.removeClass("is-invalid");
+        }
+    }
+}
+

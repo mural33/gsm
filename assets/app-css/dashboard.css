@@ -22,5 +22,87 @@
 .cards > .card-title{
     text-align: center !important;
     font-weight: 600 !important;
-
 }
+.showCard > .card{
+    border: none !important;
+    border-radius: 12px;
+    background-color: #f9ecbc;
+}
+.showCard >.card > .card-header{
+    background-color: #f9ecbc;
+}
+#summaryCard{
+    border: none !important;
+    height: 27.2rem;
+}
+#totalCount{
+    margin-left: 0;
+    margin-right: 0;
+}
+h6{
+    font-size: 13px;
+}
+.names{
+    margin-left: 2rem;
+}
+.sizeimg{
+    height: 1.5rem;
+    width: 1.5rem;
+}
+.upperCard{
+    background-color: #f9ecbc;
+    border-radius: 10px;
+    height: 4rem;
+  margin-top: -2rem;
+  padding-top: 0.2rem;
+}
+.birthday{
+    width: fit-content;
+    height: auto;
+    background-color: #fff;
+    border: none;
+   border-radius: 14px;
+  }
+  .imgBox{
+  position: absolute;
+  height: 3rem;
+  background-color: #fff;
+  width: 3rem;
+  left: 50%;
+  top: -15px;
+  transform: translateX(-50%);
+  border-radius: 100%;
+  }
+  #sideRow{
+    margin-top: -4rem;
+  }
+  .textSelect{
+    margin-top: 7px;
+  }
+  #absentCards,
+  #birthdayCards {
+      margin-right: 0;
+  }
+  .scrollCards{
+    height: 10.6rem;
+    overflow-y: auto;
+  }
+  .scrollCards::-webkit-scrollbar {
+      width: 5px; /* Set the width of the scrollbar */
+  }
+  .scrollCards::-webkit-scrollbar-thumb {
+      background-color: #888; /* Set the color of the scrollbar thumb */
+  }
+  .scrollCards::-webkit-scrollbar-track {
+      background-color: #f1f1f1; /* Set the color of the scrollbar track */
+  }
+ .scrollCards {
+      scrollbar-width: thin;
+      scrollbar-color: transparent transparent;
+  }
+  .smallCards{
+    margin-top: 1rem;
+  }
+  #Fees{
+    margin-top: -1rem;
+  }

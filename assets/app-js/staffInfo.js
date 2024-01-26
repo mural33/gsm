@@ -19,8 +19,7 @@ $(document).ready(e => {
     let staffData = new StaffData();
     staffData.getStaffAttendance(staffInfo.staffId);
     staffData.loadCalendarDetailsByStaff(staffInfo.staffId);
-    callPieChart();
-    
+    callPieChart();    
 });
 function callPieChart(absent, present, leave) {
     var existingChart = Chart.getChart("staffPieChart");

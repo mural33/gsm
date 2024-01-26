@@ -7,11 +7,22 @@ $(document).ready(()=>{
     jwtToken = $("#jwtToken").val();
     instituteId = $("#instituteId").val();
     subscriptionUrl = $("#subscriptionUrl").val();
+    // subscribers_id= $("#subscriberId").val();
     $(".btnCloseModel").on("click", function(e){
         const parentModel = $(this).closest(".modal"); 
         parentModel.modal("hide");
         $("input, textarea, select",parentModel).val("");
     });
+    $("#notificationDropdown").on("click", function(e){
+        getNotifications();
+    });
+    var storedInstituteLogo = localStorage.getItem('institute_logo');
+    var storedProfileImg = localStorage.getItem('profile_img');
+    $("#organization_logo").attr("src", storedInstituteLogo);
+    $("#profileImageId").attr("src", storedProfileImg);
+
+        // $(document).on("contextmenu", function (e) {
+    //     e.preventDefault();
 })
 function raiseErrorAlert(msg) {
     toastr.options = {
@@ -131,6 +142,7 @@ function removeLoader(loaderContainerElementId, size) {
 }
 
 
+
 // azure blob upload
 async function uploadFile(fieldId,location) {
     var defaultBlob = "https://gsmstore.blob.core.windows.net/student-profile-pictures/students.jpg";
@@ -183,13 +195,11 @@ async function downloadFile(fileName,location) {
             contentType: false,
         });
         if(response){
-            console.log(response);
             return response.file_url;
         }
         return "";
     }
     catch(e){
-        console.log(e);
         return "";
     }
 }
@@ -239,6 +249,37 @@ function fetchDetailsBasedOnPincode(pincode, stateInput, cityInput, countryInput
             }
         },
         error: function(error) {
+            raiseErrorAlert(error);
+        }
+    });
+}
+
+function getNotifications() {
+    var method = "GET";
+    subscribers_id= $("#subscriberId").val();
+    var totalUrl =subscriptionUrl + `api/Notifications?product_id=2&subscriber_id=${subscribers_id}`;
+    $.ajax({
+        type: method,
+        url: totalUrl,
+        success: function (response) {
+            var notificationTabContent = $("#notificationItemsTabContent");
+            notificationTabContent.empty();
+            response.forEach(function (notification) {
+                var notificationItem = $("<div class='text-reset notification-item d-block dropdown-item position-relative unread-message'>");
+                var content = `
+                    <div class='d-flex'>
+                        <div class='flex-grow-1'>
+                            <h6 class='text-overflow text-muted fs-sm my-2 text-uppercase notification-title'>${notification.notification_title}</h6>
+                            <div>${notification.description}</div>
+                            <div>Date: ${notification.date}</div>
+                        </div>
+                    </div>
+                `;
+                notificationItem.append(content);
+                notificationTabContent.append(notificationItem);
+            });
+        },
+        error: function (error) {
             raiseErrorAlert(error);
         }
     });

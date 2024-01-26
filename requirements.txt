@@ -7,4 +7,9 @@ psycopg2==2.9.7
 django-cors-headers
 django-logging-json
 azure-storage-blob
+XlsxWriter
+anyio
+pandas
+razorpay
+
 

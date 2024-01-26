@@ -1,0 +1,110 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- Mirrored from brandio.io/envato/iofrm/html/login19.html by HTTrack Website Copier/3.x [XR&CO'2014], Mon, 22 Jan 2024 07:06:12 GMT -->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign in</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'app-css/bootstrap.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'app-css/fontawesome-all.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'app-css/iofrm-style.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'app-css/iofrm-theme19.css' %}">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+    <div class="form-body without-side">
+        <div class="website-logo">
+            <a href="index.html">
+                <div class="logo">
+                    <img src="{% static 'img/logo-dark.png' %}" alt="">
+                </div>
+            </a>
+        </div>
+        <div class="row">
+            <div class="img-holder">
+                <div class="bg"></div>
+                <div class="info-holder">
+                    <img src="{% static 'img/graphic3.svg' %}" alt="">
+                </div>
+            </div>
+            <div class="form-holder">
+                <div class="form-content">
+                    <div class="form-items">
+                        <h3>Login to account</h3>
+                        <p>Unlock Your World: - Access Awaits!</p>
+                        <form method="POST" class="sign-in-form" action="{% url 'signin' %}">
+                        {% csrf_token %}
+                            <input class="form-control" type="text" name="email" id="email" placeholder="E-mail Address" required>
+                            <input class="form-contdrol" type="password" name="password" id="password" placeholder="Password" required>
+                            <div class="form-button">
+                                <button id="submit" type="submit" class="ibtn">Login</button> <a href="{% url 'forgetPassword' %}">Forget password?</a>
+                            </div>
+                        </form>
+                        <div class="other-links">
+                            <a href="{% url 'signup' %}">Register new account</a>
+                        </div>
+                        <div class="page-links">
+                           <span class="copyright">© 2024 <a href="https://www.alongx.com" target="_blank">AlongX Software</a> All Rights Reserved. | App Version - v1.0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+<script src="js/jquery.min.js"></script>
+<script src="js/popper.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="js/main.js"></script>
+{% if messages %}
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      var successMessages = [];
+      var errorMessages = [];
+      {% for message in messages %}
+        {% if message.tags == "error" %}
+          errorMessages.push("{{ message }}");
+        {% else %}
+          successMessages.push("{{ message }}");
+        {% endif %}
+      {% endfor %}
+      
+      if (successMessages.length > 0) {
+        Swal.fire({
+          toast: true,
+          position: 'top-right',
+          background: 'FFFFFF',
+          showConfirmButton: false,
+          icon: 'success',
+          timer: 4000,
+          title: successMessages.join('<br>'),
+          timerProgressBar: true
+        }).then((result) => {
+          if (result.dismiss === Swal.DismissReason.timer) {
+          }
+        });
+      }
+    
+      if (errorMessages.length > 0) {
+        Swal.fire({
+          toast: true,
+          position: 'top-right',
+          background: 'FFFFFF',
+          showConfirmButton: false,
+          icon: 'error',
+          timer: 4000,
+          title: errorMessages.join('<br>'),
+          timerProgressBar: true
+        }).then((result) => {
+          // This code will be executed when the popup is closed
+          if (result.dismiss === Swal.DismissReason.timer) {
+            // The timer was complete, do something here
+          }
+        });
+      }
+    });
+    </script>
+    {% endif %}
+</body>
+</html>

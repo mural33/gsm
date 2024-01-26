@@ -15,9 +15,10 @@
         <div class="row">
             <div class="col text-end">
                 <a href="/app/register_student" class="btn btn-success btn-label rounded-pill right">
-                        <i class="bi bi-plus-circle label-icon align-middle fs-lg ms-2"></i>Enroll Student</a>
-                
-                <button class="btn btn-outline-primary rounded-pill btn-icon tripledots-dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bi bi-plus-circle label-icon align-middle fs-lg ms-2"></i>Enroll Student</a>
+
+                <button class="btn btn-outline-primary rounded-pill btn-icon tripledots-dropdown-toggle"
+                    data-bs-toggle="dropdown" aria-expanded="false">
                     <i class="bi bi-three-dots-vertical"></i>
                 </button>
                 <div class="input-group">
@@ -27,7 +28,8 @@
                         <li>
                             <hr class="dropdown-divider">
                         </li>
-                        <li><a class="dropdown-item" href="#"><i class="bi bi-download me-2"> </i>Separated link</a></li>
+                        <li><a class="dropdown-item" href="#"><i class="bi bi-download me-2"> </i>Separated link</a>
+                        </li>
                     </ul>
                 </div>
             </div>
@@ -35,65 +37,78 @@
     </div>
 </div>
 <!-- Student table start -->
-    <section class="row">
-        {% if student_data %}
-            <div class="col-md-12">
-                    <table class="table table-striped table-hover table-sticky table_students" id="studentsTable">
-                        <thead class="thead-dark">
-                            <tr>
-                                <th>Img</th>
-                                <th>Student Name</th>
-                                <th>Roll Number</th>
-                                <th>Class </th>
-                                <th>Section</th>
-                                <th>Gender</th>
-                                <th>Blood Group</th>
-                                <th>Student Action</th>
-                            </tr>
-                        </thead>
-                        <tbody class="tbl__bdy" id="studentTable">
-                        {% if student_data %}
-                            {% for student in student_data %}
-                            <tr class="tr-student-{{student.student_id}}">
-                                <td>
-                                    <img src="{{student.photo}}" alt="" srcset="" with="50px" height="50px">
-                                </td>
-                                <td class="student_name">
-                                    <a href="{% url 'student_info' student.slug %}" >{{student.student_name}}</a>
-                                </td>
-                                <td class="roll_number">{{ student.roll_number }}</td>
-                                <td class="class_id">{{ student.classes.class_name }}</td>
-                                <td class="section_id">{{ student.sections.section_name }}</td>
-                                <td class="gender">{{ student.gender }}</td>
-                                <td class="blood_group">{{ student.blood_group }}</td>
-                                <td>
-                                    <a href="{% url 'edit_student' student.slug  %}"  class="btn btn-sm btn-info">
-                                        <i class="bi bi-pencil-square"></i>
-                                    </a>
-                                    <a href="#" data-student-id="{{student.student_id}}" class="btn btn-sm btn-danger btnStudentDelete">
-                                        <i class="bi bi-trash3"></i>
-                                    </a>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        {% else %}
-                            <tr class="no_data_found-tr">
-                                <td colspan="8" class="text-center">
-                                    <img src="{% static 'img/no_data_found.png' %}" alt="No Image" class="no_data_found">
-                                </td>
-                            </tr>
+<section class="row">
+    {% if student_data %}
+    <div class="col-md-12">
+        <table class="table table-striped table-hover table-sticky table_students" id="studentsTable">
+            <thead class="thead-dark">
+                <tr>
+                    <th>DP</th>
+                    <th>Student Name</th>
+                    <th>Roll Number</th>
+                    <th>Class </th>
+                    <th>Year/Semester</th>
+                    <th>Section</th>
+                    <th>Gender</th>
+                    <th>Blood Group</th>
+                    <th>Student Action</th>
+                </tr>
+            </thead>
+            <tbody class="tbl__bdy" id="studentTable">
+                {% if student_data %}
+                {% for student in student_data %}
+                <tr class="tr-student-{{student.student_id}}">
+                    <td>
+                        <img src="{{student.photo}}" alt="" srcset="" with="50px" height="50px">
+                    </td>
+                    <td class="student_name">
+                        <a href="{% url 'student_info' student.slug %}">{{student.student_name}}</a>
+                    </td>
+                    <td class="roll_number">{{ student.roll_number }}</td>
+                    <td class="class_id">{{ student.classes.class_name }}</td>
+                    <td class="current_position">
+                        {{ student.current_position }}
+                        {% if student.classes.promotion_type == 'year_vise' %}
+                            Years
+                        {% elif student.classes.promotion_type == 'course_vise' %}
+                            Course
+                        {% elif student.classes.promotion_type == 'semister_vise' %}
+                            Semester
                         {% endif %}
+                    </td>
+                    
+                    <td class="section_id">{{ student.sections.section_name }}</td>
+                    <td class="gender">{{ student.gender }}</td>
+                    <td class="blood_group">{{ student.blood_group }}</td>
+                    <td>
+                        <a href="{% url 'edit_student' student.slug  %}" class="btn btn-sm btn-info">
+                            <i class="bi bi-pencil-square"></i>
+                        </a>
+                        <a href="#" data-student-id="{{student.student_id}}"
+                            class="btn btn-sm btn-danger btnStudentDelete">
+                            <i class="bi bi-trash3"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+                {% else %}
+                <tr class="no_data_found-tr">
+                    <td colspan="8" class="text-center">
+                        <img src="{% static 'img/no_data_found.png' %}" alt="No Image" class="no_data_found">
+                    </td>
+                </tr>
+                {% endif %}
 
 
-                        </tbody>
-                    </table>
-            </div>
-        {% else %}
-        <div class="col-md-12 text-center">
-                <img src="{% static 'img/no_data_found.png' %}" alt="No Image" class="no_data_found">
-        </div>
-        {% endif %}
-    </section>
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="col-md-12 text-center">
+        <img src="{% static 'img/no_data_found.png' %}" alt="No Image" class="no_data_found">
+    </div>
+    {% endif %}
+</section>
 <!-- student table end -->
 
 

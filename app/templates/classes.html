@@ -50,7 +50,13 @@
       </p>
       <ul class="nav nav-pills arrow-navtabs nav-success bg-light mb-3 mt-2" role="tablist" style="display: none;">
         <li class="nav-item">
-          <a class="nav-link active" data-bs-toggle="tab" href="#sections" role="tab">
+          <a class="nav-link active" data-bs-toggle="tab" href="#overview" role="tab">
+            <span class="d-block d-sm-none"><i class="ti ti-home"></i></span>
+            <span class="d-none d-sm-block">Overview</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" data-bs-toggle="tab" href="#sections" role="tab">
             <span class="d-block d-sm-none"><i class="ti ti-home"></i></span>
             <span class="d-none d-sm-block">Sections</span>
           </a>
@@ -94,9 +100,48 @@
       </ul>
       <!-- Tab panes -->
       <div class="tab-content text-muted" id="tabContent">
-        <div class="tab-pane active" id="sections" role="tabpanel">
+        <div class="tab-pane active" id="overview" role="tabpanel">
           <div class="row">
-            <h6 class="col-sm-12 col-md-6 col-xl-8">List of Sections of this class</h6>
+            <div class="col-sm-12 col-md-12 col-xl-8">
+            <h6>Details of the Class and Certification.</h6>
+            <blockquote>Class Overview: Unveiling pathways to knowledge, igniting curiosity, and fostering growth.</blockquote>
+            </div>
+          </div>
+          <div class="text-center" id="tabOverview">
+            <div class="row">
+              <div class="col-md-4">
+                <div class="card">
+                  <div class="card-body">
+                    <h6 class="card-title">Certification Duration</h6>
+                    <p class="card-text certification-duration"></p>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="card">
+                  <div class="card-body">
+                    <h6 class="card-title">Promotion</h6>
+                    <p class="card-text promotion-type"></p>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="card">
+                  <div class="card-body">
+                    <h6 class="card-title total-promotion-heading">Total No. of Promotion</h6>
+                    <p class="card-text total-promotion"></p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="tab-pane" id="sections" role="tabpanel">
+          <div class="row">
+            <div  class="col-sm-12 col-md-6 col-xl-8">
+            <h6>List of Sections of this class</h6>
+            <blockquote>Where knowledge meets curiosity.</blockquote>
+            </div>
             <div class="col-sm-12 col-md-6 col-xl-4">
               <div class="col text-end">
                 <button type="button" class="btn btn-success btn-label rounded-pill right" data-bs-toggle="modal"
@@ -111,7 +156,10 @@
         </div>
         <div class="tab-pane" id="subjects" role="tabpanel">
           <div class="row">
-            <h6 class="col-sm-12 col-md-6 col-xl-8">List of Subjects of this class</h6>
+            <div  class="col-sm-12 col-md-6 col-xl-8">
+            <h6>List of Subjects of this class</h6>
+            <blockquote>Exploring the depths of knowledge, one subject at a time.</blockquote>
+            </div>
             <div class="col-sm-12 col-md-6 col-xl-4">
               <div class="col text-end">
                 <button type="button" class="btn btn-success btn-label rounded-pill right" data-bs-toggle="modal"
@@ -126,7 +174,10 @@
         </div>
         <div class="tab-pane" id="calendar" role="tabpanel">
           <div class="row">
-            <h6 class="col-sm-12 col-md-6 col-xl-8">Calender/TimeTable of this class</h6>
+            <div class="col-sm-12 col-md-6 col-xl-8">
+            <h6>Calender/TimeTable of this class</h6>
+            <blockquote>Your roadmap to academic excellence and shared adventures.</blockquote>
+            </div>
             <div class="col-sm-12 col-md-6 col-xl-4">
               <div class="col text-end">
                 <select class="custom-select custom-select-lg bg-light" name="section" id="sectionByClass">
@@ -145,7 +196,10 @@
         </div>
         <div class="tab-pane" id="students" role="tabpanel">
           <div class="row">
-            <h6 class="col-sm-12 col-md-6 col-xl-8">List of Students of this class</h6>
+            <div class="col-sm-12 col-md-6 col-xl-8">
+            <h6>List of Students of this class</h6>
+            <blockquote>Students: Dream, Learn, Achieve.</blockquote>
+            </div>
           </div>
           <div class="text-center" id="tabStudent">
 
@@ -153,7 +207,10 @@
         </div>
         <div class="tab-pane" id="examinations" role="tabpanel">
           <div class="row">
-            <h6 class="col-sm-12 col-md-6 col-xl-8">Past and Upcoming Examinations of this class</h6>
+            <div class="col-sm-12 col-md-6 col-xl-8">
+            <h6>Past and Upcoming Examinations of this class</h6>
+            <blockquote>Examinations: Testing grounds for knowledge, stepping stones to success.</blockquote>
+          </div>
             <div class="col-sm-12 col-md-6 col-xl-4">
               <div class="col text-end">
                 <button type="button" class="btn btn-success btn-label rounded-pill right" data-bs-toggle="modal"
@@ -173,7 +230,10 @@
         </div>
         <div class="tab-pane" id="gradings" role="tabpanel">
           <div class="row">
-            <h6 class="col-sm-12 col-md-6 col-xl-8">Grading configurations of this class</h6>
+            <div class="col-sm-12 col-md-6 col-xl-8">
+            <h6>Grading configurations of this class</h6>
+            <blockquote>Grades reflect effort, but growth defines success.</blockquote>
+            </div>
             <div class="col-sm-12 col-md-6 col-xl-4">
               <div class="col text-end">
                 <button type="button" class="btn btn-success btn-label rounded-pill right" data-bs-toggle="modal"
@@ -188,22 +248,25 @@
         </div>
         <div class="tab-pane" id="fees" role="tabpanel">
           <div class="row">
+            <div class="col-sm-12 col-md-6 col-xl-8">
             <h6>Fees structure configuration of this class</h6>
+            <blockquote>Invest in education, reap a lifetime of knowledge.</blockquote>
+            </div>
           </div>
           <div class="text-center" id="tabFees">
             <div class="row">
               <div class="col-md-12 d-flex gap-2">
                 <div class="col-md-2 form-content feesDiv">
                   <input type="hidden" name="fee_id" id="fee_id">
-                  <label for="total_fee" class="form-label feesLabel">Total Fees</label>
+                  <label for="total_fee" class="form-label feesLabel">Total Fees</label><span class="text-danger ms-2">*</span>
                   <input type="number" class="form-control" id="total_fee" name="fee_total" placeholder="e.g. 20000" readonly />
                 </div>
                 <div class="col-md-2 form-content feesDiv">
-                  <label for="fee_admission" class="form-label feesLabel">Admission Fees</label>
+                  <label for="fee_admission" class="form-label feesLabel">Admission Fees</label><span class="text-danger ms-2">*</span>
                   <input type="number" class="form-control" id="fee_admission" name="fee_admission"
                     placeholder="e.g. 20000" readonly />
                 </div>
-                <div class="col-md-2 form-content feesDiv" id="totalAmount">
+                <div class="col-md-2 form-content" id="totalAmount">
                   <label for="install_amount" class="form-label feesLabel">Total Installment Amount</label>
                   <input type="number" class="form-control" id="install_amount" name="total_installments"
                     placeholder="e.g. 17000" readonly />
@@ -215,6 +278,7 @@
                 </div>
                 <div class="col-md-2 form-content feesDiv" id="Total_fees">
                   <label for="installment_dropdown" class="form-label feesLabel" id="Installment">Installment Type</label>
+                  <span class="text-danger ms-2">*</span>
                   <select class="form-select custom-select-lg bg-white form-control singleDropDown" id="installment_dropdown"
                     name="installment_id">
                     <option hidden>Select one</option>
@@ -235,10 +299,7 @@
             </div>          
             <div class="row" id="installmentTable">
               <div class="col-md-12">
-                <div class="scroll-container">
-                  <div class="content">
-                    <div class="responsive-container">
-                      <div class="table-container">
+                      <div class="table-container mt-3">
                         <table class="table table-striped table-hover table-sticky table_students"
                           id="installment_table">
                           <thead class="thead-dark">
@@ -254,9 +315,6 @@
                           </tbody>
                         </table>
                       </div>
-                    </div>
-                  </div>
-                </div>
               </div>
             </div>
           </div>
@@ -264,12 +322,12 @@
       </div><!-- end card -->
     </div>
     <!-- ______AddClass Form_____-->
-    <div class="modal fade bs-example-modal-sm" id="class_creation_modal" tabindex="-1" role="dialog"
-      aria-labelledby="mySmallModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-sm">
+    <div class="modal fade bs-example-modal-md" id="class_creation_modal" tabindex="-1" role="dialog"
+      aria-labelledby="myMediumModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-md">
         <div class="modal-content" id="class-form-area">
           <div class="modal-header">
-            <h5 class="modal-title" id="mySmallModalLabel">Save Class</h5>
+            <h5 class="modal-title" id="myMediumModalLabel">Save Class</h5>
             <button type="button" class="btn-close btnCloseModel" data-bs-dismiss="modal" aria-label="Close">
             </button>
           </div>
@@ -286,9 +344,39 @@
             <div class="d-flex mt-2" id="AddClass">
               <div class="col-md-12 form-content">
                 <input type="hidden" name="class_id" id="class_id">
-                <label for="class_name" class="form-label">Class Name</label>
+                <label for="class_name" class="form-label">Class Name</label><span class="text-danger ms-2">*</span>
                 <input type="text" class="form-control class_name" id="class_name" name="class_name"
                   placeholder="Enter a Class Name" maxlength="1000">
+              </div>
+            </div>
+            <div class="d-flex mt-2 row">
+              <div class="col-md-6 form-content">
+                <label for="certification_no" class="form-label">Certification Duration</label><span class="text-danger ms-2">*</span>
+                <input type="number" class="form-control certification_no" id="certification_no" name="certification_duration" maxlength="1000">
+              </div>
+              <div class="col-md-6 form-content">
+                <label for="certification_duration" class="form-label text-white">A</label>
+                  <select class="form-select" id="certification_duration" name="certification_duration">
+                    <option value="">Select</option>
+                    <option value="years">Years</option>
+                    <option value="months">Months</option>
+                    <option value="days">Days</option>
+                </select>
+              </div>
+            </div>
+            <div class="d-flex mt-2 row">
+              <div class="col-md-12 form-content">
+                <label for="promotion_type" class="form-label">Promotion Cycle</label><span class="text-danger ms-2">*</span>
+                  <select class="form-select" id="promotion_type" name="promotion_type">
+                    <option value="">Select Promotion Type</option>
+                    <option value="year_vise">Year Wise</option>
+                    <option value="semister_vise">Semester Wise</option>
+                    <option value="course_vise" id="courseWise">Course Wise</option>
+                </select>
+              </div>
+              <div class="col-md-12 form-content">
+                <label for="number_of_promotion" class="form-label">Total Number Of Promotion</label><span class="text-danger ms-2">*</span>
+                <input type="number" class="form-control promotion_type" id="number_of_promotion" name="total_number_of_promotion" maxlength="1000">
               </div>
             </div>
           </div>
@@ -300,7 +388,6 @@
         </div><!-- /.modal-content -->
       </div><!-- /.modal-dialog -->
     </div>
-
     <!-- ______AddSection Form_____-->
     <div class="modal fade bs-example-modal-sm" id="section_creation_modal" tabindex="-1" role="dialog"
       aria-labelledby="mySmallModalLabel" aria-hidden="true">
@@ -317,16 +404,15 @@
                 <i class="ri-checkbox-circle-fill text-success"></i>
               </div>
               <div class="flex-grow-1 ms-2">
-                <p class="text-muted mb-0">A section serves as a distinct segment within a course or grade, providing a
-                  dynamic environment
-                  where students explore their interests, acquire knowledge, and shape their future paths.</p>
+                <p class="text-muted mb-0">Section: A community of learners, where unity shapes diversity and knowledge blooms in shared exploration.
+                  Where students explore their interests, acquire knowledge, and shape their future paths.</p>
               </div>
             </div>
             <div class="d-flex mt-2" id="AddSection">
               <div class="col-md-12 form-content">
                 <input type="hidden" name="class_id" id="classes_id" value={{class_id}}>
                 <input type="hidden" name="section_id" id="section_id">
-                <label for="section_name" class="form-label">Section Name</label>
+                <label for="section_name" class="form-label">Section Name</label><span class="text-danger ms-2">*</span>
                 <input type="text" class="form-control section_name" id="section_name" name="section_name"
                   placeholder="Enter a Section Name" maxlength="1000">
               </div>
@@ -357,15 +443,14 @@
                 <i class="ri-checkbox-circle-fill text-success"></i>
               </div>
               <div class="flex-grow-1 ms-2">
-                <p class="text-muted mb-0">A subject refers to a specific field of study or discipline that is taught as
-                  part of a curriculum. It serves as a fundamental unit of organization
+                <p class="text-muted mb-0">Subject: Unraveling the layers of understanding, one lesson at a time. It serves as a fundamental unit of organization
                   for academic content, representing a distinct area of knowledge or skill development.</p>
               </div>
             </div>
             <div class="d-flex mt-2" id="AddSubject">
               <div class="col-md-12 form-content">
                 <input type="hidden" name="subject_id" id="subject_id">
-                <label for="subject_name" class="form-label">Subject Name</label>
+                <label for="subject_name" class="form-label">Subject Name</label><span class="text-danger ms-2">*</span>
                 <input type="text" class="form-control subject_name" id="subject_name" name="subject_name"
                   placeholder="Enter a Subject Name" maxlength="1000">
               </div>
@@ -401,12 +486,12 @@
             </div>
             <div class="d-flex mt-2 row">
               <div class="col-md-6 form-content">
-                <label for="percent_from" class="form-label">Minimum Percentage(%)</label>
+                <label for="percent_from" class="form-label">Minimum Percentage(%)</label><span class="text-danger ms-2">*</span>
                 <input type="number" class="form-control percent_from" id="percent_from" name="percent_from"
                   placeholder="Enter Minimum Percentage" min="0" max="100">
               </div>
               <div class="col-md-6 form-content">
-                <label for="percent_upto" class="form-label">Maximum Percentage(%)</label>
+                <label for="percent_upto" class="form-label">Maximum Percentage(%)</label><span class="text-danger ms-2">*</span>
                 <input type="number" class="form-control percent_upto" id="percent_upto" name="percent_upto"
                   placeholder="Enter Maximum Percentage" min="0" max="100">
               </div>
@@ -416,7 +501,7 @@
               <div class="col-md-12 form-content">
                 <input type="hidden" name="grade_id" id="grade_id">
                 <input type="hidden" name="id" id="applicable_id">
-                <label for="grade_name" class="form-label">Grade Name</label>
+                <label for="grade_name" class="form-label">Grade Name</label><span class="text-danger ms-2">*</span>
                 <input type="text" class="form-control grade_name" id="grade_name" name="grade_name"
                   placeholder="Enter a Grade Name" maxlength="1000">
               </div>
@@ -452,15 +537,15 @@
             </div>
             <div class="d-flex mt-2 row">
               <div class="col-md-4 form-content">
-                <label for="start_date" class="form-label">Start Date</label>
+                <label for="start_date" class="form-label">Start Date</label><span class="text-danger ms-2">*</span>
                 <input type="date" class="form-control start_date" id="start_date" name="start_date">
               </div>
               <div class="col-md-4 form-content">
-                <label for="end_date" class="form-label">End Date</label>
+                <label for="end_date" class="form-label">End Date</label><span class="text-danger ms-2">*</span>
                 <input type="date" class="form-control end_date" id="end_date" name="end_date">
               </div>
               <div class="col-md-4 form-content">
-                <label for="result_date" class="form-label">Result Date</label>
+                <label for="result_date" class="form-label">Result Date</label><span class="text-danger ms-2">*</span>
                 <input type="date" class="form-control result_date" id="result_date" name="result_date">
               </div>
             </div>
@@ -469,14 +554,14 @@
                 <input type="hidden" name="parent_exam_id" id="parent_exam_id">
                 <input type="hidden" name="exam_id" id="exam_id">
                 <input type="hidden" id="exams_id">
-                <label for="parent_exam_name" class="form-label">Name of the Examination</label>
+                <label for="parent_exam_name" class="form-label">Name of the Examination</label><span class="text-danger ms-2">*</span>
                 <input type="text" class="form-control parent_exam_name" id="parent_exam_name" name="parent_exam_name"
                   placeholder="Enter a Exam Name" maxlength="1000">
               </div>
             </div>
             <div class="d-flex mt-2">
               <div class="col-md-12 form-content">
-                <label for="classesId" class="form-label">Class</label>
+                <label for="classesId" class="form-label">Class</label><span class="text-danger ms-2">*</span>
                 <input type="text" class="form-control class_id" id="classesId" name="class_id" readonly>
               </div>
             </div>

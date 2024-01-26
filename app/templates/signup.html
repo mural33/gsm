@@ -1,0 +1,118 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- Mirrored from brandio.io/envato/iofrm/html/login19.html by HTTrack Website Copier/3.x [XR&CO'2014], Mon, 22 Jan 2024 07:06:12 GMT -->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'app-css/bootstrap.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'app-css/fontawesome-all.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'app-css/iofrm-style.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'app-css/iofrm-theme19.css' %}">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+</head>
+<body>
+    <div class="form-body without-side">
+        <div class="website-logo">
+            <a href="index.html">
+                <div class="logo">
+                    <img src="{% static 'img/logo-dark.png' %}" alt="">
+                </div>
+            </a>
+        </div>
+        <div class="row">
+            <div class="img-holder">
+                <div class="bg"></div>
+                <div class="info-holder">
+                    <img src="{% static 'img/graphic3.svg' %}" alt="">
+                </div>
+            </div>
+            <div class="form-holder">
+                <div class="form-content">
+                    <div class="form-items">
+                        <h3>Register new account</h3>
+                        <p>Embark on Your Journey: Join, Connect, and Thrive!</p>
+                        <form method="POST" class="sign-up-form" action="{% url 'signup' %}">
+                            {% csrf_token %}
+                            <input class="form-control" type="text" name="institution_name" placeholder="Institute Name" required>
+                            <input class="form-control" type="text" name="institution_id" placeholder="Enrollment ID" required>
+                            <input class="form-control" type="text" name="full_name" placeholder="Your Name" required>
+                            <input class="form-control" type="text" name="institute_email" id="institute_email" placeholder="Your Email Address"  required>
+                            <input class="form-control" type="text" name="institute_phone" placeholder="Your Contact Number" minlength="10" maxlength="10" required>
+                            <input class="form-control" type="password" name="institute_password" id="institute_password" placeholder="Password" required>
+                            <input class="form-control" type="password" name="confirm_password" id="confirm_password" placeholder="Confirm Password" required>
+                            <div class="form-button">
+                                <button id="submit" type="submit" class="ibtn">Create Account</button>
+                            </div>
+                        </form>
+                        <div class="other-links">
+                            <a href="{% url 'signin' %}">Already having account? Login here</a>
+                        </div>
+                        <div class="page-links">
+                           <span class="copyright">© 2024 <a href="https://www.alongx.com" target="_blank">AlongX Software</a> All Rights Reserved. | App Version - v1.0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+<script src="js/jquery.min.js"></script>
+<script src="js/popper.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="js/main.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
+{% if messages %}
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      var successMessages = [];
+      var errorMessages = [];
+      {% for message in messages %}
+        {% if message.tags == "error" %}
+          errorMessages.push("{{ message }}");
+        {% else %}
+          successMessages.push("{{ message }}");
+        {% endif %}
+      {% endfor %}
+      
+      if (successMessages.length > 0) {
+        Swal.fire({
+          toast: true,
+          position: 'top-right',
+          background: 'FFFFFF',
+          showConfirmButton: false,
+          icon: 'success',
+          timer: 4000,
+          title: successMessages.join('<br>'),
+          timerProgressBar: true
+        }).then((result) => {
+          if (result.dismiss === Swal.DismissReason.timer) {
+          }
+        });
+      }
+    
+      if (errorMessages.length > 0) {
+        Swal.fire({
+          toast: true,
+          position: 'top-right',
+          background: 'FFFFFF',
+          showConfirmButton: false,
+          icon: 'error',
+          timer: 4000,
+          title: errorMessages.join('<br>'),
+          timerProgressBar: true
+        }).then((result) => {
+          // This code will be executed when the popup is closed
+          if (result.dismiss === Swal.DismissReason.timer) {
+            // The timer was complete, do something here
+          }
+        });
+      }
+    });
+    </script>
+    {% endif %}
+</body>
+</html>

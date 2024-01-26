@@ -87,24 +87,24 @@
         <div class="d-flex mt-2 row">
           <div class="col-md-4 form-content">
             <input type="hidden" name="fee_id" id="fee_id">
-            <label for="fee_total" class="form-label">Total Fees</label>
+            <label for="fee_total" class="form-label">Total Fees</label><span class="text-danger ms-2">*</span>
             <input type="number" class="form-control fee_total" id="fee_total" name="fee_total"
               placeholder="Enter Total Course Fee">
           </div>
           <div class="col-md-4 form-content">
-            <label for="fee_admission" class="form-label">Admission Fees</label>
+            <label for="fee_admission" class="form-label">Admission Fees</label><span class="text-danger ms-2">*</span>
             <input type="number" class="form-control fee_admission" id="fee_admission" name="fee_admission"
               placeholder="Enter Admission Fee">
           </div>
         </div>
         <div class="d-flex mt-2">
           <div class="col-md-4 form-content">
-            <label for="install_amount" class="form-label feesLabel">Total Installment Amount</label>
+            <label for="install_amount" class="form-label feesLabel">Total Installment Amount</label><span class="text-danger ms-2">*</span>
             <input type="number" class="form-control" id="install_amount" name="total_installments"
               placeholder="e.g. 17000" required />
           </div>
           <div class="col-md-4 form-content" id="classId">
-            <label for="getClassId" class="form-label feesLabel" id="Class">Class Name</label>
+            <label for="getClassId" class="form-label feesLabel" id="Class">Class Name</label><span class="text-danger ms-2">*</span>
             <select class="form-select custom-select-lg bg-white form-control classDropdown" id="getClassId"
               name="class_id">
             </select>
@@ -113,6 +113,7 @@
         <div class="d-flex mt-2">
           <div class="col-md-6 form-content installment">
             <label for="installment_dropdown" class="form-label feesLabel" id="Installment">Installment Type</label>
+            <span class="text-danger ms-2">*</span>
             <select class="form-select" id="installment_dropdown" multiple aria-label="multiple select example"
               name="installment_id">
             </select>

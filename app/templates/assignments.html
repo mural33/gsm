@@ -14,19 +14,21 @@
             <div class="col text-end">
                 <button type="button" class="btn btn-success btn-label rounded-pill right" data-bs-toggle="modal"
                     data-bs-target="#assignmentModal">
-                    <i class="bi bi-plus-circle label-icon align-middle fs-lg ms-2"></i>Create  Assigment
+                    <i class="bi bi-plus-circle label-icon align-middle fs-lg ms-2"></i>Create Assigment
                 </button>
+                <button type="button" class="btn btn-dark btn-sm rounded-pill" data-bs-toggle="modal" data-bs-target="#assignmentFilter"><i
+                        class="bi bi-funnel-fill "></i></button>
             </div>
         </div>
     </div>
 </div>
- 
+
 <div class="modal fade" id="assignmentModal" tabindex="-1" aria-labelledby="assignmentModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content" id="assignment">
             <div class="modal-header">
                 <h5 class="modal-title" id="assignmentModalLabel">Create Assignment</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close btnCloseModel" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div class="d-flex mt-3">
@@ -39,26 +41,38 @@
                 </div>
                 <input type="hidden" id="assignment_id" name="assignment_id">
                 <div class="col-md-12">
-                    <label class="form-label" for="assignment_Date">Assignment Date<span style="color: red;">*</span></label>
+                    <label class="form-label" for="assignment_Date">Assignment Date<span
+                            style="color: red;">*</span></label>
                     <input type="date" class="form-control" id="assignment_Date" name="assignment_Date">
                 </div>
                 <div class="col-md-12">
-                    <label for="assignment_due_date" class="form-label">Assignment Due Date <span style="color: red;">*</span></label>
+                    <label for="assignment_due_date" class="form-label">Assignment Due Date <span
+                            style="color: red;">*</span></label>
                     <input type="date" class="form-control" id="assignment_due_date" name="assignment_due_date">
                 </div>
                 <div class="col-md-12">
-                    <label for="assignment_title" class="form-label">Assignment Title<span style="color: red;">*</span></label>
-                    <input type="text" class="form-control" placeholder="Enter the Assignment Tittle" id="assignment_title" name="assignment_title" minlength="1" maxlength="100">
+                    <label for="assignment_title" class="form-label">Assignment Title<span
+                            style="color: red;">*</span></label>
+                    <input type="text" class="form-control" placeholder="Enter the Assignment Tittle"
+                        id="assignment_title" name="assignment_title" minlength="1" maxlength="100">
                 </div>
                 <div class="col-md-12">
-                    <label for="inputCity" class="form-label">Assignment Details <span style="color: red;">*</span></label>
-                    <textarea class="form-control" id="assignment_details" name="assignment_details" placeholder="Enter Description" minlength="1" maxlength="1000"></textarea>
+                    <label for="inputCity" class="form-label">Assignment Details <span
+                            style="color: red;">*</span></label>
+                    <textarea class="form-control" id="assignment_details" name="assignment_details"
+                        placeholder="Enter Description" minlength="1" maxlength="1000"></textarea>
+                </div>
+                <div class="col-md-12">
+                    <label for="class_id" class="form-label">Class</label>
+                    <select id="class_id" class="form-select" name="class_id">
+                        <option value="" selected>Select Class</option>
+                    </select>
                 </div>
                 <div class="row mt-3">
                     <div class="col-md-6">
-                        <label for="class_id" class="form-label">Class</label>
-                        <select id="class_id" class="form-select" name="class_id">
-                            <option value="" selected>Select Class</option>
+                        <label for="semister_id-label" class="form-label">Semister</label>
+                        <select id="semister_id" class="form-select" name="semister_id">
+                            <option value="" selected>select Semister</option>
                         </select>
                     </div>
                     <div class="col-md-6">
@@ -70,7 +84,7 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <a href="javascript:void(0);" class="btn btn-link link-success fw-medium" data-bs-dismiss="modal">
+                <a href="javascript:void(0);" class="btn btn-link link-success fw-medium btnCloseModel" data-bs-dismiss="modal">
                     <i class="ri-close-line me-1 align-middle"></i> Close
                 </a>
                 <button type="button" class="btn btn-primary" id="btnSave" name="btnSave">Save</button>
@@ -78,15 +92,15 @@
         </div>
     </div>
 </div>
- 
- 
- 
+
+
+
 <div class="row">
     <div class="col-md-12" id="assignments_container">
         <table class="table table-striped table-hover table-sticky table_students" id="assignmentTable">
             <thead class="thead-dark">
                 <tr>
-                    <th>S.NO</th>
+                  <th>SNo</th>
                     <th>Assigment Title</th>
                     <th>Assigned To</th>
                     <th>Assignment Date</th>
@@ -95,20 +109,23 @@
                     <th>Action</th>
                 </tr>
             </thead>
- 
+
             <tbody class='tbl__bdy' id="assignments_info">
                 {% for assign in assignment_data %}
-                <tr class="tr-assign-{{assign.id}}">
+                <tr class="tr-assign-{{assign.id}} assignment-row">
                     <td>{{ forloop.counter }}</td>
-                    <td class=" text-break assignment_title"><a href={% url "assignmentInfo" assign.assignment_slug %}>{{ assign.assignment_title }}</a></td>
+                    <td class=" text-break assignment_title"><a href={% url 'assignmentInfo' assign.assignment_slug %}>{{ assign.assignment_title }}</a></td>
                     <td class="text-break">
-                        <span class="class_id">{{ assign.classes.class_name }}</span>-
-                        <span class="section_id">{{ assign.sections.section_name }}</span>
+                        <span class="class_id" data-class="{{assign.class_id}}" data-promotion='{{assign.promotion_type}}' data-total_number_of_promotion='{{assign.total_number_of_promotion}}'>{{ assign.classes.class_name }}</span>-
+                        <span class="section_id"  data-section="{{assign.section_id}}">{{ assign.sections.section_name }}</span>
+
                     </td>
                     <td class=" text-break assignment_Date">{{ assign.assignment_Date }}</td>
-                    <td class="assignment_due_date">{{ assign.assignment_due_date }}</td>
+                    <td class="assignment_due_date"  data-class="{{assign.class_id}}" data-promotions='{{assign.promotion_type}}' data-total_number_of_promotions='{{assign.total_number_of_promotion}}'>{{ assign.assignment_due_date }}</td>
                     <td>
-                        <button type="button" class="openAssignmentBtn btn btn-sm btn-dark rounded-pill" data-bs-toggle="modal" data-bs-target="#assignment-view-modal" data-id="{{ assign.id }}" data-description="{{ assign.assignment_details }}">View</button>
+                        <button type="button" class="openAssignmentBtn btn btn-sm btn-dark rounded-pill"
+                            data-bs-toggle="modal" data-bs-target="#assignment-view-modal" data-id="{{ assign.id }}"
+                            data-description="{{ assign.assignment_details }}">View</button>
                     </td>
                     <td>
                         <button type="button" class="btn btn-sm btn-info btnEdit" id="btnEdit"
@@ -127,17 +144,59 @@
     </div>
 </div>
 
-<div class="modal fade bs-example-modal-md" id="assignment-view-modal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+<div class="modal fade bs-example-modal-md" id="assignment-view-modal" tabindex="-1" role="dialog"
+    aria-labelledby="mySmallModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-md">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="mySmallModalLabel">Assigment Details</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close btnCloseModel" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body" id="assignment-modal-body"></div>
+        </div>
+    </div>
+</div>
+</div>
+
+
+<div class="modal fade" id="assignmentFilter" tabindex="-1" aria-labelledby="assignmentModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" id="filter">
+            <div class="modal-header">
+                <h5 class="modal-title" id="assignmentModalLabel">Filter Assignment</h5>
+                <button type="button" class="btn-close btnCloseModel" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row mt-3">
+                    <div class="col-md-4">
+                        <label for="filter_class_id" class="form-label">Class</label>
+                        <select id="filter_class_id" class="form-select" name="filter_class_id">
+                            <option value="" selected>Select Class</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="filter_semister_id" class="form-label">Semister</label>
+                        <select id="filter_semister_id" class="form-select" name="filter_semister_id">
+                            <option value="" selected>select Semister</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="filter_section_id" class="form-label">Section</label>
+                        <select id="filter_section_id" class="form-select" name="filter_section_id">
+                            <option value="" selected>Select Section</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a href="javascript:void(0);" class="btn btn-link link-success fw-medium btnCloseModel" data-bs-dismiss="modal">
+                    <i class="ri-close-line me-1 align-middle"></i> Close
+                </a>
+                <button type="button" class="btn btn-primary" id="btnFilterAssignment" name="btnfilterAssignment">Filter</button>
             </div>
         </div>
     </div>
 </div>
+
 <script src="{% static 'app-js/assignments.js' %}"></script>
 {% endblock %}

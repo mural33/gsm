@@ -37,17 +37,17 @@ class Institute:
             "institute_id": data.get("id"),
             "user_photo_url": "https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png",
         }
-
         self.headers = {
             "accept": "application/json",
             "Content-Type": "application/json",
         }
+        print("check data api",self.api_url + end_point)
         self.responce = requests.post(
             self.api_url + end_point, json=data, headers=self.headers
         )
+        print("check response code",self.responce.status_code)
         if self.responce.status_code == 200:
             user = self.create_user(end_point="/Users/create_user/", data=self.user)
-
             if user["status"]:
                 return {"status": True, "data": self.responce.json()}
             return {"status": False, "data": user["data"]}
@@ -84,6 +84,7 @@ class Institute:
                 self.Subscription_URL, data=self.subscription_data
             )
             self.responcce_data = self.responce.json()
+            print("check responce data",self.responcce_data)
             if self.responcce_data["status"]:
                 self.fastapi_data = {
                     "id": data.get("institution_id"),
@@ -100,10 +101,11 @@ class Institute:
                     "institute_fav_icon": "string",
                     "institute_tag_line": "string",
                     "institute_website": "string",
-                    "point_of_contact": "string",
+                    "point_of_contact": data.get("full_name"),
                     "date_of_registration": datetime.today().date().isoformat(),
                     "is_deleted": False,
                 }
+                print("check fastapi data",self.fastapi_data)
                 self.fastapi_data["password"] = data.get("institute_password")
                 return {"status": True, "data": self.fastapi_data}
             else:

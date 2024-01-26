@@ -1,5 +1,8 @@
 $(document).ready(() => {
     let studentInfo =JSON.parse($("#studentInfo").val());
+
+    // student calendar
+    loadCalendarDetails(studentInfo.classId, studentInfo.sectionId);
     // 
     const studentAttendance = new StudentAttendance();
     studentAttendance.getAttendance();
@@ -31,8 +34,17 @@ $(document).ready(() => {
     const studentDocuments = new StudentDocuments(studentInfo.studentId);
     studentDocuments.getStudentDocuments();
     $("#btnstudentDocument").on("click", async (e) => {
-        await studentDocuments.uploadStudentDocument();
-    })
+        var docsName = $("#document_name").val();
+        if (docsName.trim().length >= 2) {
+            await studentDocuments.uploadStudentDocument();
+        } else {
+            $("#document_name").addClass("is-invalid");
+        }
+    });
+
+    $(".dataTables_empty").html(
+        `<img src="/assets/img/no_data_found.png" alt="No Image" class="no_data_found" id="no_data_found">`
+    )
 });
 // --------------------------Base AJax Request--------------------------
 async function ajaxRequest(type, url, data,loaderId,loaderSize,successCallback) {
@@ -184,6 +196,7 @@ class StudentParent {
     }
 
     async addNewParent(response) {
+        $("#parentRow").find("#no_data_found").hide();
         var parentData = response;
         var parentRow = $("#parentRow");
         var img = parentData.parent_gender === 'Male' ?'/assets/img/male.png' :'/assets/img/female.png'
@@ -660,11 +673,10 @@ function showDiscount(element){
 }
 function showInstallments(element) {
     let installmentTable = $("#installmentTable").DataTable();
+    installmentTable.clear().destroy();
     var installmentCount = $(element).val();
     var totalFee = $("#total_insta_amount").val();
     var installmentAmount = (parseFloat(totalFee) / installmentCount).toFixed(2);
-    installmentTable.clear().draw();
-
     for (let i = 1; i <= installmentCount; i++) {
         var color = "bg-danger";
         var statusMsg = "Unpaid";
@@ -682,9 +694,11 @@ function showInstallments(element) {
                 </td>
             </tr>
         `;
-        installmentTable.row.add($(row)).draw();
+        installmentTable.row.add($(row)).draw()
     }
+    installmentTable.draw();
 }
+
 async function editInstallment(element){
     var installmentId = $(element).attr("data-installment_id");
     $("#editInstallment").modal('show');
@@ -761,8 +775,13 @@ class StudentActivity{
         if(await this.validateStudentActivityForm() === true){
             await this.ajaxRequest(method, totalUrl, activityData, "activityFormArea", "sm",async(response) => {
                 var studentActivity = response.response;
-                activityId ? updateActivity(studentActivity):updateActivity(studentActivity);
-                this.activityTable.row.add($(showActivity(studentActivity))).draw();
+                if(activityId){
+                    updateActivity(studentActivity)
+                }
+                else{
+                    var row = showActivity(studentActivity)
+                    this.activityTable.row.add($(row)).draw()
+                }
                 function showActivity(response){
                     var activity = response
                     var title = activity.activity_name
@@ -792,6 +811,7 @@ class StudentActivity{
                 }
                 function updateActivity(response){
                     var activityTr = $(`.tr-activity-${activityId}`);
+                    $("#activityForm").modal('hide');
                     var activity = response
                     var title = activity.activity_name
                     var desc = activity.activity_description
@@ -898,9 +918,11 @@ async function deleteActivity(element){
             var totalUrl = apiUrl+endPoint;
             ajaxRequest("DELETE",totalUrl, "","activityTable","sm",(response) => {
                 $(`.tr-activity-${activityId}`).remove()
+
             })
         }
     });
+
 }
 function editActivity(element){
     var activityId = $(element).attr("data-activity_id");
@@ -1029,7 +1051,15 @@ class StudentAssignment{
             }
         }
         $("#assginmentTable").DataTable()
+        noDataImage()
     }
+
+}
+function openAssignmentDetails(response) {
+    var assignmentModel =  $("#assignmentDetailse")
+    assignmentModel.modal('show')
+    assignmentModel.find(".modal-title").text("Assignment Details")
+    assignmentModel.find(".modal-desc").text(response)
 }
 // ----------------------------------studentAssignment----------------------------------------
 // ----------------------------------studentDocument----------------------------------------
@@ -1128,6 +1158,8 @@ class StudentDocuments {
         var totalUrl = apiUrl + endPoint;
 
         await this.ajaxRequest(method, totalUrl, payload, "documentFormArea", "sm",(response) => {
+            noDataImage()
+            $("#documentForm").find("input,select,textarea").val("")
             $("#documentForm").modal('hide')
             this.docuemntRow = $("#documentRow")
             var docs = response.response
@@ -1202,3 +1234,101 @@ async function editeDocument(element){
         $("#document_id").val(documentData.document_id)
     })
 }
+async function loadCalendarDetails(class_id, section_id) {
+    try {
+    var searchUrl = `${apiUrl}/Calender/get_calender_by_class&section/?class_id=${class_id}&section_id=${section_id}`;
+      const calendarData = await $.ajax({
+        type: "GET",
+        url: searchUrl,
+        mode: "cors",
+        crossDomain: true,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${jwtToken}`,
+        },
+        beforeSend: (e) => {
+            showLoader('calenderTable', 'sm');
+        },
+      });
+  
+      var calendarDetailsContainer = $("#calendar");
+      var calendarTable = calendarDetailsContainer.find("#calenderTable");
+      var noDataImage = calendarDetailsContainer.find('.no_data_found');
+  
+      if (!calendarData.response || calendarData.response.length === 0) {
+        noDataImage.show();
+        calendarTable.hide();
+      } else {
+        noDataImage.hide();
+        calendarTable.show();
+  
+        var data = calendarData.response;
+        var className = [...new Set(data.map(item => item.classes.class_name))];
+        var sectionName = [...new Set(data.map(item => item.sections.section_name))];
+        var classSectionRow = $("<tr>");
+        classSectionRow.append(`<td colspan="8" class="col" id="column"><center><b>${className} - ${sectionName}</b></center></td>`);
+        calendarTable.empty().append(classSectionRow);
+  
+        var headerRow = $("<tr class='col' id='column'>");
+        headerRow.append("<th>Time</th>");
+  
+        const dayOrder = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+        var uniqueDays = [...new Set(data.map(item => item.day))];
+        uniqueDays.sort((a, b) => dayOrder.indexOf(a) - dayOrder.indexOf(b));
+  
+        uniqueDays.forEach(day => {
+          headerRow.append(`<th>${day}</th>`);
+        });
+        calendarTable.append(headerRow);
+  
+        var timeDayMap = {};
+        data.forEach(item => {
+          var timeKey = `${item.start_time}-${item.end_time}`;
+          if (!timeDayMap[timeKey]) {
+            timeDayMap[timeKey] = {};
+          }
+          timeDayMap[timeKey][item.day] = {
+            subject: item.subjects.subject_name,
+            staff: item.staffs.staff_name,
+          };
+        });
+  
+        for (var timeKey in timeDayMap) {
+          var timeSlotRow = $("<tr class='rowData'>");
+          timeSlotRow.append(`<td class="mod" id="tdData">${timeKey}</td>`);
+  
+          uniqueDays.forEach(day => {
+            var cellData = timeDayMap[timeKey][day];
+            if (cellData) {
+              timeSlotRow.append(`<td id="tableData">${cellData.subject} <br> (${cellData.staff})</td>`);
+            } else {
+              timeSlotRow.append('<td id="tableData"></td>');
+            }
+          });
+          calendarTable.append(timeSlotRow);
+        }
+      }
+    if(calendarData.response.length == 0){
+        $("#calendar").html(
+          `
+            <div class="row">
+            <div class="text-center" id="no_data_found">
+            <img src="/assets/img/no_data_found.png" alt="No Image" class="no_data_found" id="no_data_found">
+            </div>
+            </div>
+            `
+        );
+    }
+    } catch (error) {
+        console.log(error);
+      raiseErrorAlert(error.responseJSON.detail);
+    } finally {
+      removeLoader("calenderTable", "sm");
+    }
+  }
+function noDataImage(){
+    $(".dataTables_empty").html(
+        `<img src="/assets/img/no_data_found.png" alt="No Image" class="no_data_found" id="no_data_found">`
+    )
+}
+noDataImage()

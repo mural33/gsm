@@ -33,6 +33,10 @@ $(document).ready(function(){
         }
     });
     getExamsData();
+
+    $("#btnAnnounceResult").on("click", async function () {
+        await examResult.announceResult();
+    });
 })
 async function refreshResult(){
     let examInfo = JSON.parse($('#parentData').attr('data-examinfo'));
@@ -50,10 +54,66 @@ function showBtnResultRefresh(){
     `)
 }
 
+async function ajaxRequest(type, url, data,loaderId,loaderSize,successCallback) {
+    await $.ajax({
+        type: type,
+        url: url,
+        data: JSON.stringify(data),
+        mode: "cors",
+        crossDomain: true,
+        headers: {
+            "Authorization": `Bearer ${jwtToken}`,
+            "Content-Type": "application/json",
+        },
+        contentType: "application/json",
+        dataType: "json",
+        beforeSend: () => {
+            showLoader(loaderId,loaderSize);
+        },
+        success: (response) => {
+            successCallback(response);
+        },
+        error: (error) => {
+            raiseErrorAlert(error.responseJSON);
+        },
+        complete: () => {
+            removeLoader(loaderId, loaderSize);
+        }
+    });
+}
+
+
+async function deleteResultEntry(element){
+    var resultTable = $("#resultTable")
+    var resultId = $(element).attr("data-result_id");
+    var endPoint = `/Result/delete_result_entry_by_id/?result_entry_id=${resultId}`;
+    var totalUrl = apiUrl+endPoint;
+    await Swal.fire({
+        title: 'Are you sure, you want to delete this Record?',
+        text: 'This can\'t be reverted!',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            ajaxRequest("DELETE", totalUrl, "","resultTableColumn","sm",(response) => {
+                var row = $(`#tr-result-${resultId}`)
+                resultTable.DataTable().row(row).remove().draw();
+                var studentCount = parseInt($(".student_count").text()) - 1;
+                $(".student_count").text(studentCount);
+                raiseSuccessAlert(response.msg);
+            })
+        }
+    })
+}
+
 class ExamResult{
     constructor(examID){
         this.examID = examID;
         this.subjectData = {}
+        this.resultTable = $("#resultTable").dataTable()
     }
     async ajaxRequest(type, url, data,loaderId,loaderSize,successCallback) {
         await $.ajax({
@@ -142,25 +202,24 @@ class ExamResult{
     }
     async displayExamResult(response) {
         var resultTable = $("#resultTable");
-        resultTable.find("tbody").html("");
+        resultTable.DataTable().clear().draw();
         response.forEach(result => {
             var tr = `
-                <tr>
+                <tr id="tr-result-${result.result_entry_id}">
                     <td>${result.student.student_name}</td>
                     <td>${result.student.roll_number}</td>
                     <td>${result.result.total_obtained_marks}</td>
                     <td>${result.result.percentage}</td>
                     <td>${result.result.grade}</td>
                     <td>
-                        <button type="button" class="btn btn-danger btn-sm">
+                        <button type="button" class="btn btn-danger btn-sm" data-result_id ="${result.result_entry_id}" onClick="deleteResultEntry(this)">
                             <i class="bi bi-trash mx-2"></i>
                         </button>
                     </td>
                 </tr>
             `;
-            resultTable.find("tbody").append(tr);
+            resultTable.DataTable().row.add($(tr)).draw();
         });
-        resultTable.dataTable();
     }
     async displayRank(response) {
         showLoader("tableRank", "sm")
@@ -203,6 +262,16 @@ class ExamResult{
         });
         return gradeData;
     }
+    async announceResult(){
+        var endPoint = `/ParentExams/announce_results?parent_exam_id=${this.examID}`;
+        var totalUrl = apiUrl+endPoint;
+        await this.ajaxRequest("PATCH", totalUrl, {}, "summary", "sm", async (response) => {
+            raiseSuccessAlert(response.msg);
+            if(response.status == 200){
+                raiseSuccessAlert(response.msg);
+            }
+        });
+    }
 }
 async function readExcelData(file, parentExamId, examSubjects, gradeData) {
     try {
@@ -237,13 +306,13 @@ async function readExcelData(file, parentExamId, examSubjects, gradeData) {
                 var subjectMarks = {
                     "subject_name": subject,
                     "full_mark": examSubject.full_marks,
-                    "obtained_mark": mark,
+                    "obtained_mark": mark?mark:0,
                     "percentage": parseFloat((mark / examSubject.full_marks) * 100).toFixed(2),
                     "grade": await getGrade(parseFloat((mark / examSubject.full_marks) * 100).toFixed(2), gradeData)
                 };
 
                 studentData.result["marks"].push(subjectMarks);
-                total_obtained_marks += parseFloat(mark);
+                total_obtained_marks += mark?parseFloat(mark):0;
                 total_full_marks += parseFloat(examSubject.full_marks);
             }
 
@@ -259,20 +328,23 @@ async function readExcelData(file, parentExamId, examSubjects, gradeData) {
         raiseErrorAlert("Error reading Excel file");
     }
 }
-
 // creating barchat
-function createBarChart(label,data,backgroundColor,chartId) {
+function createBarChart(label, data, backgroundColor, chartId) {
+    var existingChart = Chart.getChart(chartId);
+    if (existingChart) {
+        existingChart.destroy();
+    }
     var ctx = document.getElementById(chartId).getContext('2d');
     var myChart = new Chart(ctx, {
         type: 'bar',
-        labels:"Grade",
+        labels: "Grade",
         data: {
-            labels:label,
+            labels: label,
             datasets: [{
-                label:"No of Students in Grade",
+                label: "No of Students in Grade",
                 data: data,
-                backgroundColor:backgroundColor,
-                borderColor: 'rgba(75, 192, 192, 1)', 
+                backgroundColor: backgroundColor,
+                borderColor: 'rgba(75, 192, 192, 1)',
                 borderWidth: 1
             }]
         },
@@ -287,7 +359,6 @@ function createBarChart(label,data,backgroundColor,chartId) {
         }
     });
 }
-
 async function getGrade(percentage,gradeData){
     for (const key in gradeData) {
         if (Object.hasOwnProperty.call(gradeData, key)) {
@@ -301,4 +372,5 @@ async function getGrade(percentage,gradeData){
         }
     }
 }
+
 

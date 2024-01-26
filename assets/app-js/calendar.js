@@ -22,11 +22,11 @@ $(document).ready(function () {
     $('#calendarPrintView').on('click', function () {
         window.print();
     });
-    $(".btnCloseEditModel").on("click", function(e){
+    $(".btnCloseEditModel").on("click", function (e) {
         const parentModel = $(this).closest(".modal");
         console.log(parentModel);
         parentModel.modal("hide");
-        $("input, textarea, select",parentModel).val("");
+        $("input, textarea, select", parentModel).val("");
         $('.context-menu-root').removeAttr('style').hide();
     });
     $("#class_id").on("change", function () {
@@ -58,7 +58,7 @@ async function getSectionsByClass(classId, selectedClass, loaderTarget) {
         contentType: "application/json",
         dataType: "json",
         beforeSend: (e) => {
-            showLoader(loaderTarget, "lg");
+            showLoader(loaderTarget, "sm");
         },
         success: (response) => {
             $(`#${selectedClass}`).empty();
@@ -70,10 +70,11 @@ async function getSectionsByClass(classId, selectedClass, loaderTarget) {
             raiseErrorAlert(error);
         },
         complete: (e) => {
-            removeLoader(loaderTarget, "lg");
+            removeLoader(loaderTarget, "sm");
         }
     });
 }
+
 function initializeClassSelect() {
     const classurl = `${apiUrl}/Classes/get_classes_by_institute/?institite_id=${instituteId}`;
     $.ajax({
@@ -83,6 +84,8 @@ function initializeClassSelect() {
             "Authorization": `Bearer ${jwtToken}`,
             "Content-Type": "application/json",
         },
+        beforeSend: (e) => {
+        },
         success: (response) => {
             for (const class_id of response) {
                 $("#class_id").append(`<option value="${class_id.class_id}">${class_id.class_name}</option>`);
@@ -91,6 +94,8 @@ function initializeClassSelect() {
         },
         error: function (error) {
             raiseErrorAlert(error.responseJSON.detail);
+        },
+        complete: (e) => {
         }
     });
 }
@@ -98,7 +103,7 @@ function initializeClassSelect() {
 function validateCalenderForm() {
     var isValid = true;
     const fields = ["subject_id", "staff_id", "day", "start_time", "end_time", 'form_class_id', 'form_section_id'];
-    
+
     for (const field of fields) {
         const element = $(`#${field}`);
         const value = element.val();
@@ -323,9 +328,13 @@ async function loadCalendarDetails(class_id, section_id) {
     }
 }
 
-async function openEditForm(cellData) {
+function openEditForm(cellData) {
     const calenderId = cellData && cellData.calender_id ? cellData.calender_id : '';
     const fetchUrl = `${apiUrl}/Calender/get_calender_by_id/?calender_id=${calenderId}`;
+    setTimeout(() => {
+        showLoader("calender_details", "lg");
+    }, 2000);
+
     $.ajax({
         type: 'GET',
         url: fetchUrl,
@@ -335,11 +344,8 @@ async function openEditForm(cellData) {
         },
         contentType: 'application/json',
         dataType: 'json',
-        beforeSend: (e) => {
-            showLoader("calender_details", "sm");
-        },
-    
         success: function (data) {
+            $('#calendarmodal').modal('show');
             if (data && data.response && data.response.length > 0) {
                 const responseData = data.response[0];
                 const classId = responseData.class_id;
@@ -351,19 +357,20 @@ async function openEditForm(cellData) {
                 $('#day').val(responseData.day);
                 $('#start_time').val(responseData.start_time);
                 $('#end_time').val(responseData.end_time);
-                $('#calendarmodal').modal('show');
                 simulateContextMenu(cellData);
             }
         },
         error: function (xhr, status, error) {
             raiseErrorAlert(xhr.responseJSON.detail);
-            console.error('Error:', error);
         },
-        complete: (e) => {
-        removeLoader("calender_details", "sm");
+        complete: function () {
+            setTimeout(() => {
+                removeLoader("calender_details", "lg");
+            }, 2000);
         }
     });
 }
+
 
 
 function simulateContextMenu(cellData) {
@@ -371,7 +378,7 @@ function simulateContextMenu(cellData) {
         edit: { name: 'Edit', icon: 'edit' },
         delete: { name: 'Delete', icon: 'delete' },
     };
-    
+
     $('#calenderTable').contextMenu({
         selector: '.editable-cell',
         items: contextMenuItems,
@@ -381,49 +388,104 @@ function simulateContextMenu(cellData) {
             } else if (key === 'delete') {
                 deletePeriod(cellData);
             }
-            
+
         },
 
     });
 
     const $targetCell = $(`.editable-cell[data-id="${cellData.calender_id}"]`);
     const e = $.Event('contextmenu', { pageX: $targetCell.offset().left, pageY: $targetCell.offset().top });
-    $targetCell.trigger(e);   
+    $targetCell.trigger(e);
 }
 
 
 async function deletePeriod(cellData) {
-    const calenderId = cellData && cellData.calender_id ? cellData.calender_id : '';
-    const deleteUrl = `${apiUrl}/Calender/delete_calender/?calender_id=${calenderId}`;
-    const deleteResult = await $.ajax({
-        type: 'DELETE',
-        url: deleteUrl,
-        headers: {
-            Authorization: `Bearer ${jwtToken}`,
-            'Content-Type': 'application/json',
-        },
-        contentType: 'application/json',
-        dataType: 'json',
-        beforeSend: (e) => {
-            showLoader("body", "sm");
-        },
-        success: (response) => {
-            if (response && response.status_code === 200) {
-                raiseSuccessAlert('Data deleted successfully');
-                const deletedCell = $(`#calenderTable td[data-id="${calenderId}"]`);
-                if (deletedCell) {
-                    deletedCell.html('');
+    try {
+        const calenderId = cellData && cellData.calender_id ? cellData.calender_id : '';
+        if (!calenderId) {
+            console.error('Invalid calenderId for deletion.');
+            return;
+        }
+
+        const deleteUrl = `${apiUrl}/Calender/delete_calender/?calender_id=${calenderId}`;
+        await $.ajax({
+            type: 'DELETE',
+            url: deleteUrl,
+            headers: {
+                Authorization: `Bearer ${jwtToken}`,
+                'Content-Type': 'application/json',
+            },
+            contentType: 'application/json',
+            dataType: 'json',
+            beforeSend: (e) => {
+                showLoader("body", "sm");
+            },
+            success: (response) => {
+                if (response && response.status_code === 200) {
+                    raiseSuccessAlert(response.msg);
+                    const deletedCell = $(`#calenderTable td[data-id="${calenderId}"]`);
+                    if (deletedCell.length > 0) {
+                        const row = deletedCell.closest('tr');
+                        deletedCell.remove();
+
+                        // Check if all cells (except the first one) are empty or contain only whitespace
+                        const cellsToCheck = row.find('td:not(:first-child)');
+                        const allCellsEmpty = cellsToCheck.toArray().every(cell => $(cell).text().trim() === '');
+
+                        if (allCellsEmpty) {
+                            row.remove();
+                        }
+                    }
+                } else {
+                    console.warn(`Failed to delete cell with calender_id ${calenderId}. Server response:`, response);
+                    raiseErrorAlert(response.msg);
                 }
-            }
-        },
-        complete: (e) => {
-            removeLoader("body", "sm");
-        },
-    });
+            },
+            error: (jqXHR, textStatus, errorThrown) => {
+                console.error(`Error: ${textStatus}, ${errorThrown}`);
+                console.log(jqXHR.responseText); // Log the server response
+                raiseErrorAlert('Error deleting data. Please try again.');
+            },
+            complete: (e) => {
+                removeLoader("body", "sm");
+            },
+        });
+    } catch (error) {
+        console.error('An unexpected error occurred:', error);
+        raiseErrorAlert('An unexpected error occurred. Please try again.');
+    }
 }
 
 
 
 
-
-
+// async function deletePeriod(cellData) {
+//     const calenderId = cellData && cellData.calender_id ? cellData.calender_id : '';
+//     const deleteUrl = `${apiUrl}/Calender/delete_calender/?calender_id=${calenderId}`;
+//     await $.ajax({
+//         type: 'DELETE',
+//         url: deleteUrl,
+//         headers: {
+//             Authorization: `Bearer ${jwtToken}`,
+//             'Content-Type': 'application/json',
+//         },
+//         contentType: 'application/json',
+//         dataType: 'json',
+//         beforeSend: (e) => {
+//             showLoader("body", "sm");
+//         },
+//         success: (response) => {
+//             if (response && response.status_code === 200) {
+//                 raiseSuccessAlert('Data deleted successfully');
+//                 const deletedCell = $(`#calenderTable td[data-id="${calenderId}"]`);
+//                 if (deletedCell.length > 0) {
+//                     deletedCell.remove();                }
+//             }   else {
+//                 console.warn(`Cell with calender_id ${calenderId} not found.`);
+//             }
+//         },
+//         complete: (e) => {
+//             removeLoader("body", "sm");
+//         },
+//     });
+// }

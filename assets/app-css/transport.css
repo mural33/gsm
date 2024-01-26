@@ -54,3 +54,16 @@
 #transportNameContent {
     word-wrap: break-word;
 }
+div.dataTables_wrapper div.dataTables_info {
+    padding-top: .85em;
+    margin-right: 19rem;
+    max-width: 11rem;
+}
+ 
+div.dataTables_wrapper div.dataTables_length label {
+    font-weight: normal;
+    text-align: left;
+    white-space: nowrap;
+    margin-right: 29rem;
+    margin-top: 0.7rem;
+}

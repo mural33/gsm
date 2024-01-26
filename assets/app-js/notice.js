@@ -13,6 +13,7 @@ $(document).ready(function () {
         // Show the modal
         $('#notice-view-modal').modal('show');
     });
+    $('#btnFilterNotice').on('click',filterNotice);
 });
 
 {
@@ -79,3 +80,51 @@ function checkNoRecords() {
         $('.no_data_found-tr').hide();
     }
 }
+async function filterNotice() {
+    const noticeTable = $('#noticeTable').DataTable();
+    var noticeDate = $('#noticeDate').val();
+    var dueDate = $('#dueDate').val();
+    var recipient = $('#recipient').val();
+    console.log(noticeDate, dueDate, recipient)
+
+    DataTable.ext.search = [];
+
+    DataTable.ext.search.push(function (settings, data, dataIndex) {
+        var filterNoticeDate = new Date(noticeDate).getTime();
+        var filterDueDate = new Date(dueDate).getTime();
+        var filterRecipient = recipient;
+        console.log(filterDueDate, filterRecipient, filterNoticeDate)
+
+        let row = noticeTable.row(dataIndex).nodes().to$();
+        let NoticeDate = new Date(row.find('.notice_date').data('notice-date')).getTime();
+        let DueDate = new Date(row.find('.due_date').data('due-date')).getTime();
+        let Recipient = row.find('.recipient').data('recipient');
+        console.log(NoticeDate, DueDate, Recipient)
+
+        if (
+            (filterRecipient === Recipient || filterRecipient === '' || filterRecipient === undefined) &&
+            (isNaN(filterDueDate) || filterDueDate === undefined) &&
+            (isNaN(filterNoticeDate) || NoticeDate >= filterNoticeDate)
+        ) {
+            console.log("if");
+            return true;
+        } else if (
+            (filterRecipient === Recipient || filterRecipient === '' || filterRecipient === undefined) &&
+            (isNaN(filterNoticeDate) || NoticeDate >= filterNoticeDate) &&
+            (isNaN(filterDueDate) || DueDate <= filterDueDate)
+        ) {
+            console.log("else if 1");
+            return true;
+        } else {
+            console.log("else");
+            return false;
+        }
+    });
+
+    noticeTable.draw();
+    $("#noticeFilter").modal("hide");
+}
+
+
+
+

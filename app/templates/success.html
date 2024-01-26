@@ -12,6 +12,7 @@
         <div class="card p-4">
             <h1 class="text-success mb-4">Payment Successful!</h1>
             <p>Your payment was processed successfully.</p>
+            <p>Amount: <strong id="amount"></strong></p>
             <p>Order ID: <strong id="orderID"></strong></p>
             <p>Product ID: <strong id="paymentID"></strong></p>
 
@@ -33,15 +34,14 @@
         document.addEventListener('DOMContentLoaded', function () {
             const orderId = localStorage.getItem('razorpay_order_id');
             const paymentId = localStorage.getItem('razorpay_payment_id');
-
-            // Display the information in your HTML elements
+            const amount = localStorage.getItem('amount');
             if (orderId && paymentId) {
                 document.getElementById('orderID').textContent = orderId;
                 document.getElementById('paymentID').textContent = paymentId;
-
-                // Clear localStorage to avoid displaying it on subsequent visits
+                document.getElementById('amount').textContent = amount;
                 localStorage.removeItem('razorpay_order_id');
                 localStorage.removeItem('razorpay_payment_id');
+                localStorage.removeItem('amount');
             }
         });
     </script>

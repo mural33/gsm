@@ -44,13 +44,19 @@
                     <!-- summary tab started -->
                     <div class="tab-content text-muted">
                         <div class="tab-pane active" id="summary" role="tabpanel">
-                            <div class="row">
-                                <div class="col-md-12">
+                            <div class="row my-3">
+                                <div class="col-md-6">
                                     <p class="">Summary</p>
                                 </div>
+                                <div class="col-md-6">
+                                    <button class="btn btn-dark text-white btn-md float-end p-2" id="btnAnnounceResult">Announce Result 
+                                        <i class="bi bi-megaphone-fill mx-2"></i>
+                                    </button>
+                                </div>
+
                             </div>
                             <div class="row">
-                                <div class="col-md-8">
+                                <div class="col-md-12">
                                     <div class="row">
                                         <div class="col-md-6">
                                             <div class="chartbardiv" style="height: 20rem;">
@@ -74,16 +80,17 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-md-4"></div>
                             </div>
                         </div>
                         <!-- summary tab End -->
                         <div class="tab-pane" id="resultEntry" role="tabpanel">
                             <div class="row">
-                                <h6>Reslut</h6>
+                                <div class="col-md-12">
+                                    <p class="">Result</p>
+                                </div>
                             </div>
                             <div class="row">
-                                <div class="col-md-6" id="uploadExcelColumn">
+                                <div class="col-md-4" id="uploadExcelColumn">
                                     <div class="row text-center">
                                         <div class="col-md-12 my-2">
                                             <a href="{% url 'generate_excel_file_for_result' exam_data.parent_exam_id %}" class="btn btn-primary">
@@ -102,7 +109,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-md-6" id="resultTableColumn">
+                                <div class="col-md-8" id="resultTableColumn">
                                     <div class="row">
                                         <div class="col-md-12 my-2">
                                             <h6>
@@ -117,7 +124,7 @@
                                                 <thead class="thead-dark">
                                                     <tr>
                                                         <th>Student Name</th>
-                                                        <th>Student Name</th>
+                                                        <th>Roll Number</th>
                                                         <th>Obtained Marks</th>
                                                         <th>%</th>
                                                         <th>Grade</th>

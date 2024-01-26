@@ -5,17 +5,21 @@
 <link rel="stylesheet" href="{% static 'app-css/staff_info.css' %}" />
 <script src="{% static 'app-js/staffInfo.js' %}"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.0/dist/html2pdf.bundle.js"></script>
+<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 
 <div class="row" id="heading-row">
     <div class="col-sm-12 col-md-9 col-xl-12 d-flex align-items-center" style="padding: 1rem">
-        <a href="{% url 'staffs' %}">
-            <i class="bi bi-arrow-left" style="font-size:1.5rem;"></i>
-        </a>
+       <a href="{% url 'staffs' %}" class="btn">
+          <i class="bi bi-arrow-left" style="font-size:1.5rem;"></i>
+      </a>
+
         <div class="mx-2">
             <h5>Staff Information</h5>
             <quote>Teachers illuminate the path to knowledge, guiding minds to brilliance with each lesson they share.</quote>
         </div>
         <div class="ms-auto">
+          <a id="downloadSnapshot" href="{% url 'staffIdCard' staff_slug %}" target="_blank" style="padding: 1rem">Virtual ID card</a>
           <a href="{% url 'edit_staff' staff_slug %}" data-id="{{ staff_data.staff_id }}"
               class="btnStaffEdit btn btn-sm btn-info">
               <i class="bi bi-pencil-square"></i>
@@ -505,4 +509,5 @@
     </div>
 </div>
 <!-- Document PopModel -->
+
 {% endblock %}

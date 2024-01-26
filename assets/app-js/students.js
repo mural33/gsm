@@ -1,5 +1,9 @@
 $("document").ready(function(){
     $("#studentsTable").DataTable()
+    // $('#studentsTable').DataTable({
+    //     dom: 'Bfrtip',
+    //     buttons: ['copy', 'csv', 'excel', 'pdf', 'print']
+    // });
     $(".btnStudentDelete").on("click",async function() {
     await Swal.fire({
         title: 'Are you sure, you want to delete this Record?',

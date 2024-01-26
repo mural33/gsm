@@ -188,3 +188,12 @@ body{
     object-fit: scale-down !important;
     margin-top: 1rem;
 }
+.organization_logo {
+    max-width: 65px;
+}
+.gradeChart{
+    width: 700px;
+    height: 300px;
+    display: block;
+    box-sizing: border-box;
+}

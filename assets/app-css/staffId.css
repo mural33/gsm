@@ -1,0 +1,97 @@
+.container-fluid {
+    min-height: 100vh;
+}
+
+.row {
+    margin: auto;
+    width: 40rem;
+    margin-top: 8rem;
+
+}
+
+.font {
+    height: 100%;
+    border-radius: 15px;
+    border: 1px solid #ddd; 
+   
+}
+
+.top {
+    min-height: auto;
+    background-color: #8338ec;
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+   
+}
+
+.bottom {
+    min-height: auto;
+    background-color: white;
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
+}
+
+.bottom p {
+    text-align: left;
+    text-transform: capitalize;
+    font-size: 14px;
+}
+
+.bottom .desi {
+    font-size: 12px;
+    color: grey;
+    font-weight: normal;
+    text-align: center;
+}
+
+@media screen and (max-width: 600px) {
+    .container-fluid {
+        height: auto;
+    }
+}
+
+.back {
+    height: 100%; /* Adjust the height as needed */
+    border-radius: 10px;
+    background-color: #8338ec;
+}
+
+.Details {
+    color: white;
+    text-align: center;
+    padding: 10px;
+    font-size: 25px;
+}
+
+.details-info {
+    color: white;
+    text-align: left;
+    padding: 5px;
+    line-height: 20px;
+    font-size: 16px;
+    text-align: center;
+    margin-top: 20px;
+    line-height: 22px;
+}
+
+.table td {
+    font-size: 15px;
+}
+
+.photo {
+    height: 100px; width: 100px; background-color: #e6ebe0; border-radius: 10px;
+}
+.logo {
+    height: 40px;
+    display: inline-block; 
+    vertical-align: middle;
+}
+.top .d-flex {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: auto; 
+    
+}
+
+/* Add other styles as needed */

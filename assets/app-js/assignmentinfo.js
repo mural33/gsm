@@ -135,10 +135,16 @@ async function checkStudentAssignmentSubmission(studentRollNumber, assignmentId)
                 console.log(data);
                 return true
             },
+            beforeSend: (e) => {
+                showLoader("assignmentCard", "sm");
+            },
             error:(data)=>{
                 raiseErrorAlert(data.responseJSON.detail)
                 return false
-            }
+            },
+            complete: (e) => {
+                removeLoader("assignmentCard", "sm");
+            },
         });
 }
 

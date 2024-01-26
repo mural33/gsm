@@ -27,7 +27,9 @@ async function profileSave(){
         "user_name": $("#fullName").val(),
         "user_phone_number": $("#phoneNumber").val(),
     }
-    console.log("profileData",profileData);
+    localStorage.setItem("profile_img",profileData.user_photo_url)
+    var storedProfileImg = localStorage.getItem('profile_img');
+    $("#profileImageId").attr("src", storedProfileImg);
     userId = $("#user_id").val();
     var method = "PATCH";
     var endPoint = `/Users/update_user_partial/?user_id=${userId}`;

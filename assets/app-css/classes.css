@@ -128,13 +128,9 @@
     height: 2.5rem;
     font-size: 1rem;
 }
-.scroll-container {
-    width: 100%;
-    height: auto;
-    overflow: hidden; 
-    border: 1px solid #ccc;
-    margin-top: 3%;
-  }
+.headingText{
+    font-size: 12px;
+}
   .table-container td{
     border-bottom: 1px solid #f2eeee;
   }

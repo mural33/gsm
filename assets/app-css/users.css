@@ -22,6 +22,6 @@
 .form-label{
     margin-right: 80%;
 }
-#cPwd{
-    margin-right: 75%;
+.custom-border{
+    border-right: none;
 }
