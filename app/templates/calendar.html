@@ -6,7 +6,8 @@
 <link href="{% static 'app-css/calendar.css' %}" rel="stylesheet" />
 <script src="{% static 'app-js/calendar.js' %}"></script>
 <script src="https://cdn.rawgit.com/swisnl/jQuery-contextMenu/2.9.2/dist/jquery.contextMenu.min.js"></script>
-<link rel="stylesheet" type="text/css" href="https://cdn.rawgit.com/swisnl/jQuery-contextMenu/2.9.2/dist/jquery.contextMenu.min.css">
+<link rel="stylesheet" type="text/css"
+  href="https://cdn.rawgit.com/swisnl/jQuery-contextMenu/2.9.2/dist/jquery.contextMenu.min.css">
 
 
 <div class="row" id="heading-row">
@@ -16,7 +17,7 @@
       rhythm.</quote>
   </div>
   <div class="col-sm-12 col-md-4 col-xl-4.5" style="margin-top: 1rem;">
-    <div class="row" >
+    <div class="row">
       <div class="text-end">
         <button type="button" class="btn btn-success btn-label rounded-pill right" data-bs-toggle="modal"
           data-bs-target="#calendarmodal">
@@ -46,97 +47,96 @@
 <div class="row">
   <div class="container" id="alertContainer">
     <table class="styled-table" id="calenderTable">
-        <tr>
-            <td colspan="7" class="col">
-                <center><b></b></center>
-            </td>
-        </tr>
-        <tr class="col">
-            <th>Time</th>
-            <th>Monday</th>
-            <th>Tuesday</th>
-            <th>Wednesday</th>
-            <th>Thursday</th>
-            <th>Friday</th>
-            <th>Saturday</th>
-        </tr>
-        <tbody id="calenderTableBody"></tbody>
+      <tr>
+        <td colspan="7" class="col">
+          <center><b></b></center>
+        </td>
+      </tr>
+      <tr class="col">
+        <th>Time</th>
+        <th>Monday</th>
+        <th>Tuesday</th>
+        <th>Wednesday</th>
+        <th>Thursday</th>
+        <th>Friday</th>
+        <th>Saturday</th>
+      </tr>
+      <tbody id="calenderTableBody"></tbody>
     </table>
     <img src="{% static 'img/no_data_found.png' %}" alt="No Image" class="no_data_found" id="no_data_found">
-</div>
+  </div>
 </div>
 
 
 <div class="modal fade" id="calendarmodal" tabindex="-1" role="dialog" aria-hidden="true">
-<div class="modal-dialog modal-dialog-centered ">
-  <div class="modal-content" id="calender_details">
-    <div class="modal-header">
-      <h5 class="modal-title" id="mysmallModalLabel">Add Calender</h5>
-      <button type="button" class="btn-close btnCloseEditModel" data-bs-dismiss="modal" aria-label="Close"></button>
-    </div>
-    <div class="modal-body">
-      <div class="row">
-        <div class="col-md-12">
-          <input type="hidden" id="calender_id" name="calender_id">
-          <label for="class_id" class="form-label">Class</label>
-          <select id="form_class_id" class="form-select" name="form_class_id">
-            <option selected value="" readonly>Select Class</option>
-          </select>
-        </div>
+  <div class="modal-dialog modal-dialog-centered ">
+    <div class="modal-content" id="calender_details">
+      <div class="modal-header">
+        <h5 class="modal-title" id="mysmallModalLabel">Add Calender</h5>
+        <button type="button" class="btn-close btnCloseEditModel" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-md-12">
+            <input type="hidden" id="calender_id" name="calender_id">
+            <label for="class_id" class="form-label">Class</label>
+            <select id="form_class_id" class="form-select" name="form_class_id">
+              <option selected value="" readonly>Select Class</option>
+            </select>
+          </div>
+        </div>
         <div class="row mt-3">
-        <div class="col-md-6">
-          <label for="section_id" class="form-label">Section Name</label>
-          <select id="form_section_id" class="form-select" name="form_section_id">
-            <option value="" readonly>Select Section </option>
-          </select>
+          <div class="col-md-6">
+            <label for="section_id" class="form-label">Section Name</label>
+            <select id="form_section_id" class="form-select" name="form_section_id">
+              <option value="" readonly>Select Section </option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label for="subject_id" class="form-label">Subject Name</label>
+            <select id="subject_id" class="form-select" name="subject_id">
+              <option value="">Select Subject</option>
+            </select>
+          </div>
         </div>
-        <div class="col-md-6">
-          <label for="subject_id" class="form-label">Subject Name</label>
-          <select id="subject_id" class="form-select" name="subject_id">
-            <option value="">Select Subject</option>
-          </select>
+        <div class="row mt-3">
+          <div class="col-md-6">
+            <label for="staff_id" class="form-label">Staff Name</label>
+            <select id="staff_id" class="form-select" name="staff_id">
+              <option value="">Select Staff</option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label for="day" class="form-label">Day</label>
+            <select id="day" class="form-select" name="day">
+              <option value="">Select Day</option>
+              <option value="Monday">Monday</option>
+              <option value="Tuesday">Tuesday</option>
+              <option value="Wednesday">Wednesday</option>
+              <option value="Thursday">Thursday</option>
+              <option value="Friday">Friday</option>
+              <option value="Saturday">Saturday</option>
+            </select>
+          </div>
+        </div>
+        <div class="row mt-3">
+          <div class="col-md-6">
+            <label for="start_time" class="form-label">Start Time</label>
+            <input type="time" class="form-control" id="start_time" name="start_time">
+          </div>
+          <div class="col-md-6">
+            <label for="end-time" class="form-label">End Time</label>
+            <input type="time" class="form-control" id="end_time" name="end_time">
+          </div>
         </div>
       </div>
-      <div class="row mt-3">
-        <div class="col-md-6">
-          <label for="staff_id" class="form-label">Staff Name</label>
-          <select id="staff_id" class="form-select" name="staff_id">
-            <option value="">Select Staff</option>
-          </select>
-        </div>
-        <div class="col-md-6">
-          <label for="day" class="form-label">Day</label>
-          <select id="day" class="form-select" name="day">
-            <option value="">Select Day</option>
-            <option value="Monday">Monday</option>
-            <option value="Tuesday">Tuesday</option>
-            <option value="Wednesday">Wednesday</option>
-            <option value="Thursday">Thursday</option>
-            <option value="Friday">Friday</option>
-            <option value="Saturday">Saturday</option>
-          </select>
-        </div>
-        </div>
-      <div class="row mt-3">
-        <div class="col-md-6">
-          <label for="start_time" class="form-label">Start Time</label>
-          <input type="time" class="form-control" id="start_time" name="start_time">
-        </div>
-        <div class="col-md-6">
-          <label for="end-time" class="form-label">End Time</label>
-          <input type="time" class="form-control" id="end_time" name="end_time">
-        </div>
-      </div>
-    </div>
 
-    <div class="modal-footer">
-      <a href="javascript:void(0);" class="btn btn-link link-success fw-medium btnCloseEditModel" data-bs-dismiss="modal"><i
-          class="ri-close-line me-1 align-middle"></i>Close</a>
-      <button type="button" class="btn btn-primary" id="btnSave" name="btnSave">Save</button>
+      <div class="modal-footer">
+        <a href="javascript:void(0);" class="btn btn-link link-success fw-medium btnCloseEditModel"
+          data-bs-dismiss="modal"><i class="ri-close-line me-1 align-middle"></i>Close</a>
+        <button type="button" class="btn btn-primary" id="btnSave" name="btnSave">Save</button>
+      </div>
     </div>
   </div>
 </div>
-</div>
-
 {% endblock %}

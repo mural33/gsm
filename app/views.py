@@ -12,6 +12,7 @@ from classlibrary.student_module import Student, StudentInfo
 from classlibrary.staff_module import Staff, StaffInfo
 from classlibrary.notice_module import Notice
 from classlibrary.exam_info import ExamInfo
+from classlibrary.renewProduct_module import SendNotification
 from django.contrib import messages
 from django.http import HttpResponseRedirect, HttpResponse
 import requests
@@ -78,8 +79,12 @@ def calendar(request):
     }
     return render(request, 'calendar.html', payload)
 
+
 def dashboard(request):
     payload = {
+        'url': API_URL,
+        'jwt_token': request.COOKIES.get('access_token'),
+        'institute_id':request.COOKIES.get('institute_id'),
         "organization_name": request.COOKIES.get("organization_name"),
         "message": request.COOKIES.get("message"),
         "subscriber_id": request.COOKIES.get("subscribers_id"),
@@ -262,7 +267,7 @@ def assignments(request):
         "subscriptionUrl" : Subscription_URL,
     }
     return render(request, "assignments.html", payload)
-def assignmentInfo(request,assignment_slug):
+def assignmentinfo(request,assignment_slug):
     access_token = request.COOKIES.get("access_token")
     institute_id = request.COOKIES.get("institute_id")
     assignmentInfo_obj = Data(API_URL)
@@ -484,7 +489,7 @@ def staff_info(request, staff_slug):
             "transport_data": staff_data["staff_transport_data"],
             "documents": staff_data["get_staff_documents_data"],
             "organization_name": request.COOKIES.get("organization_name"),
-
+            "institute_id": institute_id,
             "message": request.COOKIES.get("message"),
             "subscriber_id": request.COOKIES.get("subscribers_id"),
             "subscriptionUrl" : Subscription_URL,
@@ -548,7 +553,6 @@ def accounts(request):
             "subscriber_id": request.COOKIES.get("subscribers_id"),
             "subscriptionUrl" : Subscription_URL, 
         }
-        print(payload["accounts"])
     return render(request,'accounts.html', payload)
 
 def fees(request):
@@ -790,7 +794,6 @@ def signup(request):
                 create_instance = institute_instance.create_institute(
                     end_point="/Institute/", data=institute_result["data"]
                 )
-                print("create_instance", create_instance)
                 if create_instance["status"]:
                     messages.success(request, "Organization created successfully")
                     return HttpResponseRedirect(reverse("signin"))
@@ -808,7 +811,11 @@ def signup(request):
                 return render(request, "signup.html")
     return render(request, "signup.html")
 def forgetPassword(request):
-    return render(request, "forgetPassword.html")
+    payload = {
+        "url": API_URL,
+    }
+    return render(request, "forgetPassword.html",payload)
+ 
 def staffIdCard(request,staff_slug):
     staff_obj = Data(API_URL)
     institite_id = request.COOKIES.get("institute_id")
@@ -841,18 +848,17 @@ def studentIdCard(request,student_slug):
     institite_data = student_obj.get_data_by_institute_id(
         url=institute_url, jwt=access_token, params=params
     )
-    
     parent_url = f"/Parents/get_parents_data_by_student_id/?student_id={student_data[0]['student_id']}"
     parent_data = student_obj.get_data_by_institute_id(
         url=parent_url, jwt=access_token, params=params
     )
-    print("student_data",student_data)
-    print("parent_data", parent_data)
-    print("parent_data", parent_data['response'])
-    
+    try:
+        parent_data = parent_data["response"]
+    except:
+        parent_data = []
     payload = {
         "student_data": student_data,
-        "parent_data": parent_data['response'],
+        "parent_data": parent_data,
         "institute_data": institite_data,
     }
     return render(request, "studentIdCard.html",payload)
@@ -866,3 +872,16 @@ def reports(request):
 
     }
     return render(request, "reports.html",payload)
+
+def renew_product(request):
+    subscriber_id = request.COOKIES.get("subscribers_id")
+    plan_details = f"{Subscription_URL}api/AccountValidation?subscriber_id={subscriber_id}"
+    plan_response = requests.get(plan_details)
+    plan_data = plan_response.json()
+    email = request.COOKIES.get("email")
+    notification_sender = SendNotification()
+    notification = notification_sender.renew_product(email, plan_data)
+    payload = {
+        "plan_data": plan_data,
+    }
+    return render(request, "renew_subscription.html", payload)

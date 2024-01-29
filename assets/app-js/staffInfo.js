@@ -1,4 +1,9 @@
 $(document).ready(e => {
+    populateVehicleDetails();
+    updateUnassignButtonState();
+    $("#btnParentForm").on("click", assignTransport);
+    $("#unassignButton").on("click", unassignTransport);
+
     $("#staffPayroll").DataTable();
     $(".dataTables_empty").html(`<img src="/assets/img/no_data_found.png" alt="No Image" class="no_data_found">`)
     $("#addPayrollForm").on('click', e => {
@@ -21,6 +26,137 @@ $(document).ready(e => {
     staffData.loadCalendarDetailsByStaff(staffInfo.staffId);
     callPieChart();    
 });
+
+//--------------------------------------------staff Transport
+function updateUnassignButtonState() {
+    var noRecordImagePresent = $(".transportContainer .no_data_found").length > 0;
+    $("#unassignButton").prop("disabled", noRecordImagePresent);
+}
+
+function populateVehicleDetails() {
+    var endPoint = `/Transports/get_all_transports_by_institute/?institute_id=${instituteId}`;
+    var selectedVehicleNumber = $("#vehicle_number").val();
+    var selectedRouteName = $("#route_name").val();
+    var selectedVehicleDetails = $("#vehicle_details").val();
+    var totalUrl = apiUrl + endPoint;
+
+    ajaxRequest("GET", totalUrl, "", "transport_form", "sm", (response) => {
+        var vehicleDropdown = $("#vehicle_number").html('<option value="" selected disabled>Select Transport</option>');
+
+        for (const vehicle of response) {
+            vehicleDropdown.append(`<option value="${vehicle.transport_id}">${vehicle.vehicle_number} (${vehicle.transport_name})</option>`);
+        }
+        if (selectedVehicleNumber) vehicleDropdown.val(selectedVehicleNumber);
+        if (selectedRouteName) $("#route_name").val(selectedRouteName);
+        if (selectedVehicleDetails) $("#vehicle_details").val(selectedVehicleDetails);
+    });
+}
+
+async function unassignTransport() {
+    var rollNumber = $("#rollNumberStu").attr("data-roll_number");
+    const result = await Swal.fire({
+        title: 'Are you sure?',
+        text: 'This will unassign the transport for this Staff!',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, unassign it!'
+    });
+
+    if (result.isConfirmed) {
+        var endpoint = `${apiUrl}/Transports/unassign_transport_to_staff/?employee_id=${rollNumber}`;
+        $.ajax({
+            url: endpoint,
+            type: 'PUT',
+            headers: {
+                'accept': 'application/json',
+                'Authorization': `Bearer ${jwtToken}`
+            },
+            beforeSend: (e) => {
+                showLoader("transportContainerId", "sm");
+            },
+            success: function (data) {
+                $("transportContainer").remove();
+                $(".transportContainer").empty().append('<img src="/assets/img/no_data_found.png" %}" alt="No Image" class="no_data_found">');
+                raiseSuccessAlert("Transport Unassigned");
+                updateUnassignButtonState();
+            },
+            error: function () {
+            },
+            complete: function () {
+                removeLoader("transportContainerId", "sm");
+            }
+        });
+    }
+}
+
+function assignTransport() {
+    var rollNumber = $("#rollNumberStu").attr("data-roll_number");
+    var selectedVehicleNumber = $("#vehicle_number").val();
+    var endpoint = `${apiUrl}/Transports/assign_transport_to_staff/?employee_id=${rollNumber}&transport_id=${selectedVehicleNumber}`;                        
+    $.ajax({
+        url: endpoint,
+        type: 'PUT',
+        headers: {
+            'accept': 'application/json',
+            'Authorization': `Bearer ${jwtToken}`
+        },
+        beforeSend: (e) => {
+            showLoader("parentFormArea", "sm");
+        },
+        success: function (data) {
+            const assignedData = data.response;
+            $('#transport_form').modal('hide');
+            fetchTransportDetails(selectedVehicleNumber, function () {
+            }); 
+            raiseSuccessAlert("Transport Assigned Successfully");
+        },
+        error: function () {
+        },
+        complete: function () {
+            removeLoader("parentFormArea", "sm");
+            updateUnassignButtonState();
+        }
+    });
+}
+
+function fetchTransportDetails(transportId, callback) {
+    var transportDetailsEndpoint = `${apiUrl}/Transports/get_transport_data_by_id/?transport_id=${transportId}`;
+    $.ajax({
+        url: transportDetailsEndpoint,
+        type: 'GET',
+        headers: {
+            'accept': 'application/json',
+            'Authorization': `Bearer ${jwtToken}`
+        },
+        success: function (transportDetails) {
+            const fetchedData = transportDetails.response;
+            const transportContainer = document.querySelector('.transportContainer');
+            if (fetchedData) {
+                transportContainer.innerHTML = `
+                    <div>
+                        <img src="/assets/img/school-bus.png" alt="bus" class="bus-vehicle">
+                    </div>
+                    <div class="text-left">
+                        <p class="text-dark text-right">Vehicle Number: ${fetchedData.vehicle_number}</p>
+                        <p class="text-dark text-right">Route Name: ${fetchedData.transport_name}</p>
+                        <p class="text-dark text-right">Vehicle Details: ${fetchedData.vehicle_details}</p> 
+                    </div>`;
+            } else {
+                html(`<img src="/assets/img/no_data_found.png" alt="No Image" class="no_data_found">`);
+            }
+            $("#transportContainer").html();
+            updateUnassignButtonState();
+            if (callback && typeof callback === 'function') {
+                callback();
+            }
+        },
+        error: function () {
+        }
+    });
+}
+//----------------------------------------------------------------
 function callPieChart(absent, present, leave) {
     var existingChart = Chart.getChart("staffPieChart");
     if (existingChart) {

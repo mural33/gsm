@@ -49,3 +49,17 @@
 #statusList{
     width: auto;
 }
+#selectStudentTable {
+    width: 100%;
+}
+#selectStudentTable th td {
+    padding: 1rem;
+    text-align: center;
+}
+#selectStudentTable td {
+ font-size: 13px;
+}
+#loadStudents{
+  text-decoration: underline;
+  font-size: 18px;
+}

@@ -1,8 +1,8 @@
-$(document).ready(async function () {
+$(document).ready(function () {
     $('#assignmentInfoTable').DataTable();
-    $(".dataTables_empty").html(`<img src="/assets/img/no_data_found.png" alt="No Image" class="no_data_found">`)
+    $(".dataTables_empty").html(`<img src="/assets/img/no_data_found.png" alt="No Image" class="no_data_found">`);
     let assignmentId = $("#assignment_id").val();
-    await loadAssignmentDetails(assignmentId);
+    loadAssignmentDetails(assignmentId);
 
     $("#btnSubmitAssignment").click(async function (e) {
         $("#btnSubmitAssignment").removeClass("btn-shake")
@@ -33,91 +33,73 @@ $(document).ready(async function () {
         }
     });
 
-    var sectionId = $(".sectionId").data("section-id");
-    $("#studentRollNumberInput").autocomplete({
-        source: function (request, response) {
-            $.ajax({
-                url: apiUrl + `/Students/get_students_by_field/section_id/${sectionId}/`,
-                type: "GET",
-                dataType: "json",
-                mode: "cors",
-                crossDomain: true,
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${jwtToken}`,
-                },
-                data: {
-                    term: request.term
-                },
-                beforeSend: (e) => {
-                    showLoader("uploadAssign", "sm");
-                },
-                success: function (data) {
-                    var suggestions = $.map(data, function (item) {
-                        var label = item.roll_number;
-                        var value = item.roll_number;
+    $('#searchStudentModal').on('show.bs.modal', function() {
+        fetchStudents();
+      });
 
-                        return {
-                            label: label,
-                            value: value,
-                            student_id: item.student_id,
-                            section_id: item.section_id
-                        };
-                    });
-                    response(suggestions);
-                },
-                complete: (e) => {
-                    removeLoader("uploadAssign", "sm");
-                },
-            });
-        },
-        select: function (event, ui) {
-
-        }
-    });
-    $("#searchStudent").on("click", async function () {
-        var selectedRollNumber = $("#studentRollNumberInput").val();
-        if (selectedRollNumber) {
-            try {
-                var isValid = await validateStudentByRollNumber(selectedRollNumber, sectionId);
-                if (isValid) {
-                    raiseInfoAlert("Roll Number is validated!");
-                    $("#btnSubmitAssignment").prop("disabled", false).removeClass("disabled-button");
-                } else {
-                    raiseErrorAlert("Roll Number not found for this Section.");
-                    $("#btnSubmitAssignment").prop("disabled", true).addClass("disabled-button");
-                }
-            } catch (error) {
-                raiseErrorAlert("Select a valid Roll Number.");
-            }
-        }
+      $(document).on('click', '.selectButton', function () {
+        $("#searchStudentModal").modal("hide");
+        var selectedStudentId = $(this).data('select-id');
+        var selectedStudentRollNumber = $(this).closest('tr').find('td:nth-child(2)').text(); 
+        $('#student_id').val(selectedStudentId);
+        $('#studentRollNumberInput').val(selectedStudentRollNumber);
+        $('#studentRollNumberInput').prop('readonly', true);
+        $("#btnSubmitAssignment").prop("disabled", false).removeClass("disabled-button");
     });
 });
-async function validateStudentByRollNumber(rollNumber, sectionId) {
-    var getStudentUrl = apiUrl + `/Students/get_students_by_field/roll_number/${rollNumber}/`;
-    try {
-        var responseData = await $.ajax({
-            type: "GET",
-            url: getStudentUrl,
-            mode: "cors",
-            dataType: "json",
-            crossDomain: true,
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${jwtToken}`,
-            },
-        });
-        for (let i = 0; i < responseData.length; i++) {
-            if (responseData[i].section_id === sectionId) {
-                $("#student_id").val(responseData[i].student_id);
-                return true;
-            }
+
+function fetchStudents() {
+    var sectionId = $(".sectionId").data("section-id");
+    var semesterId = $(".semesterId").data("semestor-id");
+    const searchStudent = apiUrl + "/Students/get_students_by_field/section_id/" + sectionId +"/";
+    $.ajax({
+      url: searchStudent,
+      method: 'GET',
+      mode: "cors",
+      crossDomain: true,
+      headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${jwtToken}`,
+      },
+      beforeSend: (e) => {
+        showLoader("loadStudentsArea", "sm");
+    },
+      success: function(data) {
+        console.log(data);
+        var studentTableBody = $('#studentFind');
+        studentTableBody.empty(); 
+        var dataTable = $('#selectStudentTable').DataTable();
+
+        dataTable.clear().draw();
+        data.forEach(function(student) {
+            if (student.current_position === semesterId) {
+            //     var promotionType = student.classes.promotion_type;
+            // var additionalInfo = '';
+            // if (promotionType === 'year_vise') {
+            //   additionalInfo = student.current_position + ' Years';
+            // } else if (promotionType === 'course_vise') {
+            //   additionalInfo = student.current_position + ' Course';
+            // } else if (promotionType === 'semister_vise') {
+            //   additionalInfo = student.current_position + ' Semester';
+            // }
+            var row = $('<tr id="fetchStudent">');
+            row.append('<td>' + student.student_name + '</td>');
+            row.append('<td>' + student.roll_number + '</td>');
+            // row.append('<td>' + student.classes.class_name + '</td>');
+            // row.append('<td>' + additionalInfo + '</td>');
+            // row.append('<td>' + student.sections.section_name + '</td>');
+            row.append('<td><button type="submit" class="btn btn-primary selectButton" id="btnSelect" data-select-id="' + student.student_id + '">Select</button></td>');
+            dataTable.row.add(row).draw();
         }
-        return false;
-    } catch (error) {
-        raiseErrorAlert("An error occurred during validation.");
-        throw error;
-    }
+        });
+      },
+      error: (error) => {
+        raiseErrorAlert(error.responseJSON.detail);
+    },
+    complete: (e) => {
+        removeLoader("loadStudentsArea", "sm");
+    },
+    });
 }
 
 async function checkStudentAssignmentSubmission(studentRollNumber, assignmentId) {
@@ -139,7 +121,7 @@ async function checkStudentAssignmentSubmission(studentRollNumber, assignmentId)
                 showLoader("assignmentCard", "sm");
             },
             error:(data)=>{
-                raiseErrorAlert(data.responseJSON.detail)
+                raiseWarningAlert(data.responseJSON.detail)
                 return false
             },
             complete: (e) => {
@@ -152,15 +134,11 @@ let assignDocsField = ['studentRollNumberInput', 'assignment_file']
 async function uploadAssignment() {
     var assignmentId = $("#assignment_id").val();
     var studentRollNumber = $("#studentRollNumberInput").val();
-
     const isRollNumberPresent = await checkStudentAssignmentSubmission(studentRollNumber, assignmentId);
-    console.log(isRollNumberPresent);
-
     if (isRollNumberPresent === false) {
         raiseErrorAlert("Roll number already exists for this assignment.");
         return;
     }
-
     var todayDate = new Date();
     var formattedDate = todayDate.toISOString().split('T')[0];
     var assignmentData = {
@@ -186,7 +164,7 @@ async function uploadAssignment() {
             showLoader("assignmentCard", "sm");
         },
         success: (data) => {
-            if (data && data.response) {
+            if (data && data.response && data.response.length > 0) {
                 var responseData = data.response[0];
                 loadAssignmentDetails(responseData.assignment_id);
                 $("#student_id").val(' ');
@@ -194,7 +172,7 @@ async function uploadAssignment() {
                 resetForm(assignDocsField);
                 $("#btnSubmitAssignment").prop("disabled", true).addClass("disabled-button");
             }
-        },
+        },        
         error: (error) => {
             raiseErrorAlert(error.responseJSON.detail);
         },

@@ -36,7 +36,6 @@
     <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-    
 
     {% block js_module %}
         
@@ -123,7 +122,7 @@
                                         <a href="/app/students" class="nav-link" data-key="t-detached">Student Records</a>
                                     </li>
                                     <li class="nav-item">
-                                        <a href="/app/student_alumni" class="nav-link" data-key="t-detached">Alumni Records</a>
+                                        <a href="{% url 'student_alumni' %}" class="nav-link" data-key="t-detached">Alumni Records</a>
                                     </li>
                                     <li class="nav-item">
                                         <a href="{% url 'students_promotion' %}" class="nav-link" data-key="t-detached">Promote/Complete</a>
@@ -212,6 +211,10 @@
                         <li class="nav-item">
                             <a href="/app/user" class="nav-link menu-link"> <i class="ri-shield-user-line"></i>
                                 <span data-key="t-kanaban-board">Users</span> </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/app/reports" class="nav-link menu-link"> <i class="bi bi-bar-chart"></i>
+                                <span data-key="t-kanaban-board">Reports</span> </a>
                         </li>
                     </ul>
                 </div>
@@ -371,7 +374,7 @@
                         </div>
                         <div class="dropdown ms-sm-3 topbar-head">
                             <a class="dropdown-item fs-md" href="/app/reports/"> <span
-                                        class="align-middle">Reports</span></a>
+                                        class="align-middle"><i class="bi bi-bar-chart"></i></span></a>
                         </div>
                         <div class="dropdown ms-sm-3 topbar-head-dropdown dropdown-hover-end header-item topbar-user">
                             <button type="button" class="btn shadow-none btn-icon" id="page-header-user-dropdown"

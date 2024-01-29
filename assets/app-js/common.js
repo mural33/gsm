@@ -20,10 +20,27 @@ $(document).ready(()=>{
     var storedProfileImg = localStorage.getItem('profile_img');
     $("#organization_logo").attr("src", storedInstituteLogo);
     $("#profileImageId").attr("src", storedProfileImg);
-
+    
+    updateNavbarBrandBoxAlignment();
+    var observer = new MutationObserver(function (mutations) {
+        mutations.forEach(function (mutation) {
+            if (mutation.attributeName === 'data-sidebar-size') {
+                updateNavbarBrandBoxAlignment();
+            }
+        });
+    });
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-sidebar-size'] });
         // $(document).on("contextmenu", function (e) {
     //     e.preventDefault();
-})
+});
+function updateNavbarBrandBoxAlignment() {
+    var sidebarSize = $('html').attr('data-sidebar-size');
+    if (sidebarSize === 'lg') {
+        $('.navbar-brand-box').css('text-align', 'left');
+    } else if (sidebarSize === 'sm') {
+        $('.navbar-brand-box').css('text-align', 'center');
+    }
+}
 function raiseErrorAlert(msg) {
     toastr.options = {
         "closeButton": true,

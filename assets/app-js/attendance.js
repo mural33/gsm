@@ -13,21 +13,9 @@ $(document).ready(function () {
     initializeClass();
 
     getStudentAttendanceDetails();
-    $("#class_id").on("change", async function() {
-        const selectedClassId = $(this).val();
-        if (selectedClassId) {
-            var selectedClass = $(this).find(`option[value="${selectedClassId}"]`);
-            var studentpromotionType = selectedClass.data("promotion");
-            var studentPromotions = selectedClass.data("total_number_of_promotion"); 
-            loadSemisterOrYearAttendance(studentPromotions, studentpromotionType, "semister_id");
-        }
-    });
-    $("#semister_id").on("change", async function() {
-        const selectedSemesterId = $(this).val();
+    $("#class_id").on("change", async () => {
         const selectedClassId = $("#class_id").val();
-        if (selectedSemesterId && selectedClassId) {
-            await fetchStudentTable(selectedClassId, selectedSemesterId);
-        }
+        await fetchStudentTable(selectedClassId);
     });
     $("#classdrop").on("change", function () {
         const filterClassId = $(this).val();
@@ -35,7 +23,7 @@ $(document).ready(function () {
                 var selectedOptions = $(this).find(`option[value="${filterClassId}"]`);
                 var AttendancepromotionType = selectedOptions.data("promotion");
                 var AttendancetotalPromotions = selectedOptions.data("total_number_of_promotion");
-                loadSemisterOrYearAttendance(AttendancetotalPromotions, AttendancepromotionType, "filter_semister_id");
+                loadSemisterYearAttendance(AttendancetotalPromotions, AttendancepromotionType, "filter_semister_id");
             }
     });
     $('#studentAttendanceTab').on('click', '.btnEdit', function () {
@@ -96,7 +84,7 @@ function staffAttendanceForm() {
     return isValid;
 }
 function resetStudentAttendanceForm() {
-    const fields = ["class_id", "attendance_dates"];
+    const fields = ["class_id", "attendance_dates","semister_id"];
     for (const field of fields) {
         const element = $(`#${field}`);
         if (element.length > 0) {
@@ -134,9 +122,9 @@ function callingPieChart(absent, present) {
     }
     generateingPieChart("studentAttendancePieChat", [present, absent], ["Present%", "Absent%",], ["green", " #CE2029",]);
 }
+
 async function getStudentAttendanceDetails() {
     var endPoint = `${apiUrl}/StudentAttendance/get_student_attendance_by_institute_id/?institute_id=${instituteId}`;
-    console.log(endPoint)
     const studentAttendance = await $.ajax({
         type: "GET",
         url: endPoint,
@@ -204,8 +192,9 @@ function generateingPieChart(id = "", percentage = [], labels = [], colors = [])
     var myPieChart = new Chart(ctx, {
         type: 'pie',
         data: data,
-        options: options
+        options: options,
     });
+    
 }
 function initializeClass() {
     const classesurl = `${apiUrl}/Classes/get_classes_by_institute/?institite_id=${instituteId}`;
@@ -218,7 +207,7 @@ function initializeClass() {
         },
         success: (response) => {
             for (const classes of response) {
-                $("#class_id").append(`<option value="${classes.class_id}" data-promotion='${classes.promotion_type}' data-total_number_of_promotion='${classes.total_number_of_promotion}'>${classes.class_name}</option>`);
+                $("#class_id").append(`<option value="${classes.class_id}">${classes.class_name}</option>`);
                 $("#classdrop").append(`<option value="${classes.class_id}" data-promotion='${classes.promotion_type}' data-total_number_of_promotion='${classes.total_number_of_promotion}'>${classes.class_name}</option>`);
             }
         },
@@ -229,34 +218,28 @@ function initializeClass() {
 }
 
 
-async function  loadSemisterOrYearAttendance(examdDurationTime, exampromotionType, examtnpId) {
-    var examtnp = $(`#${examtnpId}`);
-    var ExamlabelElement = $("label[for='" + examtnpId + "']");
+async function  loadSemisterYearAttendance(studentDurationTime, studentpromotionType, studenttnpId) {
+    var studenttnp = $(`#${studenttnpId}`);
+    var studentlabelElement = $("label[for='" + studenttnpId + "']");
 
-    var exampromotionTypeMap = {
+    var studentpromotionTypeMap = {
         "semister_vise": "Semester",
         "year_vise": "Year",
     };
 
-    if (exampromotionTypeMap[exampromotionType] === undefined) {
-        examtnp.html("");
-        ExamlabelElement.text("Semester/Year");
-        examtnp.append(`<option value="">Not Applicable</option>`);
+    if (studentpromotionTypeMap[studentpromotionType] === undefined) {
+        studenttnp.html("");
+        studentlabelElement.text("Semester/Year");
+        studenttnp.append(`<option value="">Not Applicable</option>`);
         return;
     }
-
-    console.log("Label Element:", ExamlabelElement);
-    ExamlabelElement.text(exampromotionTypeMap[exampromotionType]);
-
-    examtnp.html("");
-    examtnp.append(`<option value="">All ${exampromotionTypeMap[exampromotionType]}</option>`);
-
-    for (let index = 0; index < examdDurationTime; index++) {
-        var option = `<option value="${index + 1}">${index + 1} ${exampromotionTypeMap[exampromotionType]}</option>`;
-        examtnp.append(option);
+    studentlabelElement.text(studentpromotionTypeMap[studentpromotionType]);
+    studenttnp.html("");
+    studenttnp.append(`<option value="">All ${studentpromotionTypeMap[studentpromotionType]}</option>`);
+    for (let index = 0; index < studentDurationTime; index++) {
+        var option = `<option value="${index + 1}">${index + 1} ${studentpromotionTypeMap[studentpromotionType]}</option>`;
+        studenttnp.append(option);
     }
-
-    console.log("Label Content:", ExamlabelElement);
 }
 function addStudentAttendance() {
     const selectedStudents = getSelectedStudentsData();
@@ -285,14 +268,9 @@ function addStudentAttendance() {
                     const responseDataArray = data.response;
                 var absentPercentage = JSON.parse(localStorage.getItem("studentAbsent")) || 0;
                 var presentPercentage = JSON.parse(localStorage.getItem("studentPresent")) || 0;
-
                 var totalAbsent = $("#studentAttendanceTab tbody tr").length;
-
-                // Calculate new absent and present counts
                 var newAbsent = (absentPercentage * totalAbsent) / 100;
                 var newPresent = (presentPercentage * totalAbsent) / 100;
-
-                // Calculate new total
                 var newTotal = totalAbsent + responseDataArray.length;
                     if (Array.isArray(responseDataArray)) {
                         responseDataArray.forEach((responseData) => {
@@ -323,8 +301,6 @@ function addStudentAttendance() {
                         resetStudentTable();
                         var newAbsentPercentage = (newAbsent * 100) / newTotal;
                         var newPresentPercentage = (newPresent * 100) / newTotal;
-
-                        // Save the new percentages to localStorage
                         localStorage.setItem("studentAbsent", JSON.stringify(newAbsentPercentage));
                         localStorage.setItem("studentPresent", JSON.stringify(newPresentPercentage));
                         callingPieChart(newAbsentPercentage, newPresentPercentage);
@@ -348,7 +324,7 @@ function addStudentAttendance() {
     function getSelectedStudentsData() {
         const selectedStudents = [];
         $("#student_table tbody tr").each(function () {
-            const studentId = $(this).find(".student-id").text(); // Use class selector instead of ID
+            const studentId = $(this).find(".student-id").text(); 
             const attendanceDate = $('#attendance_dates').val();
             const attendanceStatus = $(this).find("input[type='radio']:checked").val();
             if (!isNaN(studentId) && Number.isInteger(Number(studentId))) {
@@ -424,7 +400,6 @@ async function editStudentAttendance(attendanceId) {
                     $('#editstudentModalForm').modal('show');
                     $("#id").val(responseData.id);
                     $('#form_class_id').val(responseData.student.classes.class_name);
-                    console.log(responseData.student.classes.class_name)
                     $("#attendance_date").val(responseData.attendance_date);
                     if (responseData.attendance_status === 'Present') {
                         $('#present').prop('checked', true);
@@ -545,7 +520,7 @@ async function editStudentAttendance(attendanceId) {
 
 
     function resetStudentFillterForm() {
-        const fields = ["startDate", "enddate","classdrop","filter_semister_id"];
+        const fields = ["startDate", "endDate","classdrop","filter_semister_id"];
         for (const field of fields) {
             const element = $(`#${field}`);
             if (element.length > 0) {
@@ -557,13 +532,13 @@ async function editStudentAttendance(attendanceId) {
     
 
     
-function callingStaffPieChart(absent, present) {
-    var existingChart = Chart.getChart("staffAttendancePieChart");
-    if (existingChart) {
-        existingChart.destroy();
+    function callingStaffPieChart(absent, present) {
+        var existingChart = Chart.getChart("staffAttendancePieChart");
+        if (existingChart) {
+            existingChart.destroy();
+        }
+        generateingStaffPieChart("staffAttendancePieChart", [present, absent], ["Present%", "Absent%"], ["#28a745", "#dc3545"]);
     }
-    generateingStaffPieChart("staffAttendancePieChart", [present, absent], ["Present%", "Absent%"], ["#28a745", "#dc3545"]);
-}
 
 async function getStaffAttendanceDetails() {
     const endPoint = `${apiUrl}/StaffAttendance/get_staff_attendance_by_institute_id/?institute_id=${instituteId}`;
@@ -870,10 +845,10 @@ function addStaffAttendance() {
                     responseDataArray.forEach((entry) => {
                         const style = entry.attendance_status === 'Present' ? 'color: green;' : 'color: #CE2029;';
                         const staffNewRow = `<tr class="tr-staff-attendance-${entry.id}">
-                            <td class="attendance_date" data-day=${entry.attendance_date}>${entry.attendance_date}</td>
+                            <td class="attendance_dates" data-staff-day=${entry.attendance_date}>${entry.attendance_date}</td>
                             <td>${entry.staff.staff_name}</td>
                             <td>${entry.staff.employee_id}</td>
-                            <td style="${style}"  class="status" data-attendance-status="${entry.attendance_status}">${entry.attendance_status}</td>
+                            <td style="${style}" class="status" data-attendance-status="${entry.attendance_status}">${entry.attendance_status}</td>
                             <td>
                                 <button type="button" class="btn btn-sm btn-info btnEdit" id="btnEdit" data-staff-id="${entry.id}" data-bs-toggle="modal" data-bs-target="#editstaffModalForm">
                                     <i class="bi bi-pencil-square"></i>
@@ -881,26 +856,19 @@ function addStaffAttendance() {
                             </td>
                         </tr>`;
                         $('#staffAttendanceTab').DataTable().row.add($(staffNewRow)).draw();
-
-                        // Update newAbsent and newPresent based on the attendance status of the new entry
                         if (entry.attendance_status === 'Absent') {
                             newAbsent++;
                         } else if (entry.attendance_status === 'Present') {
                             newPresent++;
                         }
                     });
-
                     resetStaffAttendanceForm();
                     raiseSuccessAlert(data.msg);
                     resetStaffTable();
-
                     var newAbsentPercentage = (newAbsent * 100) / updatedTotal;
                     var newPresentPercentage = (newPresent * 100) / updatedTotal;
-
-                    // Save the new percentages to localStorage
                     localStorage.setItem("staffAbsent", JSON.stringify(newAbsentPercentage));
                     localStorage.setItem("staffPresent", JSON.stringify(newPresentPercentage));
-
                     callingStaffPieChart(newAbsentPercentage, newPresentPercentage);
                 } else {
                     raiseErrorAlert('Invalid response data format or empty array.');

@@ -25,7 +25,7 @@ urlpatterns = [
     path('classes/', classes, name='classes'),
     path('user/', user, name='user'),
     path('assignments/', assignments, name='assignments'),
-    path('assignmentInfo/<str:assignment_slug>/', views.assignmentInfo, name='assignmentInfo'),
+    path('assignmentinfo/<str:assignment_slug>/', views.assignmentinfo, name='assignmentinfo'),
     path('transportation/', transportation, name='transportation'),
     path('notice/', notice, name='notice'),
     path('notice_create/', notice_create, name='notice_create'),
@@ -51,4 +51,5 @@ urlpatterns = [
     path('signup/', views.signup, name='signup'),
     path('forgetPassword/', views.forgetPassword, name='forgetPassword'),
     path('reports/', views.reports, name='reports'),
+    path('renewProduct/', views.renew_product, name='renewProduct'),
 ]

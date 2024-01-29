@@ -33,9 +33,7 @@ $(document).ready(function () {
             if (filterClassId) {
                 var selectedOptions = $(this).find(`option[value="${filterClassId}"]`);
                 var exampromotionType = selectedOptions.data("promotion");
-                console.log(exampromotionType)
                 var examtotalPromotions = selectedOptions.data("total_number_of_promotion");
-                console.log(examtotalPromotions)
                 loadSemisterOrYear(examtotalPromotions, exampromotionType, "filter_semister_id");
             }
     });
@@ -71,6 +69,9 @@ $(document).ready(function () {
         editChildExam(parentExamId);
     });
     
+    
+    
+    
 
     $('#examTable').on('click', '.btndelete', async function () {
         var examId = $(this).attr("data-id");
@@ -84,7 +85,7 @@ $(document).ready(function () {
 
 function validateExamForm() {
     var isValid = true;
-    const fields = ["start_date", "end_date", "result_date", "parent_exam_name", "subject_Input"];
+    const fields = ["start_date", "end_date", "result_date", "parent_exam_name", "subject_Input",'semister_id'];
     for (const field of fields) {
         const element = $(`#${field}`);
         const value = element.val();
@@ -121,7 +122,7 @@ function resetExamForm() {
     }
 }
 function resetAttendanceForm() {
-    const fields = ["class_id", "attendance_dates"];
+    const fields = ["class_id", "attendance_dates",''];
     for (const field of fields) {
         const element = $(`#${field}`);
         element.val("");  // Clear the value
@@ -142,6 +143,7 @@ async function addParentExam() {
         start_date: $("#start_date").val(),
         end_date: $("#end_date").val(),
         result_date: $("#result_date").val(),
+        semistor: $("#semister_id").val(),
         is_deleted: false,
     };
     const parentExamUrl = editExams ? apiUrl + "/ParentExams/update_parent_exam?parent_exam_id=" + data.parent_exam_id : apiUrl + "/ParentExams/create_parent_exam";
@@ -168,16 +170,16 @@ async function addParentExam() {
                     rows.forEach(element => {
                         var subjectId = element.querySelector(".sublabel").getAttribute("data-subjects-id")
                         var fullMarksValue = element.querySelector(".fullMarks").value;
-                        var examId = element.querySelector(".fullMarks").getAttribute("data-child-id")
+                        var examId = element.querySelector(".fullMarks").getAttribute("data-child-id");
                         updateChildExams(examId, responseData.parent_exam_id, subjectId, fullMarksValue);
                     })                    
                     const existingRow = $("tr[data-exams-id='" + responseData.parent_exam_id + "']");
-
+ 
                     if (existingRow.length) {
                         existingRow.find('td:eq(0)').html(`
                             <span class="start_date" data-date="${responseData.start_date}" data-start-date="${responseData.start_date}">
                                 ${responseData.start_date}
-                            </span> - 
+                            </span> -
                             <span class="end_date" data-date="${responseData.end_date}" data-exam-enddate="${responseData.end_date}">
                                 ${responseData.end_date}
                             </span>
@@ -189,10 +191,11 @@ async function addParentExam() {
                         `);
                         existingRow.find('td:eq(2)').text(responseData.result_date);
                         existingRow.find('td:eq(3)').text(`${responseData.classes.class_name}`);
+                        existingRow.find('td:eq(4)').text(` ${responseData.semistor}`
+                        );
                     }
                     raiseSuccessAlert("Examination Updated Successfully");
                     $("#parent_exam_id").val("");
-                    
                 } else {
                     var tableBody = $('#examination_details');
                     var noDataImage = tableBody.find('.no_data_found-tr');
@@ -203,16 +206,17 @@ async function addParentExam() {
                     const examNewRow = `
                     <tr class="tr-exam-${responseData.parent_exam_id} exam-row" data-exams-id="${responseData.parent_exam_id}" data-start-date="${responseData.start_date}" data-exam-enddate="${responseData.end_date}" data-exam-class="${responseData.class_id}">
                     <td class="text-break">
-                        <span class="start_date" data-date="${responseData.start_date}" data-start-date="${responseData.start_date}">${responseData.start_date}</span> - 
+                        <span class="start_date" data-date="${responseData.start_date}" data-start-date="${responseData.start_date}">${responseData.start_date}</span> -
                         <span class="end_date" data-date="${responseData.end_date}" data-exam-enddate="${responseData.end_date}">${responseData.end_date}</span>
                     </td>
                     <td class="text-break parent_exam_name">
                     <a href="/app/examinationInfo/${responseData.parent_exam_slug}">${responseData.parent_exam_name}</a>
                 </td>
-                
+               
                     <td class="result_date">${responseData.result_date}</td>
                     <td class=" text-break class_id" data-class-id="${responseData.class_id}" data-exam-class="${responseData.class_id}" data-promotion='${responseData.promotion_type}'
                     data-total_number_of_promotion='${responseData.total_number_of_promotion}'>${responseData.classes.class_name}</td>
+                    <td class="semistor" data-promotions='${responseData.promotion_type}}' data-total_number_of_promotion='${responseData.total_number_of_promotion}}'>${responseData.semistor}</td>
                     <td>
                         <button type="button" class="btn btn-sm btn-info btnEditExam" data-id="${responseData.parent_exam_id}">
                             <i class="bi bi-pencil-square"></i>
@@ -236,6 +240,7 @@ async function addParentExam() {
         },
     });
 }
+
 async function addChildExams(parentExamsId) {
     const examUrl = apiUrl + "/Exams/create_bulk_exam/";
     let subjects = document.querySelectorAll(".sublabel");
@@ -326,7 +331,6 @@ function initializeClassSelect() {
             },
         });
     } catch (error) {
-        console.error("Error in initializeClassSelect:", error);
     }
 }
 
@@ -346,7 +350,6 @@ async function  loadSemisterOrYear(examdDurationTime, exampromotionType, examtnp
         return;
     }
 
-    console.log("Label Element:", ExamlabelElement);
     ExamlabelElement.text(exampromotionTypeMap[exampromotionType]);
 
     examtnp.html("");
@@ -357,7 +360,6 @@ async function  loadSemisterOrYear(examdDurationTime, exampromotionType, examtnp
         examtnp.append(option);
     }
 
-    console.log("Label Content:", ExamlabelElement);
 }
 
 
@@ -558,8 +560,6 @@ async function filterExamination() {
     const enddate = $('#enddate').val();
     const selectedClass = $('#filter_class_id').val();
     const selectedPromotions = $('#filter_semister_id').val();
-    console.log(selectedPromotions)
-
     DataTable.ext.search = [];
     DataTable.ext.search.push(function (settings, data, dataIndex) {
         let row = examTable.row(dataIndex).nodes().to$();
@@ -567,16 +567,11 @@ async function filterExamination() {
         let filterStartDate = new Date(startdate); 
         let filterEndDate = new Date(enddate);
         let filterPromotions = parseInt(selectedPromotions); // Convert to integer for comparison
-        console.log(filterPromotions)
-
         let examclass = parseInt(row.find(".class_id").data("exam-class"));
         let examstartdate = new Date(row.find(".start_date").data("start-date"));
         let examenddate = new Date(row.find(".end_date").data('exam-enddate'));
-        let examPromotions = 2
-        console.log("Exam Promotions Data:", examPromotions);
-
+        let examPromotions = parseInt(row.find(".semistor").text());
         $("#examinationFilter").modal("hide");
-
         if (
             (isNaN(filterexamclass) || filterexamclass === examclass) &&
             (isNaN(filterStartDate) || filterStartDate <= examstartdate) &&
@@ -598,7 +593,7 @@ async function filterExamination() {
 
 
 function resetFillterForm() {
-    const fields = ["startdate", "enddate","filter_class_id"];
+    const fields = ["startdate", "enddate","filter_class_id","filter_semister_id"];
     for (const field of fields) {
         const element = $(`#${field}`);
         if (element.length > 0) {

@@ -66,23 +66,21 @@
                             placeholder=" Enter Examination Name" maxlength="100" minlength="1">
                     </div>
                 </div>
-                <div class="row">
-
-                    <div class="d-flex mt-2">
-                        <div class="col-md-6">
-                            <label class="form-label" for="class_id">Class</label>
-                            <select id="class_id" class="form-select" name="class_id">
-                                <option selected value="">Select Class</option>
-                            </select>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label" for="semister_id">Semister</label>
+                <div class="row mt-2">
+                    <div class="col-md-6">
+                        <label class="form-label" for="class_id">Class</label>
+                        <select id="class_id" class="form-select" name="class_id">
+                            <option selected value="">Select Class</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label" for="semister_id">Semister</label>
                             <select id="semister_id" class="form-select" name="semister_id">
                                 <option selected value="">Select Semister</option>
                             </select>
-                        </div>
                     </div>
                 </div>
+
                 <div id="subjects"></div>
             </div>
             <div class="modal-footer">
@@ -104,6 +102,7 @@
                     <th>Exam Name</th>
                     <th>Result Out Date</th>
                     <th>Class</th>
+                    <th>Semester</th>
                     <th>Action</th>
                 </tr>
             </thead>
@@ -125,6 +124,7 @@
                         data-exam-class="{{exam.class_id}}" data-promotion='{{exam.promotion_type}}'
                         data-total_number_of_promotion='{{exam.total_number_of_promotion}}'>{{exam.classes.class_name}}
                     </td>
+                    <td class="semistor"  data-class-semister="{{exam.semistor}}" data-semester='{{exam.promotion_type}}' data-total_number_of_promotion='{{exam.total_number_of_promotion}}'>{{exam.semistor}}</td>
                     <td>
                         <button type="button" class="btn btn-sm btn-info btnEditExam" data-id="{{exam.parent_exam_id}}">
                             <i class="bi bi-pencil-square"></i>

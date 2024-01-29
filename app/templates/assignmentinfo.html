@@ -3,8 +3,8 @@
 {% block title %} Assignments {% endblock %}
 {% block content %}
 <link href="{% static 'app-css/assignments.css' %}" rel="stylesheet">
-<script src="{% static 'app-js/assignmentInfo.js' %}"></script>
-
+<script src="{% static 'app-js/assignmentinfo.js' %}"></script>
+<section>
 <div class="row" id="heading-row">
     <div class="col-sm-12 col-md-9 col-xl-12 d-flex align-items-center" style="padding: 1rem">
         <a href="{% url 'assignments' %}">
@@ -73,6 +73,16 @@
                                     <tr>
                                         <td class="">
                                             <span class="d-flex">
+                                               <p>Semester :</p>
+                                                <span class="txt-color semesterId" data-semestor-id="{{assignment.semistor}}">
+                                                    {{ assignment.semistor }}
+                                                </span>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="">
+                                            <span class="d-flex">
                                                <p>Section :</p>
                                                 <span class="txt-color sectionId" data-section-id="{{assignment.section_id}}">
                                                     {{ assignment.sections.section_name }}
@@ -96,13 +106,9 @@
                     <p class="card-title h3 mt-2">Upload Assigment</p>
                     <div class="row" id="uploadAssign">
                         <div class="col-md-4">
-                            <div class="input-group">
                             <input type="hidden" name="student_id" id="student_id">   
-                            <input type="text" class="form-control" placeholder="Enter Student Roll Number" id="studentRollNumberInput">
-                            <button class="btn btn-outline-secondary text-dark" type="button" id="searchStudent">
-                                Validate
-                            </button>
-                            </div>
+                            <input type="text" class="form-control" placeholder="Search Student" id="studentRollNumberInput" readonly>
+                           <a href="#" class="form-label" data-bs-toggle="modal" data-bs-target="#searchStudentModal" id="loadStudents">Search Students</a>
                         </div>                        
                         <div class="col-md-4">
                             <input type="file" class="form-control" accept="image/jpeg, image/png, image/jpg, .pdf" name="" id="assignment_file">
@@ -135,5 +141,45 @@
             </div>
         </div>
     </div>
+</section>
 
+    <div class="modal fade" id="searchStudentModal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content" id="loadStudentsArea">
+        <div class="modal-header">
+          <h5 class="modal-title" id="mySmallModalLabel">Search Students</h5>
+          <button type="button" class="btn-close btnCloseModel" data-bs-dismiss="modal" aria-label="Close">
+          </button>
+        </div>
+        <div class="modal-body" id="searchStudents">
+          <div class="d-flex">
+            <div class="flex-shrink-0">
+              <i class="ri-checkbox-circle-fill text-success"></i>
+            </div>
+            <div class="flex-grow-1 ms-2">
+              <p class="text-muted mb-0"> Fees are applied in a variety of ways such as costs, charges, commissions, and
+                penalties.</p>
+            </div>
+          </div>
+          <div class="d-flex mt-2 row">
+            <div class="col-md-12 form-content">
+                <table class="table table-striped table-hover table-sticky table_students" id="selectStudentTable">
+                  <thead class="thead-dark">
+                    <th>Student Name</th>
+                    <th>Roll Number</th>
+                    <th>Action</th>
+                  </thead>
+                  <tbody id="studentFind">
+                    <tr id="fetchStudent">
+
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+          </div>
+        </div>
+      </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+  </div>
     {% endblock %}

@@ -1816,21 +1816,30 @@ async function loadFeeDetails(selectedClassId) {
 
         let feeChangeClicked = false;
         btnFeeChange.off().on("click", function () {
-          if (!feeChangeClicked) {
-            alert("Change the Fee details according to your requirements");
-            feeChangeClicked = true; 
-        } else {
-          feeChangeClicked = false;
-        }
-          $(".feesDiv input").not("#installment_display").prop("readonly", false);
-          loadInstallment();
-          dropdown.hide();
-          installmentNo.hide();
-          multiSelectDropdown.show();
-          text.show();
-          btnFeeChange.hide();
-          btnUpdateFee.show();
-          tableConatiner.hide();
+            if (!feeChangeClicked) {
+              Swal.fire({
+                text: 'Change the Fee details according to your requirements',
+                showConfirmButton: true,
+                allowOutsideClick: true,
+              }).then((result) => {
+                if (result.isConfirmed) {              
+                        feeChangeClicked = true;
+                    } else {
+                        feeChangeClicked = false;
+                    }
+                    $(".feesDiv input").not("#installment_display").prop("readonly", false);
+                    loadInstallment();
+                    dropdown.hide();
+                    installmentNo.hide();
+                    multiSelectDropdown.show();
+                    text.show();
+                    btnFeeChange.hide();
+                    btnUpdateFee.show();
+                    tableConatiner.hide();
+                });
+            } else {
+                feeChangeClicked = false;
+            }
         });
         
         btnUpdateFee.off().on("click",async function (e) {
@@ -1863,7 +1872,7 @@ async function loadFeeDetails(selectedClassId) {
   });
 }
 
-let feesField=['fee_total','fee_admission','installment_dropdown','getClassId','install_amount']
+let feesField=['fee_total','fee_admission','getClassId','install_amount','installmentDropdown']
 
 async function updateFees(){
   classId = $("#classes_id").val();

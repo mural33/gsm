@@ -48,7 +48,7 @@
                         <span class="d-block">
                             Employee ID
                         </span>
-                        <span class="d-block txt-color">
+                        <span class="d-block txt-color" id="rollNumberStu" data-roll_number = "{{staff_data.employee_id}}">
                             {{staff_data.employee_id}}
                         </span>
                     </p>
@@ -304,45 +304,36 @@
 
             {% comment %} Transportation {% endcomment %}
             <div class="tab-pane" id="students" role="tabpanel">
-              <div class="mb-0">
-                <div class="row">
-                  <div class="col-md-6">
-                      <h6>Transportation</h6>
-                        <quote>In the school bus of knowledge, every journey is a chapter waiting to unfold.</quote>
-                  </div>
+              <h6 class="">Transportation</h6>
+              <blockquote>Moving Your World, One Journey at a Time!</blockquote>
+              <div class="row">
                   <div class="col-md-12 text-center">
-                    {% if transport_data %}
-                    <div class="">
-                      <div>
-                        <img
-                          src="{% static 'img/school-bus.png' %}"
-                          alt="Profile Image"
-                          class="bus-vehicle"
-                        />
+                      <div class="transportContainer" id="transportContainerId">
+                          {% if transport_data %}
+                          <div class="transDetailsCont">
+                              <div>
+                                  <img src="{% static 'img/school-bus.png' %}" alt="bus" class="bus-vehicle">
+                              </div>
+                              <div class="text-left">
+                                  <p class="text-dark text-right">Vehicle Number: {{ transport_data.vehicle_number }}</p>
+                                  <p class="text-dark text-right">Route Name: {{ transport_data.transport_name }}</p>
+                                  <p class="text-dark text-right">Vehicle Details: {{ transport_data.vehicle_details }}</p>
+                              </div>
+                          </div>
+                          {% else %}
+                          <img src="{% static 'img/no_data_found.png' %}" alt="No Image" class="no_data_found">
+                          {% endif %}
                       </div>
-                      <div class="text-left">
-                        <p class="text-dark text-right">
-                          Vehicle Number: {{ transport_data.vehicle_number }}
-                        </p>
-                        <p class="text-dark text-right">
-                          Route Name: {{ transport_data.transport_name }}
-                        </p>
-                        <p class="text-dark text-right">
-                          Vehicle Details: {{ transport_data.vehicle_details }}
-                        </p>
+                      <div class="row mt-3">
+                          <div class="col-md-12 text-center">
+                              <button type="button" data-bs-toggle="modal" data-bs-target="#transport_form"
+                                  class="btn btn-success">Assign/Change</button>
+                              <button type="button" class="btn btn-danger ms-2" id="unassignButton">UnAssign</button>
+                          </div>
                       </div>
-                    </div>
-                    {% else %}
-                    <img
-                      src="{% static 'img/no_data_found.png' %}"
-                      alt="No Image"
-                      class="no_data_found"
-                    />
-                    {% endif %}
                   </div>
-                </div>
               </div>
-            </div>
+          </div>
             <div class="tab-pane" id="documents" role="tabpanel">
               <div class="row">
                   <div class="col-md-9">
@@ -509,5 +500,34 @@
     </div>
 </div>
 <!-- Document PopModel -->
+<div class="modal fade bs-example-modal-sm" id="transport_form" tabindex="-1" role="dialog"
+    aria-labelledby="myMediumModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content" id="parentFormArea">
+            <div class="modal-header">
+                <h5 class="modal-title" id="myMediumModalLabel">
+                    Assign/Change Transportation</h5>
+                <button type="button" class="btn-close btnCloseModel">
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12 flex-grow-1">
+                        <select id="vehicle_number" class="form-select" name="vehicle_number">
+                            <option  value="" selected disabled></option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a href="javascript:void(0);" class="btn btn-link link-success fw-medium btnCloseModel"><i
+                        class="ri-close-line me-1 align-middle"></i> Close</a>
+                <button type="submit" class="btn btn-primary" id="btnParentForm" onclick="assignTransport()">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- model popupfor Transport ended -->
+
 
 {% endblock %}

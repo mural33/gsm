@@ -1,5 +1,9 @@
 $(document).ready(() => {
     let studentInfo =JSON.parse($("#studentInfo").val());
+    populateVehicleDetails();
+    updateUnassignButtonState();
+    $("#btnParentForm").on("click", assignTransport);
+    $("#unassignButton").on("click", unassignTransport);
 
     // student calendar
     loadCalendarDetails(studentInfo.classId, studentInfo.sectionId);
@@ -74,7 +78,136 @@ async function ajaxRequest(type, url, data,loaderId,loaderSize,successCallback) 
         }
     });
 }
-// --------------------------------------------------
+
+//-------------------------------Student Transport
+
+function updateUnassignButtonState() {
+    var noRecordImagePresent = $(".transportContainer .no_data_found").length > 0;
+    $("#unassignButton").prop("disabled", noRecordImagePresent);
+}
+
+function populateVehicleDetails() {
+    var endPoint = `/Transports/get_all_transports_by_institute/?institute_id=${instituteId}`;    
+    var selectedVehicleNumber = $("#vehicle_number").val();
+    var selectedRouteName = $("#route_name").val();
+    var selectedVehicleDetails = $("#vehicle_details").val();
+    var totalUrl = apiUrl + endPoint;
+    ajaxRequest("GET", totalUrl, "", "transport_form", "sm", (response) => {
+        var vehicleDropdown = $("#vehicle_number").html('<option value="" selected disabled>Select Transport</option>');
+        for (const vehicle of response) {
+            vehicleDropdown.append(`<option value="${vehicle.transport_id}">${vehicle.vehicle_number} (${vehicle.transport_name})</option>`);
+        }
+        if (selectedVehicleNumber) vehicleDropdown.val(selectedVehicleNumber);
+        if (selectedRouteName) $("#route_name").val(selectedRouteName);
+        if (selectedVehicleDetails) $("#vehicle_details").val(selectedVehicleDetails);
+    });
+}
+
+async function unassignTransport() {
+    var rollNumber = $("#rollNumberStu").attr("data-roll_number");
+    const result = await Swal.fire({
+        title: 'Are you sure?',
+        text: 'This will unassign the transport for this Student!',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, unassign it!'
+    });
+
+    if (result.isConfirmed) {
+        var endpoint = `${apiUrl}/Transports/unassign_transport_to_student/?student_roll_number=${rollNumber}`;
+        $.ajax({
+            url: endpoint,
+            type: 'PUT',
+            headers: {
+                'accept': 'application/json',
+                'Authorization': `Bearer ${jwtToken}`
+            },
+            beforeSend: (e) => {
+                showLoader("transportContainerId", "sm");
+            },
+            success: function (data) {
+                $("transportContainer").remove();
+                $(".transportContainer").empty().append('<img src="/assets/img/no_data_found.png" %}" alt="No Image" class="no_data_found">');
+                raiseSuccessAlert("Transport Unassigned");
+                updateUnassignButtonState();
+            },
+            error: function () {
+            },
+            complete: function () {
+                removeLoader("transportContainerId", "sm");
+            }
+        });
+    }
+}
+
+function assignTransport() {
+    var rollNumber = $("#rollNumberStu").attr("data-roll_number");
+    var selectedVehicleNumber = $("#vehicle_number").val();
+    var endpoint = `${apiUrl}/Transports/assign_transport_to_student/?student_roll_number=${rollNumber}&transport_id=${selectedVehicleNumber}`;
+    $.ajax({
+        url: endpoint,
+        type: 'PUT',
+        headers: {
+            'accept': 'application/json',
+            'Authorization': `Bearer ${jwtToken}`
+        },
+        beforeSend: (e) => {
+            showLoader("parentFormAreaa", "sm");
+        },
+        success: function (data) {
+            const assignedData = data.response;
+            $('#transport_form').modal('hide');
+            fetchTransportDetails(selectedVehicleNumber, function () {
+            });
+            raiseSuccessAlert("Transport Assigned Successfully");
+        },
+        error: function () {
+        },
+        complete: function () {
+            removeLoader("parentFormAreaa", "sm");
+            updateUnassignButtonState();
+        }
+    });
+}
+
+function fetchTransportDetails(transportId, callback) {
+    var transportDetailsEndpoint = `${apiUrl}/Transports/get_transport_data_by_id/?transport_id=${transportId}`;
+    $.ajax({
+        url: transportDetailsEndpoint,
+        type: 'GET',
+        headers: {
+            'accept': 'application/json',
+            'Authorization': `Bearer ${jwtToken}`
+        },
+        success: function (transportDetails) {
+            const fetchedData = transportDetails.response;
+            const transportContainer = document.querySelector('.transportContainer');
+            if (fetchedData) {
+                transportContainer.innerHTML = `
+                    <div>
+                        <img src="/assets/img/school-bus.png" alt="bus" class="bus-vehicle">
+                    </div>
+                    <div class="text-left">
+                        <p class="text-dark text-right">Vehicle Number: ${fetchedData.vehicle_number}</p>
+                        <p class="text-dark text-right">Route Name: ${fetchedData.transport_name}</p>
+                        <p class="text-dark text-right">Vehicle Details: ${fetchedData.vehicle_details}</p> 
+                    </div>`;
+            } else {
+                html(`<img src="/assets/img/no_data_found.png" alt="No Image" class="no_data_found">`);
+            }
+            $("#transportContainer").html();
+            updateUnassignButtonState();
+            if (callback && typeof callback === 'function') {
+                callback();
+            }
+        },
+        error: function () {
+        }
+    });
+}
+
 // student parent Code Here
 class StudentParent {
     async ajaxRequest(type, url, data,loaderId,loaderSize,successCallback) {
@@ -596,7 +729,15 @@ class StudentFee{
                 var installment = response[key]
                 var color = installment.installment_status === true ? "bg-success" : "bg-danger"
                 var statusMsg = installment.installment_status === true ? "Paid" : "Unpaid"
-                var payBtn = installment.installment_status === true ? "" : `<button class="btn btn-sm btn-info" onClick="editInstallment(this)" data-installment_id ='${installment.installment_id}'>Pay</button>`
+                var payBtn = installment.installment_status === true ? 
+                `<button class="btn btn-sm btn-danger" Onclick="deleteInstallment(this)" data-installment_id ='${installment.installment_id}'>
+                    <i class="bi bi-trash3"></i>
+                </button>` : 
+                `<button class="btn btn-info btn-label rounded-pill right" 
+                onClick="editInstallment(this)" data-installment_id ='${installment.installment_id}'>
+                    Pay
+                    <i class="bi bi-currency-rupee label-icon align-middle fs-lg ms-2"></i>
+                </button>`
                 var row = `
                     <tr class="tr-installment-${installment.installment_id}">
                         <td>${installment.installment_name}</td>
@@ -710,8 +851,43 @@ async function editInstallment(element){
         var installmentTr = $(`.tr-installment-${installmentId}`);
         installmentTr.find("td").eq(3).text(installmentData.installment_paid_date);
         installmentTr.find("td").eq(4).removeClass("bg-danger").addClass("bg-success").text("Paid");
+        installmentTr.find("td").eq(5).html(`
+        <button class="btn btn-sm btn-danger" Onclick="deleteInstallment(this)" data-installment_id="${installmentId}">
+        <i class="bi bi-trash3"></i>
+        </button>
+        `)
         $(element).remove();
     })
+}
+
+async function deleteInstallment(element){
+    var installmentId = $(element).attr("data-installment_id");
+    await Swal.fire({
+        title: 'Are you sure, you want to delete this Record?',
+        text: 'This can\'t be reverted!',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33'
+    }).then(async(result) => {
+        if (result.isConfirmed) {
+            var endPoint = `/StudentFee/delete_student_installment/?installment_id=${installmentId}`;
+            var totalUrl = apiUrl + endPoint;
+            await ajaxRequest("PATCH", totalUrl, "", "installmentTable", "sm",async(response) => {
+                var installmentTr = $(`.tr-installment-${installmentId}`);
+                installmentTr.find("td").eq(3).text("");
+                installmentTr.find("td").eq(4).removeClass("bg-success").addClass("bg-danger").text("Unpaid");
+                installmentTr.find("td").eq(5).html(`
+                <button class="btn btn-info btn-label rounded-pill right" 
+                onClick="editInstallment(this)" data-installment_id ='${installmentId}'>
+                    Pay
+                    <i class="bi bi-currency-rupee label-icon align-middle fs-lg ms-2"></i>
+                </button>
+                `)
+            })
+        }
+    });
+
 }
 
 // ----------------------------------studentFee----------------------------------------

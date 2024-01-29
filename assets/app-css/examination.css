@@ -31,32 +31,3 @@
     margin-left: 13px;
 }
 
-#examTable th,
-#examTable td {
-    text-align: center;
-}
-
-#examTable th:nth-child(1),
-#examTable td:nth-child(1) {
-    width: 5%; 
-}
-
-#examTable th:nth-child(2),
-#examTable td:nth-child(2) {
-    width: 10%; 
-}
-
-#examTable th:nth-child(3),
-#examTable td:nth-child(3) {
-    width: 10%; 
-}
-
-#examTable th:nth-child(4),
-#examTable td:nth-child(4) {
-    width: 10%; 
-}
-
-#examTable th:nth-child(5),
-#examTable td:nth-child(5) {
-    width: 10%; 
-}

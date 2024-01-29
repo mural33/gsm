@@ -9,7 +9,6 @@ $(document).ready(function () {
             await submitaCalenderForm();
         }
     });
-
     $('#calendarPrintView').prop('disabled', true);
     $("#btnSearch").on('click', async (e) => {
         var class_id = $('#class_id').val();
@@ -124,7 +123,6 @@ function validateCalenderForm() {
     return isValid;
 }
 
-
 function resetCalenderForm() {
     const fields = ["subject_id", "staff_id", "day", "start_time", "end_time", 'form_class_id', 'form_section_id'];
     for (const field of fields) {
@@ -133,72 +131,6 @@ function resetCalenderForm() {
             element.val("");
             element.removeClass("is-invalid");
         }
-    }
-}
-
-async function submitaCalenderForm() {
-    const isUpdate = $("#calender_id").val() !== "";
-    const calender_id = $("#calender_id").val();
-    const section_id = $('#form_section_id').val();
-    const class_id = $('#form_class_id').val();
-    const calenderData = {
-        "institute_id": instituteId,
-        "class_id": class_id,
-        "section_id": section_id,
-        "subject_id": $('#subject_id').val(),
-        "staff_id": $("#staff_id").val(),
-        "day": $("#day").val(),
-        "start_time": $("#start_time").val(),
-        "end_time": $("#end_time").val(),
-    };
-
-    const calenderEndpointurl = isUpdate ? `${apiUrl}/Calender/update_calender/?calender_id=${calender_id}` : `${apiUrl}/Calender/add_calender/`;
-    const requestType = isUpdate ? 'PUT' : 'POST';
-
-    try {
-        const response = await $.ajax({
-            type: requestType,
-            url: calenderEndpointurl,
-            data: JSON.stringify(calenderData),
-            headers: {
-                "Authorization": `Bearer ${jwtToken}`,
-                "Content-Type": "application/json",
-            },
-            contentType: "application/json",
-            dataType: "json",
-            beforeSend: (e) => {
-                showLoader("calender_details", "sm");
-            },
-            success: (data) => {
-                if (data && data.response) {
-                    const responseData = data.response;
-
-                    if (isUpdate) {
-                        $("#calendarmodal").modal("hide");
-                        const CalenderRow = $(`#calenderTable td[data-id="${calender_id}"]`).closest('tr');
-                        if (CalenderRow.length) {
-                            loadCalendarDetails(class_id, section_id);
-                            raiseSuccessAlert("Calender Updated Successfully");
-                            $('.context-menu-root').removeAttr('style').hide();
-                        } else {
-                            console.error('Row with data-id not found:', responseData.calender_id);
-                        }
-                    } else {
-                        $("#calender_id").val("");
-                        raiseSuccessAlert("Calender Added Successfully");
-                    }
-                }
-            },
-            error: (error) => {
-                raiseErrorAlert(error.responseJSON.detail);
-            },
-            complete: (e) => {
-                removeLoader("calender_details", "sm");
-                resetCalenderForm();
-            }
-        });
-    } catch (error) {
-        raiseErrorAlert(error.responseJSON.detail);
     }
 }
 
@@ -328,50 +260,73 @@ async function loadCalendarDetails(class_id, section_id) {
     }
 }
 
-function openEditForm(cellData) {
-    const calenderId = cellData && cellData.calender_id ? cellData.calender_id : '';
-    const fetchUrl = `${apiUrl}/Calender/get_calender_by_id/?calender_id=${calenderId}`;
-    setTimeout(() => {
-        showLoader("calender_details", "lg");
-    }, 2000);
+let currentEditCalenderId = null; // Declare the variable at the top level
 
-    $.ajax({
-        type: 'GET',
-        url: fetchUrl,
-        headers: {
-            Authorization: `Bearer ${jwtToken}`,
-            'Content-Type': 'application/json',
-        },
-        contentType: 'application/json',
-        dataType: 'json',
-        success: function (data) {
-            $('#calendarmodal').modal('show');
-            if (data && data.response && data.response.length > 0) {
-                const responseData = data.response[0];
-                const classId = responseData.class_id;
-                getSectionsByClass(classId, 'form_section_id');
-                subjectName(classId, 'subject_id');
-                $('#calender_id').val(responseData.calender_id);
-                $('#form_class_id').val(classId);
-                $('#staff_id').val(responseData.staff_id);
-                $('#day').val(responseData.day);
-                $('#start_time').val(responseData.start_time);
-                $('#end_time').val(responseData.end_time);
-                simulateContextMenu(cellData);
+async function submitaCalenderForm() {
+    const isUpdate = $("#calender_id").val() !== "";
+    const calenderId = isUpdate ? $("#calender_id").val() : currentEditCalenderId;
+    const sectionId = $('#form_section_id').val();
+    const classId = $('#form_class_id').val();
+
+    const calenderData = {
+        "institute_id": instituteId,
+        "class_id": classId,
+        "section_id": sectionId,
+        "subject_id": $('#subject_id').val(),
+        "staff_id": $("#staff_id").val(),
+        "day": $("#day").val(),
+        "start_time": $("#start_time").val(),
+        "end_time": $("#end_time").val(),
+    };
+
+    const calenderEndpointUrl = isUpdate ? `${apiUrl}/Calender/update_calender/?calender_id=${calenderId}` : `${apiUrl}/Calender/add_calender/`;
+    const requestType = isUpdate ? 'PUT' : 'POST';
+
+    try {
+        const response = await $.ajax({
+            type: requestType,
+            url: calenderEndpointUrl,
+            data: JSON.stringify(calenderData),
+            headers: {
+                "Authorization": `Bearer ${jwtToken}`,
+                "Content-Type": "application/json",
+            },
+            contentType: "application/json",
+            dataType: "json",
+            beforeSend: () => showLoader("calender_details", "sm"),
+            success: (data) => {
+                if (data && data.response) {
+                    const responseData = data.response;
+                    if (isUpdate) {
+                        $("#calendarmodal").modal("hide");
+                        const calenderCell = $(`#calenderTable td[data-id="${calenderId}"]`);
+                        if (calenderCell.length) {
+                            loadCalendarDetails(classId, sectionId);
+                            raiseSuccessAlert("Calender Updated Successfully");
+                            $('.context-menu-root').removeAttr('style').hide();
+                            // Clear the data-id attribute of the edited cell after a successful edit
+                            calenderCell.data('id', null);
+                        } else {
+                            console.error('Cell with data-id not found:', calenderId);
+                        }
+                    } else {
+                        $("#calender_id").val("");
+                        raiseSuccessAlert("Calender Added Successfully");
+                    }
+                    // Clear the data-id attribute after a successful operation
+                    currentEditCalenderId = null;
+                }
+            },
+            error: (error) => raiseErrorAlert(error.responseJSON.detail),
+            complete: () => {
+                removeLoader("calender_details", "sm");
+                resetCalenderForm();
             }
-        },
-        error: function (xhr, status, error) {
-            raiseErrorAlert(xhr.responseJSON.detail);
-        },
-        complete: function () {
-            setTimeout(() => {
-                removeLoader("calender_details", "lg");
-            }, 2000);
-        }
-    });
+        });
+    } catch (error) {
+        raiseErrorAlert(error.responseJSON.detail);
+    }
 }
-
-
 
 function simulateContextMenu(cellData) {
     const contextMenuItems = {
@@ -384,29 +339,104 @@ function simulateContextMenu(cellData) {
         items: contextMenuItems,
         callback: function (key, options) {
             if (key === 'edit') {
-                openEditForm(cellData);
+                // Store the calendar ID of the clicked cell
+                currentEditCalenderId = cellData.calender_id;
+                openEditForm(currentEditCalenderId);
             } else if (key === 'delete') {
-                deletePeriod(cellData);
+                const rowIndex = $(options.$trigger).closest('tr').index();
+                const colIndex = $(options.$trigger).index();
+                const calenderId = cellData.calender_id;
+                deletePeriod(rowIndex, colIndex, calenderId);
             }
-
         },
-
     });
-
+    // Trigger the context menu for the clicked cell
     const $targetCell = $(`.editable-cell[data-id="${cellData.calender_id}"]`);
     const e = $.Event('contextmenu', { pageX: $targetCell.offset().left, pageY: $targetCell.offset().top });
     $targetCell.trigger(e);
 }
 
+async function openEditForm(calenderId) {
+    if (!calenderId || calenderId === '') {
+        console.log('Invalid calendarId for editing:', calenderId);
+        return;
+    }
 
-async function deletePeriod(cellData) {
+    const fetchUrl = `${apiUrl}/Calender/get_calender_by_id/?calender_id=${calenderId}`;
+    showLoader("calender_details", "lg");
+
     try {
-        const calenderId = cellData && cellData.calender_id ? cellData.calender_id : '';
-        if (!calenderId) {
-            console.error('Invalid calenderId for deletion.');
+        const response = await $.ajax({
+            type: 'GET',
+            url: fetchUrl,
+            headers: {
+                Authorization: `Bearer ${jwtToken}`,
+                'Content-Type': 'application/json',
+            },
+            contentType: 'application/json',
+            dataType: 'json',
+            success: function (data) {
+                $('#calendarmodal').modal('show');
+                if (data && data.response && data.response.length > 0) {
+                    const responseData = data.response[0];
+                    const classId = responseData.class_id;
+                    getSectionsByClass(classId, 'form_section_id');
+                    subjectName(classId, 'subject_id');
+                    $('#calender_id').val(responseData.calender_id);
+                    $('#form_class_id').val(classId);
+                    $('#staff_id').val(responseData.staff_id);
+                    $('#day').val(responseData.day);
+                    $('#start_time').val(responseData.start_time);
+                    $('#end_time').val(responseData.end_time);
+
+                    // Clear the dynamically stored calendar ID after opening the edit form
+                    currentEditCalenderId = null;
+                }
+            },
+            error: function (xhr, status, error) {
+                raiseErrorAlert(xhr.responseJSON.detail);
+            },
+            complete: function () {
+                removeLoader("calender_details", "lg");
+            }
+        });
+    } catch (error) {
+        console.error('An unexpected error occurred:', error);
+        raiseErrorAlert('An unexpected error occurred. Please try again.');
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//Delete with No Record Found Image
+async function deletePeriod(rowIndex, colIndex) {
+    try {
+        const table = $('#calenderTable');
+        const cell = table.find(`tr:eq(${rowIndex}) td:eq(${colIndex})`);
+        const calenderId = cell.data('id');
+
+        if (!calenderId || calenderId === '') {
             return;
         }
-
         const deleteUrl = `${apiUrl}/Calender/delete_calender/?calender_id=${calenderId}`;
         await $.ajax({
             type: 'DELETE',
@@ -423,69 +453,95 @@ async function deletePeriod(cellData) {
             success: (response) => {
                 if (response && response.status_code === 200) {
                     raiseSuccessAlert(response.msg);
-                    const deletedCell = $(`#calenderTable td[data-id="${calenderId}"]`);
-                    if (deletedCell.length > 0) {
-                        const row = deletedCell.closest('tr');
-                        deletedCell.remove();
 
-                        // Check if all cells (except the first one) are empty or contain only whitespace
-                        const cellsToCheck = row.find('td:not(:first-child)');
-                        const allCellsEmpty = cellsToCheck.toArray().every(cell => $(cell).text().trim() === '');
+                    // Clear the data-id and content of the cell
+                    cell.data('id', null);
+                    cell.empty();
 
-                        if (allCellsEmpty) {
-                            row.remove();
-                        }
+                    // Find the row and remove it if all cells in the row are empty
+                    const row = cell.closest('tr');
+                    const cellsToCheck = row.find('td:not(:first-child)');
+                    const allCellsEmptyInRow = cellsToCheck.toArray().every(cell => $(cell).text().trim() === '');
+
+                    if (allCellsEmptyInRow) {
+                        row.remove();
+                    }
+                    // Check if the table is empty and hide it, show "No Record Found" image
+                    if (table.find('td.editable-cell').length === 0) {
+                        table.hide();
+                        $('#no_data_found').show();
                     }
                 } else {
-                    console.warn(`Failed to delete cell with calender_id ${calenderId}. Server response:`, response);
                     raiseErrorAlert(response.msg);
                 }
             },
-            error: (jqXHR, textStatus, errorThrown) => {
-                console.error(`Error: ${textStatus}, ${errorThrown}`);
-                console.log(jqXHR.responseText); // Log the server response
+            error: () => {
                 raiseErrorAlert('Error deleting data. Please try again.');
             },
             complete: (e) => {
                 removeLoader("body", "sm");
             },
         });
+
     } catch (error) {
-        console.error('An unexpected error occurred:', error);
         raiseErrorAlert('An unexpected error occurred. Please try again.');
     }
 }
 
 
+// async function deletePeriod(rowIndex, colIndex) {
+//     try {
+//         const table = $('#calenderTable');
+//         const cell = table.find(`tr:eq(${rowIndex}) td:eq(${colIndex})`);
+//         const calenderId = cell.data('id');
 
+//         if (!calenderId || calenderId === '') {
+//             return;
+//         }
+//         const deleteUrl = `${apiUrl}/Calender/delete_calender/?calender_id=${calenderId}`;
+//         const response = await $.ajax({
+//             type: 'DELETE',
+//             url: deleteUrl,
+//             headers: {
+//                 Authorization: `Bearer ${jwtToken}`,
+//                 'Content-Type': 'application/json',
+//             },
+//             contentType: 'application/json',
+//             dataType: 'json',
+//             beforeSend: (e) => {
+//                 showLoader("body", "sm");
+//             },
+//             success: (response) => {
+//                 if (response && response.status_code === 200) {
+//                     raiseSuccessAlert(response.msg);
 
-// async function deletePeriod(cellData) {
-//     const calenderId = cellData && cellData.calender_id ? cellData.calender_id : '';
-//     const deleteUrl = `${apiUrl}/Calender/delete_calender/?calender_id=${calenderId}`;
-//     await $.ajax({
-//         type: 'DELETE',
-//         url: deleteUrl,
-//         headers: {
-//             Authorization: `Bearer ${jwtToken}`,
-//             'Content-Type': 'application/json',
-//         },
-//         contentType: 'application/json',
-//         dataType: 'json',
-//         beforeSend: (e) => {
-//             showLoader("body", "sm");
-//         },
-//         success: (response) => {
-//             if (response && response.status_code === 200) {
-//                 raiseSuccessAlert('Data deleted successfully');
-//                 const deletedCell = $(`#calenderTable td[data-id="${calenderId}"]`);
-//                 if (deletedCell.length > 0) {
-//                     deletedCell.remove();                }
-//             }   else {
-//                 console.warn(`Cell with calender_id ${calenderId} not found.`);
-//             }
-//         },
-//         complete: (e) => {
-//             removeLoader("body", "sm");
-//         },
-//     });
+//                     // Set calendarId to null after successful deletion
+//                     // (Assuming that cell.data('id', null) sets the data-id attribute to null)
+//                     cell.data('id', null);
+
+//                     // Remove the cell from the table
+//                     cell.empty();
+
+//                     // Check if all cells in the row are empty and remove the row
+//                     const row = cell.closest('tr');
+//                     const cellsToCheck = row.find('td:not(:first-child)');
+//                     const allCellsEmpty = cellsToCheck.toArray().every(cell => $(cell).text().trim() === '');
+
+//                     if (allCellsEmpty) {
+//                         row.remove();
+//                     }
+//                 } else {
+//                     raiseErrorAlert(response.msg);
+//                 }
+//             },
+//             error: () => {
+//                 raiseErrorAlert('Error deleting data. Please try again.');
+//             },
+//             complete: (e) => {
+//                 removeLoader("body", "sm");
+//             },
+//         });
+//     } catch (error) {
+//         raiseErrorAlert('An unexpected error occurred. Please try again.');
+//     }
 // }

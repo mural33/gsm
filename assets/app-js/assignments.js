@@ -23,11 +23,11 @@ $(document).ready(() => {
         const selectedClassId = $(this).val();
     
         if (selectedClassId) {
-            var selectedOption = $(this).find(`option[value="${selectedClassId}"]`);
-            var promotionType = selectedOption.data("promotion");
-            var totalPromotions = selectedOption.data("total_number_of_promotion");
+            var selectedOptions = $(this).find(`option[value="${selectedClassId}"]`);
+            var promotionTypes = selectedOptions.data("promotion");
+            var totalPromotions = selectedOptions.data("total_number_of_promotion");
+            loadSemYear(totalPromotions, promotionTypes, "semister");
             getSectionsByClass(selectedClassId, "section_id", function () {
-                loadSemYear(totalPromotions, promotionType, "semister_id");
             });
         }
     });
@@ -114,7 +114,6 @@ $(document).ready(() => {
     async function loadSemYear(durationTime, promotionType, tnpId) {
         var tnp = $(`#${tnpId}`);
         var labelElement = $("label[for='" + tnpId + "']");
-    
         var promotionTypeMap = {
             "semister_vise": "Semester",
             "year_vise": "Year",
@@ -156,6 +155,8 @@ $(document).ready(() => {
             "assignment_title": $("#assignment_title").val(),
             "assignment_details": $("#assignment_details").val(),
             "assignment_due_date": $("#assignment_due_date").val(),
+            "semistor": parseInt($("#semister").val()),
+
             "is_deleted": false
         };
         const assignmentEndpoint = isUpdate ? `${apiUrl}/Assignments/update_assignment/?assignment_id=${assignmentId}` : `${apiUrl}/Assignments/create_assignment/`;
@@ -178,13 +179,16 @@ $(document).ready(() => {
                     const responseData = data.response;
                     if (isUpdate) {
                         const tr = dataTable.row($(`.tr-assign-${responseData.id}`)).node();
-                        dataTable.cell(tr, 1).data(`<a href=/app/assignmentInfo/${responseData.assignment_slug}>${responseData.assignment_title}</a>`);
-                        dataTable.cell(tr, 2).data(
+                        dataTable.cell(tr, 0).data(`<a href=/app/assignmentinfo/${responseData.assignment_slug}>${responseData.assignment_title}</a>`);
+                        dataTable.cell(tr, 1).data(
                             `<span class="class_id" data-class='${responseData.class_id}'>${responseData.classes.class_name}</span>-` +
                             `<span class="section_id" data-section='${responseData.section_id}'>${responseData.sections.section_name}</span>`
                         );
-                        dataTable.cell(tr, 3).data(responseData.assignment_Date);
-                        dataTable.cell(tr, 4).data(responseData.assignment_due_date);
+                        dataTable.cell(tr, 2).data(responseData.assignment_Date);
+                        dataTable.cell(tr, 3).data(responseData.assignment_due_date);
+                        dataTable.cell(tr, 4).data(
+                            `<span class="semister" data-promotions="${responseData.promotion_type}" data-total_number_of_promotion="${responseData.total_number_of_promotion}">${responseData.semistor}</span>`
+                        );
                         $(".openAssignmentBtn", tr).attr("data-description", responseData.assignment_details);
                         $("#assignment_id").val("");
                         $('#assignmentModal').addClass("model fade");
@@ -193,15 +197,16 @@ $(document).ready(() => {
                     } else {
                         const newRow = `
                     <tr class="tr-assign-${responseData.id} assignment-row">
- 
-                        <td>${$("#assignments_info tr").length + 1}</td>
-                        <td class="text-break assignment_title"><a href=/app/assignmentInfo/${responseData.assignment_slug}>${responseData.assignment_title}</a></td>
+
+                        <td class="text-break assignment_title"><a href=/app/assignmentinfo/${responseData.assignment_slug}>${responseData.assignment_title}</a></td>
                         <td class="text-break">
                         <span class="class_id" data-class='${responseData.class_id}'>${responseData.classes.class_name}</span>-
                         <span class="section_id" data-section='${responseData.section_id}'>${responseData.sections.section_name}</span>
                     </td>
                         <td class="assignment_Date">${responseData.assignment_Date}</td>
                         <td class="assignment_due_date">${responseData.assignment_due_date}</td>
+                        <td class="semister" data-promotions='${responseData.promotion_type}}' data-total_number_of_promotion='${responseData.total_number_of_promotion}'>${responseData.semistor}</td>
+
                         <td>
                             <button type="button" class="openAssignmentBtn btn btn-sm btn-dark rounded-pill"
                                 data-bs-toggle="modal" data-bs-target="#assignment-view-modal"
@@ -256,6 +261,9 @@ $(document).ready(() => {
                     $("#assignment_details").val(responseData.assignment_details);
                     $("#assignment_Date").val(responseData.assignment_Date);
                     $("#assignment_title").val(responseData.assignment_title);
+                    loadSemYear(responseData.total_number_of_promotion, responseData.promotion_type, "semistor", function () {
+                        $("#semister").val(responseData.semistor);
+                    });
                     $("#assignment_due_date").val(responseData.assignment_due_date);
                 }
             },
@@ -264,6 +272,7 @@ $(document).ready(() => {
             }
         });
     }
+    
 
     async function deleteAssignment(assignmentId) {
         const assignmentRow = dataTable.row(`.tr-assign-${assignmentId}`);
@@ -320,54 +329,35 @@ function filterAssignment() {
     const assignmentTable = $("#assignmentTable").DataTable();
     const filterClassIds = $('#filter_class_id').val();
     const filterSectionIds = $('#filter_section_id').val();
-    const filterSemesterIds = $('#filter_semester_id').val(); // Corrected variable name
- 
-    DataTable.ext.search = []; // Clear previous search functions
- 
+    const filterSemesterId = $('#filter_semister_id').val();
+    DataTable.ext.search = [];
     DataTable.ext.search.push(function (settings, data, dataIndex) {
         var filterClass = parseInt(filterClassIds);
         var filterSection = parseInt(filterSectionIds);
-        var filterSemester = parseInt(filterSemesterIds); // Corrected variable name
- 
+        var filterSemester = parseInt(filterSemesterId);
         let row = assignmentTable.row(dataIndex).nodes().to$();
         let classData = parseInt(row.find(".class_id").data("class"));
         let sectionData = parseInt(row.find(".section_id").data("section"));
-        let semesterData = parseInt(row.find(".semester_id").data("semester")); // Assuming you have a semester_id attribute
- 
+        let semesterData = parseInt(row.find(".semister").text());
         $("#assignmentFilter").modal("hide");
- 
         if (
-            (filterClass === classData) &&
-            (isNaN(filterSection) || filterSection === "" || filterSection === undefined) &&
-            (isNaN(filterSemester) || filterSemester === "" || filterSemester === undefined)
-        ) {
-            return true;
-        } else if (
-            (filterClass === classData) &&
-            (filterSection === sectionData) &&
-            (isNaN(filterSemester) || filterSemester === "" || filterSemester === undefined)
-        ) {
-            return true;
-        } else if (
-            (filterClass === classData) &&
-            (filterSection === sectionData) &&
-            (filterSemester === semesterData)
-        ) {
-            return true;
-        } else if (
-            (isNaN(filterClass) || filterClass === " ") &&
-            (isNaN(filterSection) || filterSection === "") &&
-            (isNaN(filterSemester) || filterSemester === "")
+            (isNaN(filterClass) || filterClass === classData) &&
+            (isNaN(filterSection) || filterSection === sectionData) &&
+            (isNaN(filterSemester) || filterSemester === semesterData)
         ) {
             return true;
         } else {
-            return false;
+            return false; 
         }
     });
- 
+
     assignmentTable.draw();
     resetFillterForm();
 }
+
+
+
+
 
 
 function resetFillterForm() {

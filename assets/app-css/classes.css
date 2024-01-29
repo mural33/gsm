@@ -164,3 +164,9 @@
     width: auto;
     margin-top: 10px;
   }
+  .custom-swal-container{
+    width: 20rem;
+  }
+  .custom-swal-popup {
+    margin: 0 auto; 
+  }

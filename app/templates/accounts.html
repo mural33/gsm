@@ -217,9 +217,9 @@
                         <td class="particular_name">{{account.particular_name}}</td>
                         <td class="description">{{account.description}}</td>
                         <td class="transaction_details">{{account.payment_mode}}<br>{{account.transaction_reference}}</td>
-                        <td Class="transaction_amount">{{account.transaction_amount}}</td>
+                        <td Class="transaction_amount">{{account.transaction_amount|floatformat:2}}</td>
                         <td Class="transaction_type">{{account.transaction_type}}</td>
-                        <td Class="net_balance">{{account.net_balance}}</td>
+                        <td Class="net_balance">{{account.net_balance|floatformat:2}}</td>
                     </tr>
                 {% endfor %}
             </tbody>

@@ -37,7 +37,8 @@ class Student:
 
 
 class StudentInfo:
-    student_parent_url = "/Parents/get_parents_data_by_student_id/"
+    # student_parent_url = "/Parents/get_parents_data_by_student_id/"
+    student_parent_url = "/Parents/get_parents_by_student_id/"
     student_transport_url = "student/transport/"
     student_attendance_url = "student/attendance/"
     student_academic_url = "student/academic/"
@@ -55,6 +56,7 @@ class StudentInfo:
         self.end_point = f"/Students/get_students_by_field/slug/{student_slug}/"
         self.total_url = self.api_url + self.end_point
         response = requests.get(url=self.total_url, headers=self.headers)
+        print(response.json())
         if response.status_code == 200:
             data = response.json()
             return data[0]
@@ -67,6 +69,7 @@ class StudentInfo:
         self.end_point = self.student_transport_url + f"?transport_id={transport_id}"
         self.total_url = self.api_url + self.end_point
         response = requests.get(url=self.total_url, headers=self.headers)
+        print(response.json())
         if response.status_code == 200:
             data = response.json()["response"]
             return data
@@ -74,6 +77,7 @@ class StudentInfo:
             return []
 
     async def get_student_parents_data(self, student_id=0):
+        student_id = int(student_id)
         self.total_url = (
             self.api_url
             + self.student_parent_url
@@ -82,7 +86,7 @@ class StudentInfo:
         response = requests.get(url=self.total_url, headers=self.headers)
         print(response.json())
         if response.status_code == 200:
-            data = response.json()["response"]
+            data = response.json()
             return data
         else:
             return []

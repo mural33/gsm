@@ -1,12 +1,14 @@
 $(document).ready(function () {
     applyDefaultFilter();
+    updateNetBalanceCard();
+    updateSummaryCards();
+    applyTransactionTypeColor();
     var dataTable = $('#accountsTable').DataTable({
-        "order": [],
+        ordering: false,
     });
 
     $(".dataTables_empty").html(`<img src="/assets/img/no_data_found.png" alt="No Image" class="no_data_found">`)
-    updateSummaryCards();
-    applyTransactionTypeColor();
+
     $("#exportButton").on("click", function () {
         exportTableToExcel('accountsTable', 'accounts_data');
     });
@@ -39,7 +41,7 @@ $(document).ready(function () {
             $("#btnSaveAccounts").addClass("btn-shake");
             return false;
         } else {
-            await accountsSubmitForm();
+            await accountsSubmitForm(dataTable);
         }
     });
 
@@ -76,9 +78,9 @@ $(document).ready(function () {
         $("#net_balance").val(lastNetBalance.toFixed(2));
     }
 
-    async function updateSummaryCards() {
+    async function updateNetBalanceCard() {
         const latestNetBalance = parseFloat($("#accountsTable tbody tr:first-child .net_balance").text()) || 0;
-        $("#netBalanceCard").text(latestNetBalance.toFixed(1));
+        $("#netBalanceCard").text(latestNetBalance.toFixed(2));
     }
 
     async function calculateUpdatedSummary(paymentType, newAmount) {
@@ -90,11 +92,69 @@ $(document).ready(function () {
             'Other Debits': 'otherDebitsCard',
         };
         var currentAmount = parseFloat($(`#${cardId[paymentType]}`).text()) || 0;
-        var newAmount = parseFloat(newAmount)
-        if (!Number.isNaN(currentAmount) && !Number.isNaN(newAmount)) {
-            $(`#${cardId[paymentType]}`).text((currentAmount + newAmount).toFixed(2));
-        } else {
-        }
+        var updatedAmount = currentAmount + newAmount;
+        $(`#${cardId[paymentType]}`).text(updatedAmount.toFixed(2));
+    }
+
+    async function updateSummaryCards() {
+        resetSummaryCards(); // Reset summary cards before updating
+        $("#accountsTable tbody tr:visible").each(function () {
+            const row = $(this);
+            const rowPaymentType = row.find(".payment_type").text();
+            const rowAmount = parseFloat(row.find(".transaction_amount").text()) || 0;
+            if (!Number.isNaN(rowAmount)) {
+                calculateUpdatedSummary(rowPaymentType, rowAmount);
+            }
+        });
+    }
+
+    async function resetSummaryCards() {
+        var cardId = {
+            'Fee Collections': 'feeCollectionsCard',
+            'Salary': 'salaryCard',
+            'Expenditure': 'expenditureCard',
+            'Other Credits': 'otherCreditsCard',
+            'Other Debits': 'otherDebitsCard',
+        };
+        Object.values(cardId).forEach(id => $(`#${id}`).text('0.00'));
+    }
+
+    async function applyFilter() {
+        const paymentType = $("#paymentTypeFilter").val();
+        const fromDate = $("#fromDateFilter").val();
+        const toDate = $("#toDateFilter").val();
+        resetSummaryCards();
+        $("#accountsTable tbody tr").each(function () {
+            const row = $(this);
+            const rowPaymentType = row.find(".payment_type").text();
+            const rowTransactionDate = row.find(".transaction_date").text();
+            const showRow = (paymentType === '' || rowPaymentType === paymentType) &&
+                (!fromDate || new Date(rowTransactionDate) >= new Date(fromDate)) &&
+                (!toDate || new Date(rowTransactionDate) <= new Date(toDate));
+            row.toggle(showRow);
+            if (showRow) {
+                const rowAmount = parseFloat(row.find(".transaction_amount").text()) || 0;
+                calculateUpdatedSummary(rowPaymentType, rowAmount);
+            }
+        });
+    }
+
+    async function applyDefaultFilter() {
+        const currentDate = new Date();
+        const firstDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+        const lastDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+
+        const adjustedFirstDay = new Date(firstDayOfMonth.getTime() - firstDayOfMonth.getTimezoneOffset() * 60000);
+        const adjustedLastDay = new Date(lastDayOfMonth.getTime() - lastDayOfMonth.getTimezoneOffset() * 60000);
+
+        const formattedFirstDay = adjustedFirstDay.toISOString().split('T')[0];
+        const formattedLastDay = adjustedLastDay.toISOString().split('T')[0];
+
+        $("#fromDateFilter").val(formattedFirstDay);
+        $("#toDateFilter").val(formattedLastDay);
+
+        applyFilter();
+        updateSummaryCards();
     }
 
     async function applyTransactionTypeColor() {
@@ -132,7 +192,7 @@ $(document).ready(function () {
             "particular_name": $('#particular_name').val(),
             "transaction_reference": $('#transaction_reference').val(),
         };
-        
+
         const accountsEndPoint = `/Accounts/create_transaction/`;
         const accountsUrl = `${apiUrl}${accountsEndPoint}`;
         await $.ajax({
@@ -151,6 +211,8 @@ $(document).ready(function () {
             success: function (data) {
                 $("#addAccountsModal").modal("hide");
                 const responseData = data.response;
+                const formattedTransactionAmount = parseFloat(responseData.transaction_amount).toFixed(2);
+                const formattedNetBalance = parseFloat(responseData.net_balance).toFixed(2);
                 const newAccountsRow = `
                 <tr class="tr-accounts-${responseData.account_id}">
                     <td class="transaction_date">${responseData.transaction_date}</td>
@@ -158,59 +220,26 @@ $(document).ready(function () {
                     <td class="particular_name">${responseData.particular_name}</td>
                     <td class="description">${responseData.description}</td>
                     <td class="">${responseData.payment_mode}<br>${responseData.transaction_reference}</td>
-                    <td class="transaction_amount">${responseData.transaction_amount}</td>
+                    <td class="transaction_amount">${formattedTransactionAmount}</td>
                     <td class="transaction_type">${responseData.transaction_type}</td>
-                    <td class="net_balance">${responseData.net_balance}</td>
+                    <td class="net_balance">${formattedNetBalance}</td>
                 </tr>`;
-                $(newAccountsRow).prependTo("#accountsTable tbody");
-                dataTable.row.add($(newAccountsRow)).draw();
+                $("#accountsTable tbody").prepend(newAccountsRow);
+                dataTable.clear().rows.add($("#accountsTable tbody tr")).draw();
                 calculateUpdatedSummary(accountsData["payment_type"], accountsData["transaction_amount"]);
                 raiseSuccessAlert(data.msg);
-                applyDefaultFilter();
-
             },
             error: function (error) {
                 raiseErrorAlert(error.responseJSON.detail);
             },
             complete: function (e) {
                 removeLoader("accountsFormArea", "sm");
+                updateNetBalanceCard();
                 updateSummaryCards();
                 applyTransactionTypeColor();
                 resetForm(fields);
                 $("#accounts_details").find(".no_data_found-tr").remove();
             }
         });
-    }
-
-    async function applyFilter() {
-        const paymentType = $("#paymentTypeFilter").val();
-        const fromDate = $("#fromDateFilter").val();
-        const toDate = $("#toDateFilter").val();
-        $("#accountsTable tbody tr").each(function () {
-            const row = $(this);
-            const rowPaymentType = row.find(".payment_type").text();
-            const rowTransactionDate = row.find(".transaction_date").text();
-            const showRow = (paymentType === '' || rowPaymentType === paymentType) &&
-                (!fromDate || new Date(rowTransactionDate) >= new Date(fromDate)) &&
-                (!toDate || new Date(rowTransactionDate) <= new Date(toDate));
-            row.toggle(showRow);
-        });
-    }
-
-    async function applyDefaultFilter() {
-        const currentDate = new Date();
-        const firstDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
-        const lastDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
-
-        const adjustedFirstDay = new Date(firstDayOfMonth.getTime() - firstDayOfMonth.getTimezoneOffset() * 60000);
-        const adjustedLastDay = new Date(lastDayOfMonth.getTime() - lastDayOfMonth.getTimezoneOffset() * 60000);
-
-        const formattedFirstDay = adjustedFirstDay.toISOString().split('T')[0];
-        const formattedLastDay = adjustedLastDay.toISOString().split('T')[0];
-
-        $("#fromDateFilter").val(formattedFirstDay);
-        $("#toDateFilter").val(formattedLastDay);
-
-        applyFilter();
     }
 });

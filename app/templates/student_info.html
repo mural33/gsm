@@ -22,6 +22,7 @@
         </div>
     </div>
     <div class="col-sm-12 col-md-3 col-xl-3 d-flex align-items-center justify-content-end" style="padding: 1rem">
+        <a id="downloadSnapshot" href="{% url 'studentIdCard' student_data.slug %}" target="_blank">Virtual ID card</a>
         <a href="{% url 'edit_student' student_data.slug  %}"  class="btn btn-sm btn-info mx-3">
             <i class="bi bi-pencil-square"></i>
         </a>
@@ -30,6 +31,7 @@
         </button>
     </div>
 </div>
+has context menu
 <input type="hidden" id="studentInfo" value='{"classId":{{student_data.class_id}}, "sectionId":{{student_data.section_id}}, "studentId":{{student_data.student_id}}}' />
 <div class="row">
     <div class="col-xl-3 col-lg-3 col-md-12 ">          
@@ -49,7 +51,7 @@
                         <span class="d-block">
                             Roll Number
                         </span>
-                        <span class="d-block txt-color">
+                        <span class="d-block txt-color" id="rollNumberStu" data-roll_number = "{{student_data.roll_number}}">
                             {{student_data.roll_number}}
                         </span>
                     </p>
@@ -62,6 +64,32 @@
                         <span class="d-block txt-color">
                             {{student_data.classes.class_name}}
                         </span>
+                    </p>
+                </div>
+                <div class="col-md-12 col-sm-12 col-xs-6 ">
+                    <p class="card-title">
+                        <span class="d-block">
+                             {% if student_data.classes.promotion_type == 'year_vise' %}
+                            Current Years
+                          {% elif student_data.classes.promotion_type == 'course_vise' %}
+                            Current Course
+                            {% elif student_data.classes.promotion_type == 'semister_vise' %}
+                            Current Semester
+                          {% endif %}                         
+                        </span>
+                         {% if student_data.classes.promotion_type == 'year_vise' %}
+                        <span class="d-block txt-color">
+                          {{student_data.current_position}} Years
+                        </span>
+                      {% elif student_data.classes.promotion_type == 'course_vise' %}
+                        <span class="d-block txt-color">
+                          {{student_data.current_position}} Course
+                        </span>
+                        {% elif student_data.classes.promotion_type == 'semister_vise' %}
+                        <span class="d-block txt-color">
+                          {{student_data.current_position}} Semester
+                        </span>
+                      {% endif %} 
                     </p>
                 </div>
                 <div class="col-md-12 col-sm-12 col-xs-6 ">
@@ -370,20 +398,29 @@
                             <blockquote>Moving Your World, One Journey at a Time!</blockquote>
                             <div class="row">
                                 <div class="col-md-12 text-center">
-                                    {% if transport_data %}
-                                        <div class="">
+                                    <div class="transportContainer" id="transportContainerId">
+                                        {% if transport_data %}
+                                        <div class="transDetailsCont">
                                             <div>
-                                                <img src="{% static 'img/school-bus.png' %}" alt="Profile Image" class="bus-vehicle">
+                                                <img src="{% static 'img/school-bus.png' %}" alt="bus" class="bus-vehicle">
                                             </div>
                                             <div class="text-left">
                                                 <p class="text-dark text-right">Vehicle Number: {{ transport_data.vehicle_number }}</p>
                                                 <p class="text-dark text-right">Route Name: {{ transport_data.transport_name }}</p>
-                                                <p class="text-dark text-right">Vehicle Details: {{ transport_data.vehicle_details }}</p> 
+                                                <p class="text-dark text-right">Vehicle Details: {{ transport_data.vehicle_details }}</p>
                                             </div>
                                         </div>
-                                    {% else %}
+                                        {% else %}
                                         <img src="{% static 'img/no_data_found.png' %}" alt="No Image" class="no_data_found">
-                                    {% endif %}
+                                        {% endif %}
+                                    </div>
+                                    <div class="row mt-3">
+                                        <div class="col-md-12 text-center">
+                                            <button type="button" data-bs-toggle="modal" data-bs-target="#transport_form"
+                                                class="btn btn-success">Assign/Change</button>
+                                            <button type="button" class="btn btn-danger ms-2" id="unassignButton">UnAssign</button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -405,7 +442,7 @@
                                         <input type="number" name="" id="discount" class="form-control" value="0" oninput="showDiscount(this)">
                                     </div>
                                     <div class="col-md-2">
-                                        <label for="total_insta_amount" class="form-label">Total Installment Amount</label>
+                                        <label for="total_insta_amount" class="form-label">TIA</label>
                                         <input type="number" name="" id="total_insta_amount" class="form-control" readonly value="0">
                                     </div>
                                     <div class="col-md-2">
@@ -813,6 +850,35 @@
     </div>
 </div>
 <!-- model popupfor Activity Detailse ended -->
+<div class="modal fade bs-example-modal-sm" id="transport_form" tabindex="-1" role="dialog"
+    aria-labelledby="myMediumModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content" id="parentFormAreaa">
+            <div class="modal-header">
+                <h5 class="modal-title" id="myMediumModalLabel">
+                    Assign/Change Transportation</h5>
+                <button type="button" class="btn-close btnCloseModel">
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12 flex-grow-1">
+                        <select id="vehicle_number" class="form-select" name="vehicle_number">
+                            <option value="" selected disabled></option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a href="javascript:void(0);" class="btn btn-link link-success fw-medium btnCloseModel"><i
+                        class="ri-close-line me-1 align-middle"></i> Close</a>
+                <button type="submit" class="btn btn-primary" id="btnParentForm" onclick="assignTransport()">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- model popupfor Transport ended -->
+
 
 {% endblock %}
 

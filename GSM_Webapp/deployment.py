@@ -6,11 +6,8 @@ from .settings import BASE_DIR
 DEBUG = False
 SECRET_KEY = 'django-insecure-0%60if2d8bu&pm&84%&_%ud#j_bg@_5*=hjn74rrr(s6rsk8kx'
 
-# setting ALLOWED_HOSTS = ['*']
-ALLOWED_HOSTS = ['*']
 
-# seeting csrf cookie secure
-# CSRF_TRUSTED_ORIGINS = ['https://'+ os.environ['WEBSITE_HOSTNAME']]
+ALLOWED_HOSTS = ['*']
 
 CSRF_TRUSTED_ORIGINS = [
     "https://gurukul-web-prod-si-as.azurewebsites.net",

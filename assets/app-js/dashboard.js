@@ -6,7 +6,6 @@ $(document).ready(function () {
     // loadAccountSummary();
 });
 
-
 function loadUpcomingNotice() {
     const upomingNoticeUrl = apiUrl + `/Notice/get_notices_institute/?institute_id=${instituteId}`;
     console.log(upomingNoticeUrl);
@@ -25,7 +24,7 @@ function loadUpcomingNotice() {
             const currentDate = new Date();
             responseData = responseData.filter(notice => new Date(notice.notice_date) >= currentDate);
             responseData.sort((a, b) => new Date(a.notice_date) - new Date(b.notice_date));
-            const upcomingNotices = responseData.slice(0, 5);
+            const upcomingNotices = responseData.slice(0, 8);
             if (upcomingNotices.length > 0) {
             upcomingNotices.forEach((notice) => {
                 const noticeHtml= `
@@ -53,7 +52,7 @@ function loadUpcomingNotice() {
     }
         },
         error: (error) => {
-            raiseErrorAlert(error.responseJSON.detail);
+            raiseErrorAlert(error.detail);
         },
     });
 }
@@ -111,7 +110,7 @@ function getStaffCount(){
             countStaffCard.append(countStaffHtml);
         },
         error: (error) => {
-            raiseErrorAlert(error.responseJSON.detail);
+            raiseErrorAlert(error.detail);
         },
     });
 }

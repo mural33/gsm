@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gurukul School Management - Subscription Renewal</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 600px;
+      margin: 20px auto;
+      background-color: #ffffff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    h2 {
+      color: #333;
+    }
+    p {
+      color: #666;
+    }
+    .button {
+      display: inline-block;
+      padding: 10px 20px;
+      text-decoration: none;
+      color: #ffffff;
+      background-color: #2dcb73;
+      border-radius: 5px;
+    }
+    li{
+        color:#666;
+    }
+    span{
+        color:#2dcb73;
+    }
+    .footer-text{
+        color:#666;
+        font-size: 12px;
+    }
+    .brand-logo-signature{
+        width: 100px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Thank You for Renewing Your Subscription to Gurukul <span>{{ plan_data.0.PlanName }}</span> Plan!</h2>
+    <p>Dear {{ plan_data.0.OrganizationName }},</p>
+    <p>We are thrilled to inform you that your subscription to the Gurukul {{ plan_data.0.PlanName }} Plan has been successfully renewed. Thank you for choosing Gurukul School Management for your school's needs!</p>
+    <p>With the Gurukul {{ plan_data.0.PlanName }} Plan, you continue to enjoy premium features and benefits, ensuring a seamless and enhanced school management experience.</p>
+    <p>Your continued support allows us to continually improve and provide you with the best possible service. If you have any questions or need assistance, feel free to reach out to our dedicated support team.</p>
+    <p>Thank you for being a valued member of the Gurukul community!</p>
+    <a href="https://www.alongx.com/Gurukul" target="_blank" class="button">Explore Gurukul {{ plan_data.0.PlanName }} Features</a>
+    <br>
+    <br>
+    <p><b>Best regards,</b>
+        <br>Team Gurukul<br>
+        <img src="https://gsm-webapp.azurewebsites.net/assets/img/logo-dark.png" class="brand-logo-signature">
+    </p>
+    <p class="footer-text">Know more about <a href="https://www.alongx.com/Gurukul" target="_blank">Gurukul.</a></p>
+    <p class="footer-text">You receive this email from <a href="https://www.alongx.com" target="_blank">AlongX Software</a> on behalf of its "GSM" product team.</p>
+</div>
+
+</body>
+</html>

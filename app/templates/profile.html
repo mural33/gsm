@@ -6,15 +6,13 @@
 <link rel="stylesheet" href="{% static 'app-css/profile.css' %}">
 <div class="row">
     <div class="row">
-        <div class="col-md-8">
-            <h4 class="mb-4">My Profile</h4>
+        <div class="col-md-8 mb-4">
+            <h4>My Profile</h4>
+            <quote>Empower your profile with the strength of a new password; change is the key to a secure account</qoute>
         </div>
     </div>
-    <div class="card" id="userDetails">
-    <div class="card-body">
+    <div class="row justify-content-center" id="userDetails">
     <input type="hidden" id="user_id" value="{{user_data.0.user_id}}">
-
-    <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="mb-3">
                 <input type="file" id="profilePicInput" accept=".jpg, .jpeg" name="profilePicInput" class="form-control visually-hidden" title="Load Profile Picture"/>
@@ -70,8 +68,6 @@
             
 
         </div>
-    </div>
-    </div>
     </div>
 </div>
 
