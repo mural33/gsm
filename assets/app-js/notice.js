@@ -7,10 +7,8 @@ $(document).ready(function () {
         var noticeId = $(this).data('id');
         var noticeTitle = $(this).data('title');
         var noticeDescription = $(this).data('description')
-        // Update modal content based on the clicked button's data
         $('#notice-view-modal .modal-title').text(noticeTitle);
         $('#notice-view-modal #notice-view-body').html(`${noticeDescription}`);
-        // Show the modal
         $('#notice-view-modal').modal('show');
     });
     $('#btnFilterNotice').on('click',filterNotice);
@@ -25,11 +23,7 @@ $(document).ready(function () {
 
 async function deleteNotice(noticeId) {
     const noticeRow = `.tr-notice-${noticeId}`;
-    
-    // Get the row index before removing
     const rowIndex = $(noticeRow).index();
-
-    // Confirm alert
     Swal.fire({
         title: 'Are you sure, you want to delete this Record?',
         text: 'This can\'t be reverted!',
@@ -55,13 +49,9 @@ async function deleteNotice(noticeId) {
                     showLoader("noticeTable", "sm");
                 },
                 success: (response) => {
-                    // Remove the row
                     $(noticeRow).remove();
-
-                    // Update serial numbers of remaining rows
                     $('.tbl__bdy tr').each(function(index) {
-                        const newSerial = index + 1;
-                        $(this).find('.serial-number').text(newSerial);
+                        $(this).find('.serial-number').text(index + 1);
                     });
 
                     raiseSuccessAlert('Notice Deleted Successfully');
