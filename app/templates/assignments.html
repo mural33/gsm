@@ -100,6 +100,7 @@
         <table class="table table-striped table-hover table-sticky table_students" id="assignmentTable">
             <thead class="thead-dark">
                 <tr>
+                    <th>SNo</th>
                     <th>Assignment Title</th>
                     <th>Assigned To</th>
                     <th>Assignment Date</th>
@@ -114,7 +115,8 @@
             <tbody class='tbl__bdy' id="assignments_info">
                 {% for assign in assignment_data %}
                 <tr class="tr-assign-{{assign.id}} assignment-row">
-                    <td class=" text-break assignment_title"><a href={% url 'assignmentinfo' assign.assignment_slug %}>{{ assign.assignment_title }}</a></td>
+                    <td>{{forloop.counter}}</td>
+                    <td class=" text-break assignment_title"><a href="{% url 'assignmentinfo' assign.assignment_slug %}">{{ assign.assignment_title }}</a></td>
                     <td class="text-break">
                         <span class="class_id" data-class="{{assign.class_id}}" data-promotion='{{assign.promotion_type}}' data-total_number_of_promotion='{{assign.total_number_of_promotion}}'>{{ assign.classes.class_name }}</span>-
                         <span class="section_id"  data-section="{{assign.section_id}}">{{ assign.sections.section_name }}</span>
@@ -122,9 +124,16 @@
                     </td>
                     <td class=" text-break assignment_Date">{{ assign.assignment_Date }}</td>
                     <td class="assignment_due_date">{{ assign.assignment_due_date }}</td>
-                    <td class="semister" data-promotions='{{assign.promotion_type}}' data-total_number_of_promotion='{{assign.total_number_of_promotion}}'>{{ assign.semistor }}</td>
-
-
+                    <td class="semister" data-promotion_types="{{assign.promotion_type}}"  data-total_number_of_promotions='{{assign.total_number_of_promotion}}'>
+                        {{ assign.semistor }}
+                        {% if assign.classes.promotion_type == 'year_vise' %}
+                            Years
+                        {% elif assign.classes.promotion_type == 'course_vise' %}
+                            Course
+                        {% elif assign.classes.promotion_type == 'semister_vise' %}
+                            Semester
+                        {% endif %}
+                    </td>
                     <td>
                         <button type="button" class="openAssignmentBtn btn btn-sm btn-dark rounded-pill"
                             data-bs-toggle="modal" data-bs-target="#assignment-view-modal" data-id="{{ assign.id }}"

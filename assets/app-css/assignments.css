@@ -10,32 +10,36 @@
 
 #assignmentTable th:nth-child(2),
 #assignmentTable td:nth-child(2) {
-    width: 20%; 
+    width: 13%; 
 }
 
 #assignmentTable th:nth-child(3),
 #assignmentTable td:nth-child(3) {
-    width: 15%; 
+    width: 13%; 
 }
 
 #assignmentTable th:nth-child(4),
 #assignmentTable td:nth-child(4) {
-    width: 15%; 
+    width: 13%; 
 }
 
 #assignmentTable th:nth-child(5),
 #assignmentTable td:nth-child(5) {
-    width: 15%; 
+    width: 13%; 
 }
 
 #assignmentTable th:nth-child(6),
 #assignmentTable td:nth-child(6) {
-    width: 15%; 
+    width: 13%; 
 }
 
 #assignmentTable th:nth-child(7),
 #assignmentTable td:nth-child(7) {
-    width: 15%; 
+    width: 13%; 
+}
+.modal-body {
+    word-wrap: break-word; /* For older browsers */
+    overflow-wrap: break-word; /* For modern browsers */
 }
 #btnSubmitAssignment{
     height: 2.5rem;

@@ -111,7 +111,8 @@ $(document).ready(() => {
     }
     
 
-    async function loadSemYear(durationTime, promotionType, tnpId) {
+    async function loadSemYear(durationTime, promotionType, tnpId, current) {
+        console.log("current", current);
         var tnp = $(`#${tnpId}`);
         var labelElement = $("label[for='" + tnpId + "']");
         var promotionTypeMap = {
@@ -130,11 +131,17 @@ $(document).ready(() => {
         tnp.html("");
         tnp.append(`<option value="">All ${promotionTypeMap[promotionType]}</option>`);
     
-        for (let index = 0; index < durationTime; index++) {
-            var option = `<option value="${index + 1}">${index + 1} ${promotionTypeMap[promotionType]}</option>`;
+        // Adjust the loop to start from 1 if your semesters start from 1
+        for (let index = 1; index <= durationTime; index++) {
+            if (current && current === index) {
+                var option = `<option value="${index}" selected>${index} ${promotionTypeMap[promotionType]}</option>`;
+            } else {
+                var option = `<option value="${index}">${index} ${promotionTypeMap[promotionType]}</option>`;
+            }
             tnp.append(option);
         }
     }
+    
     
     
     
@@ -143,6 +150,7 @@ $(document).ready(() => {
         'class_id', 'section_id', 'institute_id', 'assignment_Date', 'assignment_title',
         'assignment_details', 'assignment_due_date', 'is_deleted'
     ];
+
 
     function addAssignment() {
         let isUpdate = $("#assignment_id").val() !== "";
@@ -178,35 +186,51 @@ $(document).ready(() => {
                 if (data) {
                     const responseData = data.response;
                     if (isUpdate) {
+                        var NopromotionType = responseData.classes.promotion_type;
+                        var NosemesterText = "";
+                        if (NopromotionType === 'year_vise') {
+                            NosemesterText = `${responseData.semistor} Year`;
+                        } else if (NopromotionType === 'course_vise') {
+                            NosemesterText =`${responseData.semistor}  Course`;
+                        } else if (NopromotionType === 'semister_vise') {
+                            NosemesterText = `${responseData.semistor} Semester`;
+                        } 
                         const tr = dataTable.row($(`.tr-assign-${responseData.id}`)).node();
-                        dataTable.cell(tr, 0).data(`<a href=/app/assignmentinfo/${responseData.assignment_slug}>${responseData.assignment_title}</a>`);
-                        dataTable.cell(tr, 1).data(
+                        dataTable.cell(tr, 1).data(`<a href=/app/assignmentinfo/${responseData.assignment_slug}>${responseData.assignment_title}</a>`);
+                        dataTable.cell(tr, 2).data(
                             `<span class="class_id" data-class='${responseData.class_id}'>${responseData.classes.class_name}</span>-` +
                             `<span class="section_id" data-section='${responseData.section_id}'>${responseData.sections.section_name}</span>`
                         );
-                        dataTable.cell(tr, 2).data(responseData.assignment_Date);
-                        dataTable.cell(tr, 3).data(responseData.assignment_due_date);
-                        dataTable.cell(tr, 4).data(
-                            `<span class="semister" data-promotions="${responseData.promotion_type}" data-total_number_of_promotion="${responseData.total_number_of_promotion}">${responseData.semistor}</span>`
+                        dataTable.cell(tr, 3).data(responseData.assignment_Date);
+                        dataTable.cell(tr, 4).data(responseData.assignment_due_date);
+                        dataTable.cell(tr, 5).data(
+                            `<span class="semister" data-promotions="${responseData.promotion_type}" data-total_number_of_promotion="${responseData.total_number_of_promotion}">${NosemesterText}</span>`
                         );
-                        $(".openAssignmentBtn", tr).attr("data-description", responseData.assignment_details);
+                        $(`.tr-assign-${responseData.id}`).find(".openAssignmentBtn").attr("data-description", responseData.assignment_details);
                         $("#assignment_id").val("");
                         $('#assignmentModal').addClass("model fade");
                         raiseSuccessAlert("Assignment Updated Successfully");
- 
                     } else {
+                        var promotionType = responseData.classes.promotion_type;
+                        var semesterText = "";
+                        if (promotionType === 'year_vise') {
+                            semesterText = `${responseData.semistor} Year`;
+                        } else if (promotionType === 'course_vise') {
+                            semesterText =`${responseData.semistor}  Course`;
+                        } else if (promotionType === 'semister_vise') {
+                            semesterText = `${responseData.semistor} Semester`;
+                        } 
                         const newRow = `
                     <tr class="tr-assign-${responseData.id} assignment-row">
-
-                        <td class="text-break assignment_title"><a href=/app/assignmentinfo/${responseData.assignment_slug}>${responseData.assignment_title}</a></td>
-                        <td class="text-break">
+                    <td>${$("#assignments_info tr").length + 1}</td>
+                    <td class="text-break assignment_title"><a href=/app/assignmentinfo/${responseData.assignment_slug}>${responseData.assignment_title}</a></td>
+                    <td class="text-break">
                         <span class="class_id" data-class='${responseData.class_id}'>${responseData.classes.class_name}</span>-
                         <span class="section_id" data-section='${responseData.section_id}'>${responseData.sections.section_name}</span>
                     </td>
                         <td class="assignment_Date">${responseData.assignment_Date}</td>
                         <td class="assignment_due_date">${responseData.assignment_due_date}</td>
-                        <td class="semister" data-promotions='${responseData.promotion_type}}' data-total_number_of_promotion='${responseData.total_number_of_promotion}'>${responseData.semistor}</td>
-
+                        <td class="semister" data-promotions='${responseData.promotion_type}}' data-total_number_of_promotion='${responseData.total_number_of_promotion}'>${semesterText}</td>
                         <td>
                             <button type="button" class="openAssignmentBtn btn btn-sm btn-dark rounded-pill"
                                 data-bs-toggle="modal" data-bs-target="#assignment-view-modal"
@@ -238,6 +262,7 @@ $(document).ready(() => {
             }
         });
     }
+
     function editAssignment(assignment_id) {
         const fetchUrl = `${apiUrl}/Assignments/get_assignment_by_id/?assignment_id=${assignment_id}`;
         $.ajax({
@@ -249,9 +274,10 @@ $(document).ready(() => {
             },
             contentType: "application/json",
             dataType: "json",
-            success: (data) => {
+            success: async (data) => {
                 if (data && data.assignment_details) {
                     var responseData = data;
+                    console.log("im in if",data);
                     $('#assignmentModal').modal('show');
                     $("#assignment_id").val(responseData.id);
                     $("#class_id").val(responseData.class_id);
@@ -261,9 +287,19 @@ $(document).ready(() => {
                     $("#assignment_details").val(responseData.assignment_details);
                     $("#assignment_Date").val(responseData.assignment_Date);
                     $("#assignment_title").val(responseData.assignment_title);
-                    loadSemYear(responseData.total_number_of_promotion, responseData.promotion_type, "semistor", function () {
-                        $("#semister").val(responseData.semistor);
-                    });
+                    var PromotionType = responseData.classes.promotion_type;
+                    var tnp = responseData.classes.total_number_of_promotion
+                    console.log("PromotionType",PromotionType)
+                    console.log('total numberof promotions',tnp)
+                    var semesterWise = "";
+                    if (PromotionType === 'year_vise') {
+                        semesterWise = `${responseData.semistor} Year`;
+                    } else if (PromotionType === 'course_vise') {
+                        semesterWise = `${responseData.semistor} Empty`;
+                    } else if (PromotionType === 'semister_vise') {
+                        semesterWise = `${responseData.semistor} Semester`;
+                    }   
+                    loadSemYear(tnp, PromotionType, "semister",responseData.semistor,semesterWise);
                     $("#assignment_due_date").val(responseData.assignment_due_date);
                 }
             },
@@ -352,13 +388,13 @@ function filterAssignment() {
     });
 
     assignmentTable.draw();
+    if (assignmentTable.rows({ search: 'applied' }).count() === 0) {
+        $(".dataTables_empty").html(`<img src="/assets/img/no_data_found.png" alt="No Image" class="no_data_found">`)
+    } else {
+        $(".dataTables_empty").empty();
+    }
     resetFillterForm();
 }
-
-
-
-
-
 
 function resetFillterForm() {
     const fields = ["filter_class_id", "filter_section_id","filter_semister_id"];

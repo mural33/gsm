@@ -1,7 +1,7 @@
 $(document).ready(() => {
     $("#saveBtn").on("click", async (e) => {
         $("#saveBtn").removeClass("btn-shake");
-        if (validateForm(fields) === false) {
+        if (validatetransportForm() === false) {
             $("#saveBtn").addClass("btn-shake");
             return false;
         } else {
@@ -40,9 +40,45 @@ function bindGridButtonEvents() {
         });
     });
 }
-let fields = [
-    'vehicle_number', 'vehicle_details', 'register_date', 'transport_name',
-];
+
+function validatetransportForm() {
+        var isValid = true;
+        const fields = ['vehicle_number', 'vehicle_details', 'register_date', 'transport_name'];
+        for (const field of fields) {
+            const element = $(`#${field}`);
+            const value = element.val();
+            if (value === "") {
+                element.focus().addClass("is-invalid");
+                isValid = false;
+            }
+        }
+        const vehicleNumber = $("#vehicle_number").val();
+        const isEditing = $("#id").val() !== "";
+        if (!isEditing) {
+            const vehicleNumbersEntered = JSON.parse(localStorage.getItem('vehicleNumbers')) || [];
+            if (vehicleNumbersEntered.includes(vehicleNumber)) {
+                raiseErrorAlert("Vehicle number already entered. Please enter a different vehicle number.");
+                isValid = false;
+            } else {
+                vehicleNumbersEntered.push(vehicleNumber);
+                localStorage.setItem('vehicleNumbers', JSON.stringify(vehicleNumbersEntered));
+            }
+        }
+        return isValid;
+    }
+
+    function resetTransportForm() {
+        const fields = [ 'vehicle_number', 'vehicle_details', 'register_date', 'transport_name',];
+        for (const field of fields) {
+            const element = $(`#${field}`);
+            if (element.length > 0) {
+                element.val("");
+                element.removeClass("is-invalid");
+            }
+        }
+    }
+
+
 
 function addTransport() {
     let isUpdate = $("#id").val() !== "";
@@ -110,8 +146,8 @@ function addTransport() {
                         </td>
                         </tr>
                     `;
-                    bindGridButtonEvents();
                     dataTable.row.add($(newRow)).draw();
+                    bindGridButtonEvents();
                     raiseSuccessAlert(data.msg);
                 }
             }
@@ -121,7 +157,7 @@ function addTransport() {
         },
         complete: (e) => {
             removeLoader("transport", "lg");
-            resetForm(fields)
+            resetTransportForm();
         }
     });
 }
