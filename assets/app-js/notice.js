@@ -3,13 +3,15 @@ $(document).ready(function () {
         'order': [],
     })
     $(".dataTables_empty").html(`<img src="/assets/img/no_data_found.png" alt="No Image" class="no_data_found">`)
-    $('.openBtn').on('click', function () {
+    $('#noticeTable').on('click', '.openBtn', function () {
         var noticeId = $(this).data('id');
         var noticeTitle = $(this).data('title');
-        var noticeDescription = $(this).data('description')
+        var noticeDescription = $(this).data('description');        
         $('#notice-view-modal .modal-title').text(noticeTitle);
         $('#notice-view-modal #notice-view-body').html(`${noticeDescription}`);
         $('#notice-view-modal').modal('show');
+    });
+    dataTable.on('draw', function () {
     });
     $('#btnFilterNotice').on('click',filterNotice);
 });
