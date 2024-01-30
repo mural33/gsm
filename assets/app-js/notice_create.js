@@ -63,7 +63,7 @@ async function noticeSubmitForm() {
     var isEdit = $("#is_edit").val();
     var method = isEdit === "1" ? "PUT" : "POST";
     var noticeId = $("#notice_id").val();  
-    var noticeEndPoint = isEdit === "1" ? `/Notice/update_notice/?notice_id=${noticeId}` : `/Notice/create_notice/`;
+    var noticeEndPoint = isEdit === "1" ? `/Notice/update_notice    /?notice_id=${noticeId}` : `/Notice/create_notice/`;
     var noticeUrl = `${apiUrl}${noticeEndPoint}`;
 
     $.ajax({
@@ -82,11 +82,13 @@ async function noticeSubmitForm() {
         success: (response) => {
             raiseSuccessAlert("Notice Announced Successfully");
             resetForm(fields);
+            editorInstance.setData('');
             removeLoader("noticeFormArea", "sm");
             if (isEdit === "1") {
                 raiseSuccessAlert("Notice Updated Successfully");
                 resetForm(fields);
                 editorInstance.setData('');
+                
                 window.location.href = `/app/notice/`;
             } else {
                 

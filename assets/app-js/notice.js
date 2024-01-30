@@ -25,7 +25,11 @@ $(document).ready(function () {
 
 async function deleteNotice(noticeId) {
     const noticeRow = `.tr-notice-${noticeId}`;
-    // confirm alert
+    
+    // Get the row index before removing
+    const rowIndex = $(noticeRow).index();
+
+    // Confirm alert
     Swal.fire({
         title: 'Are you sure, you want to delete this Record?',
         text: 'This can\'t be reverted!',
@@ -36,7 +40,6 @@ async function deleteNotice(noticeId) {
         confirmButtonText: 'Yes, delete it!'
     }).then(async (result) => {
         if (result.isConfirmed) {
-            $(noticeRow).remove();
             const endpoint = `/Notice/delete_notice/?notice_id=${noticeId}`;
             const url = `${apiUrl}${endpoint}`;
             const response = await $.ajax({
@@ -52,6 +55,15 @@ async function deleteNotice(noticeId) {
                     showLoader("noticeTable", "sm");
                 },
                 success: (response) => {
+                    // Remove the row
+                    $(noticeRow).remove();
+
+                    // Update serial numbers of remaining rows
+                    $('.tbl__bdy tr').each(function(index) {
+                        const newSerial = index + 1;
+                        $(this).find('.serial-number').text(newSerial);
+                    });
+
                     raiseSuccessAlert('Notice Deleted Successfully');
                     removeLoader("noticeTable", "sm");
                     checkNoRecords();
@@ -66,6 +78,7 @@ async function deleteNotice(noticeId) {
         }
     });
 }
+
 function checkNoRecords() {
     var rowCount = $('#notice_details tr').length;
     if (rowCount <= 0 ) {
@@ -80,6 +93,7 @@ function checkNoRecords() {
         $('.no_data_found-tr').hide();
     }
 }
+
 async function filterNotice() {
     const noticeTable = $('#noticeTable').DataTable();
     var noticeDate = $('#noticeDate').val();
