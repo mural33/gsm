@@ -73,10 +73,28 @@
                                     <tr>
                                         <td class="">
                                             <span class="d-flex">
-                                               <p>Semester :</p>
+                                                <p>
+                                                {% if assignment.classes.promotion_type == 'year_vise' %}
+                                               Year :
+                                               {% elif assignment.classes.promotion_type == 'course_vise' %}
+                                               Course :
+                                               {% elif assignment.classes.promotion_type == 'semister_vise' %}
+                                               Semester :
+                                             {% endif %}  
+                                            </p>
+                                                {% if assignment.classes.promotion_type == 'year_vise' %}
                                                 <span class="txt-color semesterId" data-semestor-id="{{assignment.semistor}}">
-                                                    {{ assignment.semistor }}
+                                                    {{ assignment.semistor }} Year
                                                 </span>
+                                              {% elif assignment.classes.promotion_type == 'course_vise' %}
+                                              <span class="txt-color semesterId" data-semestor-id="{{assignment.semistor}}">
+                                                {{ assignment.semistor }} Course
+                                            </span>
+                                                {% elif assignment.classes.promotion_type == 'semister_vise' %}
+                                                <span class="txt-color semesterId" data-semestor-id="{{assignment.semistor}}">
+                                                    {{ assignment.semistor }} Semester
+                                                </span>
+                                              {% endif %} 
                                             </span>
                                         </td>
                                     </tr>
@@ -107,7 +125,7 @@
                     <div class="row" id="uploadAssign">
                         <div class="col-md-4">
                             <input type="hidden" name="student_id" id="student_id">   
-                            <input type="text" class="form-control" placeholder="Search Student" id="studentRollNumberInput" readonly>
+                            <input type="text" class="form-control" placeholder="Search Student by click below link" id="studentRollNumberInput" readonly>
                            <a href="#" class="form-label" data-bs-toggle="modal" data-bs-target="#searchStudentModal" id="loadStudents">Search Students</a>
                         </div>                        
                         <div class="col-md-4">
@@ -158,8 +176,7 @@
               <i class="ri-checkbox-circle-fill text-success"></i>
             </div>
             <div class="flex-grow-1 ms-2">
-              <p class="text-muted mb-0"> Fees are applied in a variety of ways such as costs, charges, commissions, and
-                penalties.</p>
+              <p class="text-muted mb-0">Finding students for submit the assignments.</p>
             </div>
           </div>
           <div class="d-flex mt-2 row">

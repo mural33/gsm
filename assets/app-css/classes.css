@@ -27,7 +27,6 @@
     background-color: rgb(144, 215, 130);
 }
 .filter {
-    width: 8rem;
     height: 1.9rem;
     border-radius: 18px;
     text-align: center;
@@ -142,6 +141,9 @@
   color: #000;
   font-size: 1rem;
   }
+  .feesLabel{
+    color: #000;
+  }
 #btnUpdateFee,#btnFeeChange{
     height: 2.5rem;
     margin-top: 0.5rem;
@@ -170,3 +172,26 @@
   .custom-swal-popup {
     margin: 0 auto; 
   }
+  @media (max-width: 500px) {
+    .classSection {
+        flex-direction: column;
+        align-items: center;
+        gap: 6px;
+        max-width: 100%;
+    }
+    .filter {
+        width: calc(100% - 12px); 
+        max-width: 100%;
+    }
+
+    #class_list {
+        width: auto !important; 
+        min-width: 0 !important; 
+    }
+
+    #btnEdit,
+    #btnDelete {
+        width:auto !important; 
+        margin-top: 6px;
+    }
+}

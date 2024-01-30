@@ -25,7 +25,7 @@
 <div class="card">
   <div class="card-body">
     <div>
-      <div class="fields">
+      <div class="fields classSection">
         <div class="input-field" id="class">
           <select class="gender-list filter" name="class" id="class_list">
             <option value="0" id="classOption" selected>Select Class</option>
@@ -214,7 +214,7 @@
             <div class="col-sm-12 col-md-6 col-xl-4">
               <div class="col text-end">
                 <button type="button" class="btn btn-success btn-label rounded-pill right" data-bs-toggle="modal"
-                  data-bs-target="#exam_creation_modal">
+                  data-bs-target="#exam_creation_modal" id="addExams">
                   <i class="bi bi-plus-circle label-icon align-middle fs-lg ms-2"></i>Add New Examination</button>
               </div>
             </div>
@@ -565,6 +565,14 @@
                 <input type="text" class="form-control class_id" id="classesId" name="class_id" readonly>
               </div>
             </div>
+            <div class="d-flex mt-2">
+              <div class="col-md-12 form-content">
+                <label for="classesId" class="form-label">Year/Semester</label>
+            <select class="form-select" id="semistor" name="semistor">
+
+          </select>
+        </div>
+      </div>
             <div class="d-flex mt-2">
               <div class="col-md-12 form-content">
                 <table id="subjectTable">

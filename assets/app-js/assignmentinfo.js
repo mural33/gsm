@@ -50,6 +50,7 @@ $(document).ready(function () {
 
 function fetchStudents() {
     var sectionId = $(".sectionId").data("section-id");
+    console.log(sectionId);
     var semesterId = $(".semesterId").data("semestor-id");
     const searchStudent = apiUrl + "/Students/get_students_by_field/section_id/" + sectionId +"/";
     $.ajax({
@@ -72,22 +73,11 @@ function fetchStudents() {
 
         dataTable.clear().draw();
         data.forEach(function(student) {
-            if (student.current_position === semesterId) {
-            //     var promotionType = student.classes.promotion_type;
-            // var additionalInfo = '';
-            // if (promotionType === 'year_vise') {
-            //   additionalInfo = student.current_position + ' Years';
-            // } else if (promotionType === 'course_vise') {
-            //   additionalInfo = student.current_position + ' Course';
-            // } else if (promotionType === 'semister_vise') {
-            //   additionalInfo = student.current_position + ' Semester';
-            // }
+            if (!student.course_complete_type && student.current_position === semesterId) {
+
             var row = $('<tr id="fetchStudent">');
             row.append('<td>' + student.student_name + '</td>');
             row.append('<td>' + student.roll_number + '</td>');
-            // row.append('<td>' + student.classes.class_name + '</td>');
-            // row.append('<td>' + additionalInfo + '</td>');
-            // row.append('<td>' + student.sections.section_name + '</td>');
             row.append('<td><button type="submit" class="btn btn-primary selectButton" id="btnSelect" data-select-id="' + student.student_id + '">Select</button></td>');
             dataTable.row.add(row).draw();
         }
@@ -103,40 +93,29 @@ function fetchStudents() {
 }
 
 async function checkStudentAssignmentSubmission(studentRollNumber, assignmentId) {
-    var checkUrl = apiUrl + `/AssignmentSubmission/check_student_assignment_submission/?student_roll_number=${studentRollNumber}&assignment_id=${assignmentId}`;
-        const checkResponse = await $.ajax({
-            type: "GET",
-            url: checkUrl,
-            mode: "cors",
-            crossDomain: true,
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${jwtToken}`,
-            },
-            success :(data)=>{
-                console.log(data);
-                return true
-            },
-            beforeSend: (e) => {
-                showLoader("assignmentCard", "sm");
-            },
-            error:(data)=>{
-                raiseWarningAlert(data.responseJSON.detail)
-                return false
-            },
-            complete: (e) => {
-                removeLoader("assignmentCard", "sm");
-            },
-        });
+    const dataTable = $('#assignmentInfoTable').DataTable();
+    let isRollNumberPresent = false;
+    dataTable.rows().every(function () {
+        const rowData = this.data(); 
+        const existingRollNumber = rowData[0];
+        if (existingRollNumber.trim().toLowerCase() === studentRollNumber.trim().toLowerCase()) {
+            isRollNumberPresent = true;
+            return false; 
+        }
+        return true; 
+    });
+    return isRollNumberPresent;
 }
 
 let assignDocsField = ['studentRollNumberInput', 'assignment_file']
 async function uploadAssignment() {
     var assignmentId = $("#assignment_id").val();
     var studentRollNumber = $("#studentRollNumberInput").val();
+    console.log(assignmentId,"assign");
+    console.log(studentRollNumber,"roll");
     const isRollNumberPresent = await checkStudentAssignmentSubmission(studentRollNumber, assignmentId);
-    if (isRollNumberPresent === false) {
-        raiseErrorAlert("Roll number already exists for this assignment.");
+    if (isRollNumberPresent) {
+        raiseWarningAlert("Student Roll number already exists for this assignment.");
         return;
     }
     var todayDate = new Date();
@@ -206,7 +185,7 @@ async function loadAssignmentDetails(assignmentId) {
                 response.forEach(assign => {
                     const assignmentFile = assign.assignment_file ? assign.assignment_file.split('/').pop() : '';
                     const row = `<tr id="assignInfoId-${assign.id}">
-                                    <td>${assign.students.roll_number}</td>
+                                    <td data-assigns-id="${assign.assignment_id}">${assign.students.roll_number}</td>
                                     <td>${assign.students.student_name}</td>
                                     <td>
                                         <a href="/app/azure_download/${assignmentFile}/student_assignment_document/" type="button" class="btn btn-dark btn-label rounded-pill right" data-assinInfo-id=${assign.id}>

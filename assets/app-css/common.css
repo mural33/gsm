@@ -1,5 +1,5 @@
 body{
-    background-color: #fcf5dc;;
+    background-color: #fcf5dc;
 }
 .txt-color{
     color:#332757;
@@ -12,6 +12,7 @@ body{
 .navbar-brand-box{
     text-align: left;
 }
+
 .form_section{
     display: none;
     position:absolute;

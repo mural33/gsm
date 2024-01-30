@@ -38,6 +38,7 @@ $(document).ready(function () {
       parentModel.modal("hide");
       $('#start_date,#end_date,#result_date,#parent_exam_id,#parent_exam_name,#subject_Input',parentModel).val("");
   });
+
   });
   const installmentDropdown = document.getElementById("installment_dropdown");
   installmentDropdown.addEventListener("change", function () {
@@ -203,6 +204,7 @@ $(document).ready(function () {
       $("#exam_creation_modal .modal-title").text("Save Examination");
     }
   });
+  
 });
 
 function showContent() {
@@ -447,10 +449,11 @@ async function loadClassOverview(selectedClassId) {
           : 'Total No. of Promotion';
 
         overviewContainer.find('.total-promotion-heading').text(totalPromotionHeading);
-
         overviewContainer.find('.total-promotion').text(responseData.total_number_of_promotion);
-
+        overviewContainer.attr('data-promotion-type', responseData.promotion_type);
+        overviewContainer.attr('data-total-promotion', responseData.total_number_of_promotion);
         overviewContainer.find('.no-data-found').remove();
+        await loadSemandYear(responseData.total_number_of_promotion, responseData.promotion_type, 'semistor');
       } else {
         overviewContainer.empty().html('<img src="/assets/img/no_data_found.png" class="no-data-found">');
       }
@@ -865,6 +868,8 @@ async function loadStudentDetails(selectedClassId) {
           studentTableHtml += '<th>Course</th>';
         } else if (promotionType === 'semister_vise') {
           studentTableHtml += '<th>Semester</th>';
+        }else{
+          studentTableHtml += '<th>Year/Semester</th>';
         }
         studentTableHtml +=
           '<th>Section</th>' +
@@ -883,6 +888,8 @@ async function loadStudentDetails(selectedClassId) {
             additionalInfo = student.current_position + ' Course';
           } else if (promotionType === 'semister_vise') {
             additionalInfo = student.current_position + ' Semester';
+          }else{
+            additionalInfo = '1';
           }
           var studentHtml =
             '<tr class="tr-student-' + student.student_id + '">' +
@@ -1251,7 +1258,7 @@ function validateExamForm() {
 }
 
 function resetExamForm() {
-  const fields = ["start_date", "end_date", "result_date", "parent_exam_name"];
+  const fields = ["start_date", "end_date", "result_date", "parent_exam_name","semistor"];
   for (const field of fields) {
     const element = $(`.form-control.${field}`);
     if (element.length > 0) {
@@ -1281,77 +1288,97 @@ async function loadExams(selectedClassId) {
 
       if (examsData.upcoming_parent_exam.length === 0 && examsData.old_parent_exams.length === 0) {
         examsContainer.html('<img src="/assets/img/no_data_found.png" class="no_data_found">');
-      } else {
+      }else {
         if (examsData.upcoming_parent_exam.length > 0) {
+          var promotionType = examsData.upcoming_parent_exam[0].classes.promotion_type; 
           var upcomingHtml = '<h5 class="examHeading">Upcoming Exams</h5>' +
             '<table class="table table-striped table-hover table-sticky mt-3 table_students" id="upcomingExam">' +
             '<thead class="thead-dark">' +
             '<tr>' +
             '<th>Exam Date</th>' +
-            '<th>Name of Exams</th>' +
-            '<th>Result Date</th>'+
+            '<th>Name of Exams</th>';
+          if (promotionType === "semister_vise") {
+            upcomingHtml += '<th>Semester</th>';
+          }else if(promotionType === "year_vise"){
+            upcomingHtml += '<th>Year</th>';
+          }else if(promotionType === "course_vise"){
+            upcomingHtml += '<th>Course</th>';
+          }else{
+            upcomingHtml += '<th>Year/Semester</th>';
+          }
+          upcomingHtml += '<th>Result Date</th>' +
             '<th>Action</th>' +
             '</tr>' +
             '</thead>' +
             '<tbody class="tbl__bdy">';
-
+            
           for (var i = 0; i < examsData.upcoming_parent_exam.length; i++) {
             var exam = examsData.upcoming_parent_exam[i];
-            var startDate = new Date(exam.start_date);
-            var endDate = new Date(exam.end_date);
-            var resultDate = new Date(exam.result_date);
-            var formattedStartDate = formatDate(startDate);
-            var formattedEndDate = formatDate(endDate);
-            var formattedResultDate = formatDate(resultDate);
-            var upcomingExamHtml =
+            upcomingHtml +=
               '<tr class="upcomExam" data-exm-id="' + exam.parent_exam_id + '">' +
-              '<td>' + formattedStartDate + ' - ' + formattedEndDate + '</td>' +
-              '<td>' + exam.parent_exam_name + '</td>' +
-              '<td>' + formattedResultDate + '</td>' +
+              '<td>' + exam.start_date + ' - ' + exam.end_date + '</td>' +
+              '<td>' + exam.parent_exam_name + '</td>';
+            if (exam.classes.promotion_type === "semister_vise") {
+              upcomingHtml += '<td>' + exam.semistor + ' ' + 'Semester' + '</td>';
+            }else if (exam.classes.promotion_type === "year_vise") {
+              upcomingHtml += '<td>' + exam.semistor + ' ' + 'Year' + '</td>';
+            }else if (exam.classes.promotion_type === "course_vise") {
+              upcomingHtml += '<td>' + exam.semistor + ' ' + 'Course' + '</td>';
+            }else{
+              upcomingHtml += '<td>' + '1'  + '</td>';
+            }
+            upcomingHtml +=
+              '<td>' + exam.result_date + '</td>' +
               '<td>' +
               '<a class="btn btn-sm btn-info" onclick="editExam(this)" data-exam-id="' + exam.parent_exam_id + '"><i class="bi bi-pencil-square"></i></a>' +
               '<a class="btn btn-sm btn-danger" onclick="deleteExam(this)" data-exam-id="' + exam.parent_exam_id + '" id="examDelete"><i class="bi bi-trash3"></i></a>' +
               '</td>' +
               '</tr>';
-
-            upcomingHtml += upcomingExamHtml;
           }
-
           upcomingHtml += '</tbody></table>';
           examsContainer.append(upcomingHtml);
           $('#upcomingExam').DataTable();
         }
         if (examsData.old_parent_exams.length > 0) {
+          var promotionTypePast = examsData.old_parent_exams[0].classes.promotion_type; 
           var pastHtml = '<h5 class="examHeading">Past Exams</h5>' +
             '<table class="table table-striped table-hover table-sticky mt-3 table_students" id="pastExam">' +
             '<thead class="thead-dark">' +
             '<tr>' +
             '<th>Exam Date</th>' +
-            '<th>Name of Exams</th>' +
-            '<th>Result Date</th>' +
+            '<th>Name of Exams</th>';
+          if (promotionTypePast === "semister_vise") {
+            pastHtml += '<th>Semester</th>';
+          }else if(promotionTypePast === "year_vise"){
+            pastHtml += '<th>Year</th>';
+          }else if(promotionTypePast === "course_vise"){
+            pastHtml += '<th>Course</th>';
+          }else{
+            pastHtml += '<th>Year/Semester</th>';
+          }
+          pastHtml += '<th>Result Date</th>' +
             '</tr>' +
             '</thead>' +
             '<tbody class="tbl__bdy">';
-
           for (var i = 0; i < examsData.old_parent_exams.length; i++) {
-            var exam = examsData.old_parent_exams[i];
-            var startDate = new Date(exam.start_date);
-            var endDate = new Date(exam.end_date);
-            var resultDate = new Date(exam.result_date);
-            var formattedStartDate = formatDate(startDate);
-            var formattedEndDate = formatDate(endDate);
-            var formattedResultDate = formatDate(resultDate);
-
-            var pastExamHtml =
+            var exam = examsData.old_parent_exams[i];   
+            pastHtml +=
               '<tr>' +
-              '<td>' + formattedStartDate + ' - ' + formattedEndDate + '</td>' +
-              '<td>' + exam.parent_exam_name + '</td>' +
-              '<td>' + formattedResultDate + '</td>' +
+              '<td>' + exam.start_date + ' - ' + exam.end_date + '</td>' +
+              '<td>' + exam.parent_exam_name + '</td>';
+            if (exam.classes.promotion_type === "semister_vise") {
+              pastHtml += '<td>' + exam.semistor + ' ' + 'Semester ' + '</td>';
+            }else if (exam.classes.promotion_type === "year_vise") {
+              pastHtml += '<td>' + exam.semistor + ' ' + 'Year' + '</td>';
+            }else if (exam.classes.promotion_type === "course_vise") {
+              pastHtml += '<td>' + exam.semistor + ' ' + 'Course' + '</td>';
+            }else{
+              pastHtml += '<td>' + '1'  + '</td>';
+            }
+            pastHtml +=
+              '<td>' + exam.result_date + '</td>' +
               '</tr>';
-
-            pastHtml += pastExamHtml;
           }
-
           pastHtml += '</tbody></table>';
           examsContainer.append(pastHtml);
           $('#pastExam').DataTable();
@@ -1367,15 +1394,32 @@ async function loadExams(selectedClassId) {
   });
 }
 
-function formatDate(date) {
-  var day = date.getDate();
-  var month = date.getMonth() + 1;
-  var year = date.getFullYear();
-  day = day < 10 ? '0' + day : day;
-  month = month < 10 ? '0' + month : month;
+async function loadSemandYear(durationTime, promotionType, tnpId) {
+  var tnp = $(`#${tnpId}`);
+  var labelElement = $("label[for='" + tnpId + "']");
+  var promotionTypeMap = {
+      "semister_vise": "Semester",
+      "year_vise": "Year",
+      "course_vise":"Course",
+  };
 
-  return day + '-' + month + '-' + year;
+  if (promotionTypeMap[promotionType] === undefined) {
+      tnp.html("");
+      labelElement.text("Year/Semester");
+      tnp.append(`<option value="">Not Applicable</option>`);
+      return;
+  }
+  labelElement.text(promotionTypeMap[promotionType]);
+
+  tnp.html("");
+  tnp.append(`<option value="">All ${promotionTypeMap[promotionType]}</option>`);
+
+  for (let index = 0; index < durationTime; index++) {
+      var option = `<option value="${index + 1}">${index + 1} ${promotionTypeMap[promotionType]}</option>`;
+      tnp.append(option);
+  }
 }
+
 async function addExam() {
   let editExam = $("#parent_exam_id").val() !== "";
   classesId = $("#classes_id").val();
@@ -1387,6 +1431,7 @@ async function addExam() {
     start_date: $("#start_date").val(),
     end_date: $("#end_date").val(),
     result_date: $("#result_date").val(),
+    semistor: $("#semistor").val(),
     is_deleted: false,
   };
   const parentExamUrl = editExam ? apiUrl + "/ParentExams/update_parent_exam?parent_exam_id=" + data.parent_exam_id : apiUrl + "/ParentExams/create_parent_exam";
@@ -1408,13 +1453,6 @@ async function addExam() {
       if (data) {
         $("#exam_creation_modal").modal("hide");
         const responseData = data["response"];
-        var startDate = new Date(responseData.start_date);
-        var endDate = new Date(responseData.end_date);
-        var resultDate = new Date(responseData.result_date);
-        var formattedStartDate = formatDate(startDate);
-        var formattedEndDate = formatDate(endDate);
-        var formattedResultDate = formatDate(resultDate);
-
         if (editExam) {
           let rows = document.querySelectorAll('.sublabel');
           for (let i = 0; i < rows.length; i++) {
@@ -1431,9 +1469,18 @@ async function addExam() {
           }
           const existingRow = $("tr[data-exm-id='" + responseData.parent_exam_id + "']");
           if (existingRow.length) {
-            existingRow.find('td:eq(0)').text(formattedStartDate + ' - ' + formattedEndDate);
+            existingRow.find('td:eq(0)').text(responseData.start_date + ' - ' + responseData.end_date);
             existingRow.find('td:eq(1)').text(responseData.parent_exam_name);
-            existingRow.find('td:eq(2)').text(formattedResultDate);
+            if (responseData.classes.promotion_type === "semister_vise") {
+              existingRow.find('td:eq(2)').text(responseData.semistor + ' Semester');
+            } else if (responseData.classes.promotion_type === "year_vise") {
+              existingRow.find('td:eq(2)').text(responseData.semistor + ' Year');
+            } else if (responseData.classes.promotion_type === "course_vise") {
+              existingRow.find('td:eq(2)').text(responseData.semistor + ' Course');
+            } else {
+              existingRow.find('td:eq(2)').text('1'); 
+            }            
+            existingRow.find('td:eq(3)').text(responseData.result_date);
           }
           raiseSuccessAlert(data.msg);
           $("#parent_exam_id").val("");
@@ -1456,8 +1503,17 @@ async function addExam() {
                   '<thead class="thead-dark">' +
                   '<tr>' +
                   '<th>Exam Date</th>' +
-                  '<th>Name of Exams</th>' +
-                  '<th>Result Date</th>' +
+                  '<th>Name of Exams</th>' ;
+                  if (responseData.classes.promotion_type === "semister_vise") {
+                    upcomingHtml += '<th>Semester</th>';
+                  }else if(responseData.classes.promotion_type === "year_vise"){
+                    upcomingHtml += '<th>Year</th>';
+                  }else if(responseData.classes.promotion_type === "course_vise"){
+                    upcomingHtml += '<th>Course</th>';
+                  }else{
+                    upcomingHtml += '<th>Year/Semester</th>';
+                  }                  
+                  upcomingHtml += '<th>Result Date</th>' +
                   '<th>Action</th>' +
                   '</tr>' +
                   '</thead>' +
@@ -1468,12 +1524,20 @@ async function addExam() {
               examsContainer.append(upcomingHtml);
               upcomingTable = $("#upcomingExam").DataTable();
           }
-  
-          var upcomingExamHtml =
+         var upcomingExamHtml =
               '<tr class="upcomExam" data-exm-id="' + responseData.parent_exam_id + '">' +
-              '<td>' + formattedStartDate + ' - ' + formattedEndDate + '</td>' +
-              '<td>' + responseData.parent_exam_name + '</td>' +
-              '<td>' + formattedResultDate + '</td>' +
+              '<td>' + responseData.start_date + ' - ' + responseData.end_date + '</td>' +
+              '<td>' + responseData.parent_exam_name + '</td>' ;
+              if (responseData.classes.promotion_type === "semister_vise") {
+                upcomingExamHtml += '<td>' + responseData.semistor + ' ' + 'Semester' + '</td>';
+              }else if (responseData.classes.promotion_type === "year_vise") {
+                upcomingExamHtml += '<td>' + responseData.semistor + ' ' + 'Year' + '</td>';
+              }else if (responseData.classes.promotion_type === "course_vise") {
+                upcomingExamHtml += '<td>' + responseData.semistor + ' ' + 'Course' + '</td>';
+              }else{
+                upcomingExamHtml += '<td>' + '1'  + '</td>';
+              }
+              upcomingExamHtml += '<td>' + responseData.result_date + '</td>' +
               '<td>' +
               '<a class="btn btn-sm btn-info" onclick="editExam(this)" data-exam-id="' + responseData.parent_exam_id + '"><i class="bi bi-pencil-square"></i></a>' +
               '<a class="btn btn-sm btn-danger" onclick="deleteExam(this)" data-exam-id="' + responseData.parent_exam_id + '" id="examDelete"><i class="bi bi-trash3"></i></a>' +
@@ -1561,6 +1625,31 @@ async function updateChildExam(examId, parentExamId, subjectId, fullMarksValue) 
       },
     });
 }
+async function loadSemandYearEdit(durationTime, promotionType, tnpId, selectedSemistor) {
+  var tnp = $(`#${tnpId}`);
+  var labelElement = $("label[for='" + tnpId + "']");
+  var promotionTypeMap = {
+    "semister_vise": "Semester",
+    "year_vise": "Year",
+    "course_vise":"Course",
+  };
+  if (promotionTypeMap[promotionType] === undefined) {
+    tnp.html("");
+    labelElement.text("Year/Semester");
+    tnp.append(`<option value="">Not Applicable</option>`);
+    return;
+  }
+  labelElement.text(promotionTypeMap[promotionType]);
+
+  tnp.html("");
+  tnp.append(`<option value="">All ${promotionTypeMap[promotionType]}</option>`);
+
+  for (let index = 0; index < durationTime; index++) {
+    var option = `<option value="${index + 1}" ${selectedSemistor == index + 1 ? 'selected' : ''}>${index + 1} ${promotionTypeMap[promotionType]}</option>`;
+    tnp.append(option);
+  }
+  return tnp.val();
+}
 
 async function editExam(element) {
   event.preventDefault();
@@ -1570,6 +1659,8 @@ async function editExam(element) {
   const editExamUrl = apiUrl + "/ParentExams/get_parent_exam_by_parent_exam_id?parent_exam_id=" + parentExamId;
   const editChildExamUrl = apiUrl + "/Exams/get_exam_by_parent_exam_id/?parent_exam_id=" + parentExamId;
 
+  var promotionTypes = $("#tabOverview").data('promotion-type');
+  var totalPromotions = $("#tabOverview").data('total-promotion');
   const parentExamData = await $.ajax({
     type: "GET",
     url: editExamUrl,
@@ -1590,6 +1681,7 @@ async function editExam(element) {
         $("#start_date").val(responseData.start_date);
         $("#end_date").val(responseData.end_date);
         $("#result_date").val(responseData.result_date);
+        var selectedSemester = await loadSemandYearEdit(totalPromotions, promotionTypes, "semistor", responseData.semistor);
       }
 
       const childExamsData = await $.ajax({
@@ -1886,7 +1978,6 @@ async function updateFees(){
       installment_id:selectedInstallments,
       total_installments: $("#install_amount").val(),
   };
-  console.log(data);
   const feeUpdateUrl = apiUrl + "/Fees/update_fees/?fee_id=" + data.fee_id ;
   await $.ajax({
       type: "PUT",
@@ -1909,7 +2000,6 @@ async function updateFees(){
           }
       },
       error: function (error) {
-        console.error("Error updating fees:", error);
         raiseErrorAlert(error.responseJSON ? error.responseJSON.detail : "Unknown error occurred");
       },      
       complete: (e) => {

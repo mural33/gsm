@@ -1955,3 +1955,8 @@ input.sm-content {
         margin-top: 30px;
     }
 }
+input[type=password]::-ms-reveal,
+input[type=password]::-ms-clear
+{
+    display: none;
+}

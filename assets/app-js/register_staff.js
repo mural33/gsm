@@ -130,8 +130,8 @@ async function addPayrollStaff(staffId) {
     staff_id: staffId,
     payroll_type: $("#employee_type").val(),
     salary_amount: $("#salary").val(),
-    payment_mode: "string",
-    payroll_details: "string",
+    payment_mode: "N/A",
+    payroll_details: "N/A",
   };
   var payrollUrl = `${apiUrl}/StaffPayrole/add_payroll/`;
   await $.ajax({

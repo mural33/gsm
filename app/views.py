@@ -833,7 +833,7 @@ def staffIdCard(request,staff_slug):
         "staff_data": staff_data,
         "institute_data": institite_data,
     }
-    return render(request, "staffId.html",payload)
+    return render(request, "staff_id.html",payload)
 
 def studentIdCard(request,student_slug):
     student_obj = Data(API_URL)
@@ -861,7 +861,7 @@ def studentIdCard(request,student_slug):
         "parent_data": parent_data,
         "institute_data": institite_data,
     }
-    return render(request, "studentIdCard.html",payload)
+    return render(request, "student_id.html",payload)
 def reports(request):
     payload = {
         "organization_name": request.COOKIES.get("organization_name"),

@@ -26,6 +26,7 @@
 .showCard > .card{
     border: none !important;
     background-color: #fff;
+    border-radius: 0;
 }
 .showCard >.card > .card-header{
     background-color: #fff;
@@ -80,9 +81,8 @@ h6{
   }
   .imgBox{
   position: absolute;
-  height: 3rem;
   background-color: #fff;
-  width: 3rem;
+  width: 2rem;
   left: 50%;
   top: -15px;
   transform: translateX(-50%);
@@ -102,23 +102,34 @@ h6{
   #birthdayCards {
       margin-right: 0;
   }
-  .scrollCards{
+.scrollCards {
     height: 10.6rem;
     overflow-y: auto;
-  }
-  .scrollCards::-webkit-scrollbar {
-      width: 5px; 
-  }
-  .scrollCards::-webkit-scrollbar-thumb {
-      background-color: #888; 
-  }
-  .scrollCards::-webkit-scrollbar-track {
-      background-color: #f1f1f1; 
-  }
- .scrollCards {
-      scrollbar-width: thin;
-      scrollbar-color: transparent transparent;
-  }
+    scrollbar-width: thin;
+}
+.scrollCards::-webkit-scrollbar {
+    width: 5px;
+}
+.scrollCards::-webkit-scrollbar-thumb {
+    background-color: #888;
+}
+.scrollCards::-webkit-scrollbar-track {
+    background-color: #f1f1f1;
+}
+.scrollDiv {
+    height:32rem;
+    overflow-y: auto;
+    scrollbar-width: thin;
+}
+.scrollDiv::-webkit-scrollbar {
+    width: 5px;
+}
+.scrollDiv::-webkit-scrollbar-thumb {
+    background-color: #888;
+}
+.scrollDiv::-webkit-scrollbar-track {
+    background-color: #f1f1f1;
+}
   .smallCards{
     margin-top: 1rem;
   }
@@ -130,4 +141,10 @@ h6{
 }
 .examImg{
     margin-left: 15rem;
+}
+#noDataImage{
+    width: 18rem;
+}
+.birthdayImg{
+    height: 2rem;
 }
