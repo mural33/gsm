@@ -21,7 +21,6 @@ let fields = [
   "date_of_birth",
   "blood_group",
   "gender",
-  'staffPhoto',
   // contact Details
   "email",
   "phone_number",

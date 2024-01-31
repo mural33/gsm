@@ -1960,3 +1960,7 @@ input[type=password]::-ms-clear
 {
     display: none;
 }
+.custom-no-border{
+    background: #f7f7f7;
+    border: none;
+}

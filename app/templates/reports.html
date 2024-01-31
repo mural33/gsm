@@ -2,6 +2,14 @@
 {% block title %} Reports {% endblock %}
 {% load static %}
 {% block content %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/2.1.1/css/buttons.dataTables.min.css">
+<script type="text/javascript" src="https://cdn.datatables.net/buttons/2.1.1/js/dataTables.buttons.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/buttons/2.1.1/js/buttons.html5.min.js"></script>
+
+<!-- Include DataTables Buttons extension dependencies -->
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+
 <script src="{% static 'app-js/reports.js' %}"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <link rel="stylesheet" href="{% static 'app-css/reports.css' %}">
@@ -74,20 +82,13 @@
                         <div class="row">
                             <div class="row mb-3">
                                 <div class="col-md-3">
-                                    <label for="class_id" class="form-label">Class</label>
-                                    <select class="form-select" id="class_id" name="class_id">
-                                        <option value="0">All Classes</option>
-                                        <option value="1">MBBS</option>
-                                        <option value="2">BDS</option>
-                                        <option value="3">BAMS</option>
-                                        <option value="4">BHMS</option>
-                                        <option value="5">B.Sc Nursing</option>
-                                        <option value="6">B.Pharm</option>
-                                        <option value="7">BPT</option>
-                                        <option value="8">B.Sc MLT</option>
-                                        <option value="9">B.Sc Optometry</option>
-                                        <option value="10">B.Sc CardiacCardiacCardiacCardiac Care</option>
-                                    </select>   
+                                    <label for="classDrop1" class="form-label">Class</label>
+                                    <select id="classDrop1" class="form-select" name="class_id" data-class-id="">
+                                        <option selected value="0">All Classes</option>
+                                        {% for class_item in class_data %}
+                                            <option value="{{ class_item.class_id }}">{{ class_item.class_name }}</option>
+                                        {% endfor %}
+                                    </select>
                                 </div>
                                 <div class="col-md-3 mt-2">
                                     <button type="button" class="btn btn-primary mt-4" id="btnPaymentDefaulters">Generate Report</button>
@@ -106,54 +107,7 @@
                                     </tr>
                                 </thead>
                                 <tbody class="tbl__bdy" id="">
-                                    <tr><td>R141693</td>
-                                        <td>Yash</td>
-                                        <td>BCS</td>
-                                        <td>Year-2</td>
-                                        <td>Section A</td>
-                                        <td>2024-07-24</td>
-                                        <td>More than one dues</td>
-                                    </tr>
-                                    <tr><td>R141693</td>
-                                        <td>Sai</td>
-                                        <td>B.Tech</td>
-                                        <td>Semester-3</td>
-                                        <td>Section D</td>
-                                        <td>2024-09-24</td>
-                                        <td>No due</td>
-                                    </tr>
-                                    <tr><td>R141693</td>
-                                        <td>Hari</td>
-                                        <td>Class 12</td>
-                                        <td>Year 2</td>
-                                        <td>Section C</td>
-                                        <td>2024-04-24</td>
-                                        <td>More than one dues</td>
-                                    </tr>
-                                    <tr><td>R141693</td>
-                                        <td>Mouni</td>
-                                        <td>M.Tech</td>
-                                        <td>Semester-2</td>
-                                        <td>Section E</td>
-                                        <td>2024-07-24</td>
-                                        <td>No due</td>
-                                    </tr>
-                                    <tr><td>R141693</td>
-                                        <td>Mouni</td>
-                                        <td>M.Tech</td>
-                                        <td>Semester-2</td>
-                                        <td>Section E</td>
-                                        <td>2024-07-24</td>
-                                        <td>No due</td>
-                                    </tr>
-                                    <tr><td>R141693</td>
-                                        <td>Mouni</td>
-                                        <td>M.Tech</td>
-                                        <td>Semester-2</td>
-                                        <td>Section E</td>
-                                        <td>2024-07-24</td>
-                                        <td>No due</td>
-                                    </tr>
+                                    
                                 </tbody>
                             </table>
                         </div>
@@ -163,31 +117,25 @@
                         <div class="row">
                             <div class="row mb-3">
                                 <div class="col-md-3">
-                                    <label for="class_id" class="form-label">Class</label>
-                                    <select class="form-select" id="class_id" name="class_id">
-                                        <option value="0">All Classes</option>
-                                        <option value="1">MBBS</option>
-                                        <option value="2">BDS</option>
-                                        <option value="3">BAMS</option>
-                                        <option value="4">BHMS</option>
-                                        <option value="5">B.Sc Nursing</option>
-                                        <option value="6">B.Pharm</option>
-                                        <option value="7">BPT</option>
-                                        <option value="8">B.Sc MLT</option>
-                                        <option value="9">B.Sc Optometry</option>
-                                        <option value="10">B.Sc CardiacCardiacCardiacCardiac Care</option>
-                                    </select>   
+                                    <label for="classDrop2" class="form-label">Class</label>
+                                    <select id="classDrop2" class="form-select" name="class_id" data-class-id="">
+                                        <option selected value="0">All Classes</option>
+                                        {% for class_item in class_data %}
+                                            <option value="{{ class_item.class_id }}">{{ class_item.class_name }}</option>
+                                        {% endfor %}
+                                    </select>
                                 </div>
+
                                 <div class="col-md-3">
                                     <label for="from_date" class="form-label">From Date</label>
-                                    <input type="date" class="form-control" id="from_date" name="from_date">
+                                    <input type="date" class="form-control" id="from_date2" name="from_date">
                                 </div>
                                 <div class="col-md-3">
                                     <label for="to_date" class="form-label">To Date</label>
-                                    <input type="date" class="form-control" id="to_date" name="to_date">
+                                    <input type="date" class="form-control" id="to_date2" name="to_date">
                                 </div>
                                 <div class="col-md-3 mt-2">
-                                    <button type="button" class="btn btn-primary mt-4" id="btnPaymentDefaulters">Generate Report</button>
+                                    <button type="button" class="btn btn-primary mt-4" id="btnFeesCollected">Generate Report</button>
                                 </div>
                             </div>
                             <table class="table table-striped table-hover table-sticky mt-3" id="feesCollectedTable">
@@ -199,51 +147,11 @@
                                         <th>Promotional Cycle</th>
                                         <th>Section</th>
                                         <th>Dues Amount</th>
+                                        <th>Payment Date</th>
                                     </tr>
                                 </thead>
-                                <tbody class="tbl__bdy" id="">
-                                    <tr><td>R141693</td>
-                                        <td>Yash</td>
-                                        <td>BCS</td>
-                                        <td>Year-2</td>
-                                        <td>Section A</td>
-                                        <td>20000</td>
-                                    </tr>
-                                    <tr><td>R141693</td>
-                                        <td>Sai</td>
-                                        <td>B.Tech</td>
-                                        <td>Semester-3</td>
-                                        <td>Section D</td>
-                                        <td>15000</td>
-                                    </tr>
-                                    <tr><td>R141693</td>
-                                        <td>Hari</td>
-                                        <td>Class 12</td>
-                                        <td>Year 2</td>
-                                        <td>Section C</td>
-                                        <td>18000</td>
-                                    </tr>
-                                    <tr><td>R141693</td>
-                                        <td>Mouni</td>
-                                        <td>M.Tech</td>
-                                        <td>Semester-2</td>
-                                        <td>Section E</td>
-                                        <td>20000</td>
-                                    </tr>
-                                    <tr><td>R141693</td>
-                                        <td>Mouni</td>
-                                        <td>M.Tech</td>
-                                        <td>Semester-2</td>
-                                        <td>Section E</td>
-                                        <td>20000</td>
-                                    </tr>
-                                    <tr><td>R141693</td>
-                                        <td>Mouni</td>
-                                        <td>M.Tech</td>
-                                        <td>Semester-2</td>
-                                        <td>Section E</td>
-                                        <td>20000</td>
-                                    </tr>
+                                <tbody class="tbl__bdy" id="feesCollectedTableBody">
+                                    
                                 </tbody>
                             </table>
                         </div>  
@@ -254,30 +162,23 @@
                         <div class="row">
                             <div class="row mb-3">
                                 <div class="col-md-3">
-                                    <label for="class_id" class="form-label">Class</label>
-                                    <select class="form-select" id="class_id" name="class_id">
-                                        <option value="0">All Classes</option>
-                                        <option value="1">MBBS</option>
-                                        <option value="2">BDS</option>
-                                        <option value="3">BAMS</option>
-                                        <option value="4">BHMS</option>
-                                        <option value="5">B.Sc Nursing</option>
-                                        <option value="6">B.Pharm</option>
-                                        <option value="7">BPT</option>
-                                        <option value="8">B.Sc MLT</option>
-                                        <option value="9">B.Sc Optometry</option>
-                                        <option value="10">B.Sc CardiacCardiacCardiacCardiac Care</option>
-                                    </select>   
+                                    <label for="classDrop3" class="form-label">Class</label>
+                                    <select id="classDrop3" class="form-select" name="class_id" data-class-id="">
+                                        <option selected value="0">All Classes</option>
+                                        {% for class_item in class_data %}
+                                            <option value="{{ class_item.class_id }}">{{ class_item.class_name }}</option>
+                                        {% endfor %}
+                                    </select>
                                 </div>
                                 <div class="col-md-3">
-                                    <label for="by_date" class="form-label">To Date</label>
-                                    <input type="date" class="form-control" id="by_date" name="by_date">
+                                    <label for="to_date3" class="form-label">To Date</label>
+                                    <input type="date" class="form-control" id="to_date3" name="to_date3">
                                 </div>
                                 <div class="col-md-3 mt-2">
-                                    <button type="button" class="btn btn-primary mt-4" id="btnPaymentDefaulters">Generate Report</button>
+                                    <button type="button" class="btn btn-primary mt-4" id="btnFeesToCollect">Generate Report</button>
                                 </div>
                             </div>
-                            <table class="table table-striped table-hover table-sticky mt-3" id="feestoCollectTable">
+                            <table class="table table-striped table-hover table-sticky mt-3" id="feesToCollectTable">
                                 <thead class="thead-dark">
                                     <tr>
                                         <th>Roll Number</th>
@@ -286,51 +187,11 @@
                                         <th>Promotional Cycle</th>
                                         <th>Section</th>
                                         <th>Amount</th>
+                                        <th>Due Date</th>
                                     </tr>
                                 </thead>
                                 <tbody class="tbl__bdy" id="">
-                                    <tr><td>R141693</td>
-                                        <td>Yash</td>
-                                        <td>BCS</td>
-                                        <td>Year-2</td>
-                                        <td>Section A</td>
-                                        <td>15000</td>
-                                    </tr>
-                                    <tr><td>R141693</td>
-                                        <td>Sai</td>
-                                        <td>B.Tech</td>
-                                        <td>Semester-3</td>
-                                        <td>Section D</td>
-                                        <td>20000</td>
-                                    </tr>
-                                    <tr><td>R141693</td>
-                                        <td>Hari</td>
-                                        <td>Class 12</td>
-                                        <td>Year 2</td>
-                                        <td>Section C</td>
-                                        <td>15000</td>
-                                    </tr>
-                                    <tr><td>R141693</td>
-                                        <td>Mouni</td>
-                                        <td>M.Tech</td>
-                                        <td>Semester-2</td>
-                                        <td>Section E</td>
-                                        <td>18000</td>
-                                    </tr>
-                                    <tr><td>R141693</td>
-                                        <td>Mouni</td>
-                                        <td>M.Tech</td>
-                                        <td>Semester-2</td>
-                                        <td>Section E</td>
-                                        <td>18000</td>
-                                    </tr>
-                                    <tr><td>R141693</td>
-                                        <td>Mouni</td>
-                                        <td>M.Tech</td>
-                                        <td>Semester-2</td>
-                                        <td>Section E</td>
-                                        <td>20000</td>
-                                    </tr>
+                                    
                                 </tbody>
                             </table>
                         </div>
@@ -381,7 +242,7 @@
                                     <input type="date" class="form-control" id="by_date" name="by_date">
                                 </div>
                                 <div class="col-md-2">
-                                    <button type="button" class="btn btn-primary mt-4" id="btnPaymentDefaulters">Generate Report</button>
+                                    <button type="button" class="btn btn-primary mt-4" id="sss">Generate Report</button>
                                 </div>
                             </div>
                             <table class="table table-striped table-hover table-sticky mt-3" id="resultStatisticsTable">
@@ -464,7 +325,7 @@
                                     </select>   
                                 </div>
                                 <div class="col-md-3 mt-2">
-                                    <button type="button" class="btn btn-primary mt-4" id="btnPaymentDefaulters">Generate Report</button>
+                                    <button type="button" class="btn btn-primary mt-4" id="">Generate Report</button>
                                 </div>
                             </div>
                             <table class="table table-striped table-hover table-sticky mt-3" id="studentResultsTable">
@@ -473,6 +334,7 @@
                                         <th>Roll Number</th>
                                         <th>Student Name</th>
                                         <th>Class</th>
+                                        <th>Subject</th>
                                         <th>Full Mark</th>
                                         <th>Obtained Mark</th>
                                         <th>% of Mark</th>
@@ -483,6 +345,7 @@
                                     <tr><td>R141693</td>
                                         <td>Yash</td>
                                         <td>BCS</td>
+                                        <td>Maths</td>
                                         <td>100</td>
                                         <td>56</td>
                                         <td>26%</td>
@@ -491,6 +354,7 @@
                                     <tr><td>R141693</td>
                                         <td>Sai</td>
                                         <td>B.Tech</td>
+                                        <td>Maths</td>
                                         <td>100</td>
                                         <td>78</td>
                                         <td>65%</td>
@@ -499,6 +363,7 @@
                                     <tr><td>R141693</td>
                                         <td>Hari</td>
                                         <td>Class 12</td>
+                                        <td>Maths</td>
                                         <td>100</td>
                                         <td>78</td>
                                         <td>58%</td>
@@ -507,6 +372,7 @@
                                     <tr><td>R141693</td>
                                         <td>Mouni</td>
                                         <td>M.Tech</td>
+                                        <td>Maths</td>
                                         <td>100</td>
                                         <td>67</td>
                                         <td>45%</td>
@@ -515,6 +381,7 @@
                                     <tr><td>R141693</td>
                                         <td>Mouni</td>
                                         <td>M.Tech</td>
+                                        <td>Maths</td>
                                         <td>100</td>
                                         <td>98</td>
                                         <td>89%</td>
@@ -523,6 +390,7 @@
                                     <tr><td>R141693</td>
                                         <td>Mouni</td>
                                         <td>M.Tech</td>
+                                        <td>Maths</td>
                                         <td>100</td>
                                         <td>89</td>
                                         <td>98%</td>
@@ -538,23 +406,23 @@
                         <div class="row">
                             <div class="row mb-3">
                                 <div class="col-md-3">
-                                    <label for="class_id" class="form-label">Class</label>
-                                    <select class="form-select" id="class_id" name="class_id">
-                                        <option value="0">All Classes</option>
-                                        <option value="1">MBBS</option>
-                                        <option value="2">BDS</option>
-                                        <option value="3">BAMS</option>
-                                    </select>   
+                                    <label for="classDrop6" class="form-label">Class</label>
+                                    <select id="classDrop6" class="form-select" name="class_id" data-class-id="">
+                                        <option selected value="0">All Classes</option>
+                                        {% for class_item in class_data %}
+                                            <option value="{{ class_item.class_id }}">{{ class_item.class_name }}</option>
+                                        {% endfor %}
+                                    </select>
                                 </div>
                                 <div class="col-md-3">
-                                    <label for="alumni" class="form-label">Alumni</label>
-                                    <select class="form-select" id="alumni" name="alumni">
-                                        <option value="0">True</option>
-                                        <option value="1">False</option>
+                                    <label for="alumni1" class="form-label">Alumni</label>
+                                    <select class="form-select" id="alumni1" name="alumni1">
+                                        <option value="true" selected>Yes</option>
+                                        <option value="false">No</option>
                                     </select>   
                                 </div>
                                 <div class="col-md-3 mt-2">
-                                    <button type="button" class="btn btn-primary mt-4" id="btnPaymentDefaulters">Generate Report</button>
+                                    <button type="button" class="btn btn-primary mt-4" id="btnStudentCountByClass">Generate Report</button>
                                 </div>
                             </div>
                             <table class="table table-striped table-hover table-sticky mt-3" id="studentCountByClassTable">
@@ -565,15 +433,7 @@
                                     </tr>
                                 </thead>
                                 <tbody class="tbl__bdy" id="">
-                                    <tr><td>MBA</td>
-                                        <td>70</td>
-                                    </tr>
-                                    <tr><td>BBA</td>
-                                        <td>80</td>
-                                    </tr>
-                                    <tr><td>B.Tech</td>
-                                        <td>60</td>
-                                    </tr>
+                                   
                                 </tbody>
                             </table>
                         </div>  
@@ -584,31 +444,29 @@
                         <div class="row">
                             <div class="row mb-3">
                                 <div class="col-md-3">
-                                    <label for="class_id" class="form-label">Class</label>
-                                    <select class="form-select" id="class_id" name="class_id">
-                                        <option value="0">All Classes</option>
-                                        <option value="1">MBBS</option>
-                                        <option value="2">BDS</option>
-                                        <option value="3">BAMS</option>
-                                    </select>   
+                                    <label for="classDrop7" class="form-label">Class</label>
+                                    <select id="classDrop7" class="form-select" name="class_id" data-class-id="">
+                                        <option selected value="0">All Classes</option>
+                                        {% for class_item in class_data %}
+                                            <option value="{{ class_item.class_id }}" data-promotion="{{class_item.promotion_type}}"  data-tnp="{{class_item.total_number_of_promotion}}">{{ class_item.class_name }}</option>
+                                        {% endfor %}
+                                    </select>
                                 </div>
                                 <div class="col-md-3">
-                                    <label for="promotional_cycle" class="form-label">Promotional Cycle</label>
-                                    <select class="form-select" id="promotional_cycle" name="promotional_cycle">
-                                        <option value="0">Semester</option>
-                                        <option value="1">Year 2</option>
-                                        <option value="2">Class 12</option>
-                                    </select>   
+                                    <label for="tnp" class="form-label" id="tnp-label">Sem/Year</label>
+                                    <select id="tnp" class="form-select">
+                                        <option selected value="">Choose...</option>
+                                    </select>  
                                 </div>
                                 <div class="col-md-3">
-                                    <label for="alumni" class="form-label">Alumni</label>
-                                    <select class="form-select" id="alumni" name="alumni">
-                                        <option value="0">True</option>
-                                        <option value="1">False</option>
+                                    <label for="alumni2" class="form-label">Alumni</label>
+                                    <select class="form-select" id="alumni2" name="alumni2">
+                                        <option value="false" selected>True</option>
+                                        <option value="true">False</option>
                                     </select>   
                                 </div>
                                 <div class="col-md-3 mt-2">
-                                    <button type="button" class="btn btn-primary mt-4" id="btnPaymentDefaulters">Generate Report</button>
+                                    <button type="button" class="btn btn-primary mt-4" id="btnstudentCountByPosition">Generate Report</button>
                                 </div>
                             </div>
                             <table class="table table-striped table-hover table-sticky mt-3" id="studentCountByPositionTable">
@@ -619,15 +477,7 @@
                                     </tr>
                                 </thead>
                                 <tbody class="tbl__bdy" id="">
-                                    <tr><td>MBA</td>
-                                        <td>70</td>
-                                    </tr>
-                                    <tr><td>BBA</td>
-                                        <td>80</td>
-                                    </tr>
-                                    <tr><td>B.Tech</td>
-                                        <td>60</td>
-                                    </tr>
+
                                 </tbody>
                             </table>
                         </div>  
@@ -642,7 +492,7 @@
                                     <input type="text" class="form-control" id="student_roll_number" name="student_roll_number"> 
                                 </div>
                                 <div class="col-md-3 mt-2">
-                                    <button type="button" class="btn btn-primary mt-4" id="btnPaymentDefaulters">Search</button>
+                                    <button type="button" class="btn btn-primary mt-4" id="">Search</button>
                                 </div>
                             </div>
                             <div class="col-md-6 text-align-center">

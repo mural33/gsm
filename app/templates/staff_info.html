@@ -10,14 +10,14 @@
 
 <div class="row" id="heading-row">
     <div class="col-sm-12 col-md-9 col-xl-12 d-flex align-items-center" style="padding: 1rem">
-       <a href="{% url 'staffs' %}" class="btn">
-          <i class="bi bi-arrow-left" style="font-size:1.5rem;"></i>
-      </a>
-
+        <a href="{% url 'staffs' %}">
+            <i class="bi bi-arrow-left" style="font-size:1.5rem;"></i>
+        </a>
         <div class="mx-2">
             <h5>Staff Information</h5>
             <quote>Teachers illuminate the path to knowledge, guiding minds to brilliance with each lesson they share.</quote>
-        </div>
+
+    </div>
         <div class="ms-auto">
           <a id="downloadSnapshot" href="{% url 'staffIdCard' staff_slug %}" target="_blank" style="padding: 1rem">Virtual ID card</a>
           <a href="{% url 'edit_staff' staff_slug %}" data-id="{{ staff_data.staff_id }}"
@@ -48,7 +48,7 @@
                         <span class="d-block">
                             Employee ID
                         </span>
-                        <span class="d-block txt-color" id="rollNumberStu" data-roll_number = "{{staff_data.employee_id}}">
+                        <span class="txt-color badge rounded-pill bg-dark-subtle text-body" id="rollNumberStu" data-roll_number = "{{staff_data.employee_id}}">
                             {{staff_data.employee_id}}
                         </span>
                     </p>

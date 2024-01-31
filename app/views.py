@@ -800,7 +800,7 @@ def signup(request):
                 else:
                     messages.error(
                         request,
-                        create_instance.get("error", "Error in creating institute"),
+                        create_instance.get("error", "Enrollment ID already Exists"),
                     )
                     return render(request, "signup.html")
             else:
@@ -862,13 +862,27 @@ def studentIdCard(request,student_slug):
         "institute_data": institite_data,
     }
     return render(request, "student_id.html",payload)
+    
 def reports(request):
+    class_obj = Data(API_URL)
+    institute_id = request.COOKIES.get("institute_id")
+    access_token = request.COOKIES.get("access_token")
+    params = {"institute_id": institute_id}
+    class_data = class_obj.get_class_data(
+        end_point=f"/Classes/get_classes_by_institute/?institite_id={int(institute_id)}",
+        jwt=access_token,
+        params=params,
+    )
+    print("class_Data",class_data["data"])    
     payload = {
-        "organization_name": request.COOKIES.get("organization_name"),
+        "organization_name" : request.COOKIES.get("organization_name"),
         "message": request.COOKIES.get("message"),
-        "subscriber_id": request.COOKIES.get("subscribers_id"), 
-        "subscriber_id": request.COOKIES.get("subscribers_id"), 
+        "subscriber_id" : request.COOKIES.get("subscribers_id"), 
+        "subscriber_id" : request.COOKIES.get("subscribers_id"), 
         "subscriptionUrl" : Subscription_URL,
+        "class_data" : class_data["data"],
+        "institute_id" : institute_id,
+        "url" : API_URL,
 
     }
     return render(request, "reports.html",payload)
