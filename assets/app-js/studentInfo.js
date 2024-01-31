@@ -2,7 +2,7 @@ $(document).ready(() => {
     let studentInfo =JSON.parse($("#studentInfo").val());
     populateVehicleDetails();
     updateUnassignButtonState();
-    $("#btnParentForm").on("click", assignTransport);
+    $("#btnTransportForm").on("click", assignTransport);
     $("#unassignButton").on("click", unassignTransport);
 
     // student calendar
@@ -19,6 +19,12 @@ $(document).ready(() => {
     $("#btnFeeForm").on("click", async (e) => {
         await studentFee.fixFee();
     })
+    $("#installment_type").on("change", async () => {
+        console.log("im working");
+        var installType = $("#installment_type option:selected").val();
+        console.log(installType);
+        await studentFee.showInstallments(installType);
+    });
     // student activity
     const studentActivity = new StudentActivity(studentInfo.studentId);
     studentActivity.getStudentActivity();
@@ -31,7 +37,7 @@ $(document).ready(() => {
 
     $("#btnParentForm").on("click", async (e) => {
         e.preventDefault();
-        const studentParent = new StudentParent();
+        const studentParent = new StudentParent(studentInfo.studentId);
         await studentParent.addParent();
     })
     // student Documents
@@ -49,6 +55,10 @@ $(document).ready(() => {
     $(".dataTables_empty").html(
         `<img src="/assets/img/no_data_found.png" alt="No Image" class="no_data_found" id="no_data_found">`
     )
+
+    $("#parent_age, #parent_phone").on("input", function () {
+        phoneNumber($(this).attr('id'));
+    });
 });
 // --------------------------Base AJax Request--------------------------
 async function ajaxRequest(type, url, data,loaderId,loaderSize,successCallback) {
@@ -159,8 +169,7 @@ function assignTransport() {
         success: function (data) {
             const assignedData = data.response;
             $('#transport_form').modal('hide');
-            fetchTransportDetails(selectedVehicleNumber, function () {
-            });
+            fetchTransportDetails(selectedVehicleNumber);
             raiseSuccessAlert("Transport Assigned Successfully");
         },
         error: function () {
@@ -172,7 +181,7 @@ function assignTransport() {
     });
 }
 
-function fetchTransportDetails(transportId, callback) {
+function fetchTransportDetails(transportId) {
     var transportDetailsEndpoint = `${apiUrl}/Transports/get_transport_data_by_id/?transport_id=${transportId}`;
     $.ajax({
         url: transportDetailsEndpoint,
@@ -199,9 +208,6 @@ function fetchTransportDetails(transportId, callback) {
             }
             $("#transportContainer").html();
             updateUnassignButtonState();
-            if (callback && typeof callback === 'function') {
-                callback();
-            }
         },
         error: function () {
         }
@@ -210,6 +216,9 @@ function fetchTransportDetails(transportId, callback) {
 
 // student parent Code Here
 class StudentParent {
+    constructor (studentId) {
+        this.studentId = studentId
+    }
     async ajaxRequest(type, url, data,loaderId,loaderSize,successCallback) {
         await $.ajax({
             type: type,
@@ -230,14 +239,19 @@ class StudentParent {
                 successCallback(response);
             },
             error: (error) => {
-                raiseErrorAlert(error.responseJSON);
+                try{
+                    raiseWarningAlert(error.responseJSON.detail)
+                }
+                catch{
+                    raiseErrorAlert(error.responseJSON);
+                }
             },
             complete: () => {
                 removeLoader(loaderId, loaderSize);
             }
         });
     }
-    async addParent() {        
+    async addParent() {     
         if (await this.validateParentForm()) {
             var parentData = {
                 "parent_name": $("#parent_name").val(),
@@ -250,12 +264,13 @@ class StudentParent {
                 "parent_address": "string",
                 "parent_profession":$("#parent_profession").val(),
                 "photo": "string",
-                "student_id":$("#student_id").val()
+                "student_id":this.studentId
             }
             var parentId = $("#parent_id").val();
             var method = parentId ? "PUT" : "POST";
             var endPoint = parentId ? `/Parents/update_parent/?parent_id=${parentId}` : "/Parents/add_parent/";
             var totalUrl = apiUrl+endPoint
+            console.log(method, totalUrl,parentId)
             this.ajaxRequest(method, totalUrl,parentData, "parentFormArea", "sm", async (response) => {
                 $("#parent_form").modal('hide');
                 var parentData = response.response
@@ -329,28 +344,29 @@ class StudentParent {
     }
 
     async addNewParent(response) {
+        console.log(response);
         $("#parentRow").find("#no_data_found").hide();
         var parentData = response;
         var parentRow = $("#parentRow");
         var img = parentData.parent_gender === 'Male' ?'/assets/img/male.png' :'/assets/img/female.png'
         var card = `
-        <div class="card col-md-4 mx-2" id="parent-card-${parentData.parent_id}">
+        <div class="card col-md-5 mx-2" id="parent-card-${parentData.parent_id}">
             <div class="card-heade text-center my-2">
                 <img src=${img} alt="" srcset="" class="card-img-top parent_profile">
             </div>
             <div class="card-body row">
-                <p class="card-title col-md-6">
+                <p class="card-title col-md-12">
                     Name: <span class="parent-${parentData.parent_id}-parent_name">${parentData.parent_name}</span>
+                </p>
+                <p class="card-title col-md-6 ">
+                    Age: <span class="parent-${parentData.parent_id}-parent_age">${parentData.parent_age}</span>
                 </p>
                 <p class="card-title col-md-6 ">
                     Gender: <span class="parent-${parentData.parent_id}-parent_gender">${parentData.parent_gender}</span>
                 </p>
-                <p class="card-title col-md-6">
+                <p class="card-title col-md-12">
                     Relation: <span
                         class="parent-${parentData.parent_id}-relation_with_student">${parentData.relation_with_student}</span>
-                </p>
-                <p class="card-title col-md-6 ">
-                    Age: <span class="parent-${parentData.parent_id}-parent_age">${parentData.parent_age}</span>
                 </p>
             </div>
             <div class="card-footer">
@@ -569,7 +585,12 @@ class StudentExam{
                 successCallback(response);
             },
             error: (error) => {
-                raiseErrorAlert(error.responseJSON);
+                try{
+                    raiseWarningAlert(error.responseJSON.detail)
+                    
+                }catch{
+                    raiseErrorAlert(error.responseJSON);
+                }
             },
             complete: () => {
                 removeLoader(loaderId, loaderSize);
@@ -636,36 +657,44 @@ async function getResultData(element){
     var totalUrl = apiUrl + endPoint;
     await this.ajaxRequest("GET", totalUrl, "", "resultModelArea", "sm",async(response) => {
         var resultTable = $("#resultTable");
-        if(response.response){
-            var resultData = response.response["result"];
-            var marksData = resultData.marks;
-            resultTable.find("tbody").html("");
-            var trs = [];
-            marksData.forEach(result => {
-                var tr = `
-                    <tr>
-                        <td>${result.subject_name}</td>
-                        <td>${result.full_marks}</td>
-                        <td>${result.obtained_marks}</td>
-                        <td>${result.percentage}</td>
-                        <td>${result.grade}</td>
-                    </tr>
-                `;
-                trs.push(tr);
-            });
-            var lastTr = `<tr>
-                    <td>Total</td>
-                    <td>${resultData.total_marks}</td>
-                    <td>${resultData.total_obtained_marks}</td>
-                    <td>${resultData.percentage}</td>
-                    <td>${resultData.grade}</td>
-                </tr>`
-            trs.push(lastTr);
-            resultTable.find("tbody").append(trs.join(""));
-            resultTable.dataTable();
+        if(response.status_code == 200){
+            if(response.response){
+                var resultData = response.response["result"];
+                var marksData = resultData.marks;
+                resultTable.find("tbody").html("");
+                var trs = [];
+                marksData.forEach(result => {
+                    var grade = result.grade ? result.grade:""
+                    var tr = `
+                        <tr>
+                            <td>${result.subject_name}</td>
+                            <td>${result.full_mark}</td>
+                            <td>${result.obtained_mark}</td>
+                            <td>${result.percentage}</td>
+                            <td>${grade}</td>
+                        </tr>
+                    `;
+                    trs.push(tr);
+                });
+                var total_grade = resultData.grade ? resultData.grade:""
+                var lastTr = `<tr class="bg-dark">
+                        <td class="text-white">Total</td>
+                        <td class="text-white">${resultData.total_full_marks}</td>
+                        <td class="text-white">${resultData.total_obtained_marks}</td>
+                        <td class="text-white">${resultData.percentage}</td>
+                        <td class="text-white">${total_grade}</td>
+                    </tr>`
+                trs.push(lastTr);
+                resultTable.find("tbody").append(trs.join(""));
+                resultTable.dataTable();
+            }
+            else{
+                resultTable.dataTable();
+            }
         }
         else{
-            resultTable.dataTable();
+            resultTable.dataTable()
+            raiseWarningAlert(response.detail)
         }
     }); 
 
@@ -675,6 +704,12 @@ async function getResultData(element){
 class StudentFee{
     constructor(studentId){
         this.studentId =studentId
+        this.table = $("#installmentTable").DataTable(
+            {
+                "ordering": [],
+                'sort': false,
+            }
+        )
     }
     async ajaxRequest(type, url, data,loaderId,loaderSize,successCallback) {
         await $.ajax({
@@ -717,14 +752,8 @@ class StudentFee{
     }
     async displayInstallentData(response){
         showLoader("installmentTable","sm")
-        var installmentTable = $("#installmentTable").DataTable(
-            {
-                "ordering": [],
-                'sort': false,
-            }
-        )
         if(response.length > 0){
-            installmentTable.clear().draw();
+            this.table.clear();
             for (const key in response) {
                 var installment = response[key]
                 var color = installment.installment_status === true ? "bg-success" : "bg-danger"
@@ -738,21 +767,22 @@ class StudentFee{
                     Pay
                     <i class="bi bi-currency-rupee label-icon align-middle fs-lg ms-2"></i>
                 </button>`
+                var paymentDate = installment.installment_paid_date ? installment.installment_paid_date:""
                 var row = `
                     <tr class="tr-installment-${installment.installment_id}">
                         <td>${installment.installment_name}</td>
                         <td>${installment.installment_due_date}</td>
                         <td>${installment.installment_amount}</td>
-                        <td>${installment.installment_paid_date}</td>
-                        <td class="${color}">
-                            ${statusMsg}
+                        <td>${paymentDate}</td>
+                        <td class="">
+                            <span class="badge rounded-pill ${color}">${statusMsg}</span>
                         </td>
                         <td>
                             ${payBtn}
                         </td>
                     </tr>
                 `
-                installmentTable.row.add($(row)).draw()
+                this.table.row.add($(row)).draw()
             }
         }
         removeLoader("installmentTable","sm")
@@ -805,6 +835,34 @@ class StudentFee{
             raiseSuccessAlert("Fee Fixed Successfully")
         })
     }
+    async showInstallments(element) {
+        console.log("im called",element);
+        this.table.clear();
+        var installmentCount = element;
+        var totalFee = $("#total_insta_amount").val();
+        var installmentAmount = (parseFloat(totalFee) / installmentCount).toFixed(2);
+        var trs = [];
+        for (let i = 1; i <= installmentCount; i++) {
+            var color = "bg-danger";
+            var statusMsg = "Unpaid";
+            var dueDate = new Date();
+            dueDate.setDate(dueDate.getDate() + (30 * i));
+            dueDate = dueDate.toISOString().split('T')[0];
+            var row = `
+                <tr>
+                    <td>installment_${i}</td>
+                    <td>${dueDate}</td>
+                    <td>${installmentAmount}</td>
+                    <td>-</td>
+                    <td class="${color}">
+                        ${statusMsg}
+                    </td>
+                </tr>
+            `;
+            this.table.row.add($(row)).draw()
+        }
+
+    }
 }
 function showDiscount(element){
     var discount = $(element).val();
@@ -812,33 +870,7 @@ function showDiscount(element){
     var totalInstaAmount = totalFee - discount;
     $("#total_insta_amount").val(totalInstaAmount);
 }
-function showInstallments(element) {
-    let installmentTable = $("#installmentTable").DataTable();
-    installmentTable.clear().destroy();
-    var installmentCount = $(element).val();
-    var totalFee = $("#total_insta_amount").val();
-    var installmentAmount = (parseFloat(totalFee) / installmentCount).toFixed(2);
-    for (let i = 1; i <= installmentCount; i++) {
-        var color = "bg-danger";
-        var statusMsg = "Unpaid";
-        var dueDate = new Date();
-        dueDate.setDate(dueDate.getDate() + (30 * i));
-        dueDate = dueDate.toISOString().split('T')[0];
-        var row = `
-            <tr>
-                <td>installment_${i}</td>
-                <td>${dueDate}</td>
-                <td>${installmentAmount}</td>
-                <td>-</td>
-                <td class="${color}">
-                    ${statusMsg}
-                </td>
-            </tr>
-        `;
-        installmentTable.row.add($(row)).draw()
-    }
-    installmentTable.draw();
-}
+
 
 async function editInstallment(element){
     var installmentId = $(element).attr("data-installment_id");
@@ -850,7 +882,9 @@ async function editInstallment(element){
         var installmentData = response.response;
         var installmentTr = $(`.tr-installment-${installmentId}`);
         installmentTr.find("td").eq(3).text(installmentData.installment_paid_date);
-        installmentTr.find("td").eq(4).removeClass("bg-danger").addClass("bg-success").text("Paid");
+        installmentTr.find("td").eq(4).removeClass("bg-danger").html(
+            `<span class="badge rounded-pill bg-success">Paid</span>`
+        );
         installmentTr.find("td").eq(5).html(`
         <button class="btn btn-sm btn-danger" Onclick="deleteInstallment(this)" data-installment_id="${installmentId}">
         <i class="bi bi-trash3"></i>
@@ -863,7 +897,7 @@ async function editInstallment(element){
 async function deleteInstallment(element){
     var installmentId = $(element).attr("data-installment_id");
     await Swal.fire({
-        title: 'Are you sure, you want to delete this Record?',
+        title: 'Are you sure, You want to Unpay this ?',
         text: 'This can\'t be reverted!',
         icon: 'warning',
         showCancelButton: true,
@@ -876,7 +910,9 @@ async function deleteInstallment(element){
             await ajaxRequest("PATCH", totalUrl, "", "installmentTable", "sm",async(response) => {
                 var installmentTr = $(`.tr-installment-${installmentId}`);
                 installmentTr.find("td").eq(3).text("");
-                installmentTr.find("td").eq(4).removeClass("bg-success").addClass("bg-danger").text("Unpaid");
+                installmentTr.find("td").eq(4).removeClass("bg-danger").html(
+                    `<span class="badge rounded-pill bg-danger">Unpaid</span>`
+                );
                 installmentTr.find("td").eq(5).html(`
                 <button class="btn btn-info btn-label rounded-pill right" 
                 onClick="editInstallment(this)" data-installment_id ='${installmentId}'>
@@ -1108,7 +1144,6 @@ function editActivity(element){
     var totalUrl = apiUrl+endPoint;
     ajaxRequest("GET",totalUrl, "","activityFormArea","sm",(response) => {
         var activityData = response.response;
-        console.log(activityData);
         for (const key in activityData) {
             try{
                 $(`#${key}`).val(activityData[key]);
@@ -1187,7 +1222,7 @@ class StudentAssignment{
                         </button>
                     </td>
                     <td class="assignment_status">
-                    <span class="bg-success p-2 text-white">Submited</span>
+                    <span class="badge rounded-pill bg-success">Submited</span>
                     </td>
                     <td class="action_btn">
                             <button  class="btn btn-primary btn-label right rounded-pill">
@@ -1213,7 +1248,7 @@ class StudentAssignment{
                         </button>
                     </td>
                     <td class="assignment_status">
-                        <span class="bg-danger p-2 text-white">Not Submited</span>
+                        <span class="badge rounded-pill bg-danger">Not Submited</span>
                     </td>
                     <td class="action_btn">
                         <button onClick = "openAssignmentSubmissionModal('${assignment.assignment_title}','${assignment.id}')" class="btn btn-primary btn-label right rounded-pill">
@@ -1496,7 +1531,6 @@ async function loadCalendarDetails(class_id, section_id) {
         );
     }
     } catch (error) {
-        console.log(error);
       raiseErrorAlert(error.responseJSON.detail);
     } finally {
       removeLoader("calenderTable", "sm");

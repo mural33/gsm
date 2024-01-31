@@ -6,6 +6,7 @@
 <link rel="stylesheet" href="{% static 'app-css/common.css' %}">
 <script src="{% static 'app-js/register_student.js' %}"></script>
 
+<input type="hidden" id="studentInfo" value='{"classId":{{student_data.class_id}}, "sectionId":{{student_data.section_id}}, "studentId":{{student_data.student_id}}}'/>
 <div class="row" id="heading-row">
     <div class="col-md-2"></div>
     <div class="col-sm-12 col-md-8 col-xl-7.5" style="padding: 1rem">
@@ -34,7 +35,7 @@
                         </div>
                         <div class="col-6">
                             <button type="submit" id="btnStudentForm" class="btn btn-primary" data-bs-dismiss="modal" style="float:right">
-                                <i class="bi bi-save"></i>&nbsp;Save changes</button>
+                                <i class="bi bi-save"></i>&nbsp;Save</button>
                         </div>
                     </div>
                 </div>
@@ -68,12 +69,12 @@
                                         <div class="col-md-6">
                                             <label for="student_name" class="form-label">Name</label>
                                             <input type="text" class="form-control" id="student_name" name="student_name"
-                                            value="{{student_data.student_name}}" maxlength="255">
+                                            value="{{student_data.student_name}}" maxlength="255" minlength="3">
                                         </div>
                                         <div class="col-md-6">
                                             <label for="roll_number" class="form-label">Roll Number</label>
                                             <input type="text" class="form-control" id="roll_number" name="roll_number"
-                                            value="{{student_data.roll_number}}" maxlength="255">
+                                            value="{{student_data.roll_number}}" maxlength="255" minlength="1">
                                         </div>
                                     </div>
                                     <div class="row">
@@ -122,7 +123,7 @@
                                 <div class="accordion-body">
                                     <div class="col-md-12">
                                         <label for="email" class="form-label">Email</label>
-                                        <input type="text" class="form-control" id="email" name="email" value="{{student_data.email}}" maxlength="255">
+                                        <input type="text" class="form-control" id="email" name="email" value="{{student_data.email}}" maxlength="255" minlength="5">
                                     </div>
                                     <div class="col-md-12">
                                         <label for="phone_number" class="form-label">Phone</label>
@@ -145,30 +146,30 @@
                                 <div class="accordion-body">
                                     <div class="col-md-12">
                                         <label for="Address" class="form-label">Address Line</label>
-                                        <textarea class="form-control" id="address" rows="3" name="address" maxlength="255"
+                                        <textarea class="form-control" id="address" rows="3" name="address" maxlength="255" minlength="3"
                                         >{{student_data.address.0}}</textarea>
                                     </div>
                                     <div class="row">
                                         <div class="col-md-6">
                                             <label for="city" class="form-label">City</label>
-                                            <input type="text" class="form-control" id="city" name="city" value="{{student_data.address.1}}" maxlength="100">
+                                            <input type="text" class="form-control" id="city" name="city" value="{{student_data.address.1}}" minlength="3" maxlength="100">
                                         </div>
                                         <!-- state -->
                                         <div class="col-md-6">
                                             <label for="state" class="form-label">State</label>
-                                            <input type="text" class="form-control" id="state" name="state" value="{{student_data.address.2}}" maxlength="100">
+                                            <input type="text" class="form-control" id="state" name="state" value="{{student_data.address.2}}" minlength="1" maxlength="100">
                                         </div>
                                     </div>
                                     <div class="row">
                                         <!-- country -->
                                         <div class="col-md-6">
                                             <label for="country" class="form-label">Country</label>
-                                            <input type="text" class="form-control" id="country" name="country" value="{{student_data.address.3}}" maxlength="100">
+                                            <input type="text" class="form-control" id="country" name="country" value="{{student_data.address.3}}" minlength="1" maxlength="100">
                                         </div>
                                         <!-- pincode -->
                                         <div class="col-md-6">
                                             <label for="pincode" class="form-label">Pincode</label>
-                                            <input type="text" class="form-control" id="pincode" name="pincode" value="{{student_data.address.4}}" maxlength="100">
+                                            <input type="text" class="form-control" id="pincode" name="pincode" value="{{student_data.address.4}}"minlength="3"  maxlength="100">
                                         </div>
                                     </div>
                                 </div>
@@ -185,20 +186,34 @@
                             <div id="accor_borderedExamplecollapse5" class="accordion-collapse collapse"
                                 aria-labelledby="accordionborderedExample5" data-bs-parent="#accordionBordered">
                                 <div class="accordion-body">
-                                    <div class="col-md-12">
-                                        <label for="class_id" class="form-label">Class</label>
-                                        <select id="class_id" class="form-select" name="class_id" data-class-id="{{student.class_id}}">
-                                            <option selected value="">Choose...</option>
-                                            {% for class in class_data %}
-                                                <option value="{{class.class_id}}">{{class.class_name}}</option>
-                                            {% endfor %}
-                                        </select>
-                                    </div>
-                                    <div class="col-md-12">
-                                        <label for="section_id" class="form-label">Section</label>
-                                        <select id="section_id" class="form-select" name="section_id">
-                                            <option value="">Select class first</option>
-                                        </select>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <label for="class_id" class="form-label">Class</label>
+                                            <select id="class_id" class="form-select" name="class_id" data-class-id="{{student.class_id}}">
+                                                {% if not student_data.class_id %}
+                                                    <option selected value="">Choose...</option>
+                                                {% endif %}
+                                                {% for class in class_data %}
+                                                    {% if class.class_id ==  student_data.class_id %}
+                                                        <option value="{{class.class_id}}" data-tnp="{{class.total_number_of_promotion}}" data-promotion_type="{{class.promotion_type}}" selected>{{class.class_name}}</option>
+                                                    {% else %}
+                                                        <option value="{{class.class_id}}" data-tnp="{{class.total_number_of_promotion}}" data-promotion_type="{{class.promotion_type}}" >{{class.class_name}}</option>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6 my-2">
+                                            <label for="section_id" class="form-label">Section</label>
+                                            <select id="section_id" class="form-select" name="section_id">
+                                                <option value="">Select class first</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6 my-2">
+                                            <label for="semistor" class="form-label">Sem/Year</label>
+                                            <select id="semistor" class="form-select" name="section_id">
+                                                <option value="">All</option>
+                                            </select>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

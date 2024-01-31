@@ -51,7 +51,7 @@ has context menu
                         <span class="d-block">
                             Roll Number
                         </span>
-                        <span class="d-block txt-color" id="rollNumberStu" data-roll_number = "{{student_data.roll_number}}">
+                        <span class="f-5 badge bg-dark-subtle text-body" id="rollNumberStu" data-roll_number = "{{student_data.roll_number}}">
                             {{student_data.roll_number}}
                         </span>
                     </p>
@@ -61,14 +61,14 @@ has context menu
                         <span class="d-block">
                             Class
                         </span>
-                        <span class="d-block txt-color">
+                        <span class="badge bg-dark-subtle text-body">
                             {{student_data.classes.class_name}}
                         </span>
                     </p>
                 </div>
                 <div class="col-md-12 col-sm-12 col-xs-6 ">
                     <p class="card-title">
-                        <span class="d-block">
+                        <span class="d-block ">
                              {% if student_data.classes.promotion_type == 'year_vise' %}
                             Current Years
                           {% elif student_data.classes.promotion_type == 'course_vise' %}
@@ -78,15 +78,15 @@ has context menu
                           {% endif %}                         
                         </span>
                          {% if student_data.classes.promotion_type == 'year_vise' %}
-                        <span class="d-block txt-color">
+                        <span class="badge bg-dark-subtle text-body">
                           {{student_data.current_position}} Years
                         </span>
                       {% elif student_data.classes.promotion_type == 'course_vise' %}
-                        <span class="d-block txt-color">
+                        <span class="badge bg-dark-subtle text-body">
                           {{student_data.current_position}} Course
                         </span>
                         {% elif student_data.classes.promotion_type == 'semister_vise' %}
-                        <span class="d-block txt-color">
+                        <span class="badge bg-dark-subtle text-body">
                           {{student_data.current_position}} Semester
                         </span>
                       {% endif %} 
@@ -97,7 +97,7 @@ has context menu
                         <span class="d-block">
                             Section
                         </span>
-                        <span class="d-block txt-color">
+                        <span class="badge bg-dark-subtle text-body">
                             {{student_data.sections.section_name}}
                         </span>
                     </p>
@@ -254,7 +254,7 @@ has context menu
                                 <div class="row mx-0 my-2" id="parentRow">
                                     {% if parent_data %}
                                         {% for data in parent_data %}
-                                        <div class="card col-md-4 mx-2" id="parent-card-{{data.parent_id}}">
+                                        <div class="card col-md-5 mx-2" id="parent-card-{{data.parent_id}}">
                                             <div class="card-heade text-center my-2">
                                                 {% if data.parent_gender == 'Male' %}
                                                     <img src="{% static 'img/male.png' %}" alt="" srcset="" class="card-img-top parent_profile" id="parent-img-{{data.parent_id}}">
@@ -263,7 +263,7 @@ has context menu
                                                 {% endif %}
                                             </div>
                                             <div class="card-body row">
-                                                <p class="card-title col-md-6">
+                                                <p class="card-title col-md-6   ">
                                                     Name: <span class="parent-{{data.parent_id}}-parent_name">{{data.parent_name}}</span>
                                                 </p>
                                                 <p class="card-title col-md-6 ">
@@ -447,7 +447,7 @@ has context menu
                                     </div>
                                     <div class="col-md-2">
                                         <label for="installment_type" class="form-label">Installment Type</label>
-                                        <select name="" id="installment_type" class="form-select" onchange="showInstallments(this)">
+                                        <select name="" id="installment_type" class="form-select">
                                         </select>
                                     </div>
                                     <div class="col-md-2">
@@ -850,13 +850,14 @@ has context menu
     </div>
 </div>
 <!-- model popupfor Activity Detailse ended -->
-<div class="modal fade bs-example-modal-sm" id="transport_form" tabindex="-1" role="dialog"
+<div class="modal fade bs-example-modal-md" id="transport_form" tabindex="-1" role="dialog"
     aria-labelledby="myMediumModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-sm">
+    <div class="modal-dialog modal-md">
         <div class="modal-content" id="parentFormAreaa">
             <div class="modal-header">
-                <h5 class="modal-title" id="myMediumModalLabel">
-                    Assign/Change Transportation</h5>
+                <h6 class="modal-title">
+                    Assign/Change Transportation
+                </h6>
                 <button type="button" class="btn-close btnCloseModel">
                 </button>
             </div>
@@ -872,7 +873,7 @@ has context menu
             <div class="modal-footer">
                 <a href="javascript:void(0);" class="btn btn-link link-success fw-medium btnCloseModel"><i
                         class="ri-close-line me-1 align-middle"></i> Close</a>
-                <button type="submit" class="btn btn-primary" id="btnParentForm" onclick="assignTransport()">Save</button>
+                <button type="submit" class="btn btn-primary" id="btnTransportForm" onclick="assignTransport()">Save</button>
             </div>
         </div>
     </div>
