@@ -130,8 +130,6 @@ $(document).ready(() => {
     
         tnp.html("");
         tnp.append(`<option value="">All ${promotionTypeMap[promotionType]}</option>`);
-    
-        // Adjust the loop to start from 1 if your semesters start from 1
         for (let index = 1; index <= durationTime; index++) {
             if (current && current === index) {
                 var option = `<option value="${index}" selected>${index} ${promotionTypeMap[promotionType]}</option>`;

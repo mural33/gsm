@@ -13,27 +13,24 @@ $(document).ready(function () {
     });
     $("#class_id").on("change", async function() {
         const selectedClassId = $(this).val();
+            await fetchSubjectsAndFullMarks(selectedClassId);   
         if (selectedClassId) {
             var selectedOptions = $(this).find(`option[value="${selectedClassId}"]`);
             var ExampromotionType = selectedOptions.data("promotion");
             var ExamtotalPromotions = selectedOptions.data("total_number_of_promotion"); 
             loadSemisterOrYear(ExamtotalPromotions, ExampromotionType, "semister_id");
         }
+        
     });
     
-    $("#semister_id").on("change", async function() {
-        const selectedSemesterId = $(this).val();
-        const selectedClassId = $("#class_id").val();
-        if (selectedSemesterId && selectedClassId) {
-            await fetchSubjectsAndFullMarks(selectedClassId, selectedSemesterId);
-        }
-    });
     $("#filter_class_id").on("change", function () {
         const filterClassId = $(this).val();
             if (filterClassId) {
                 var selectedOptions = $(this).find(`option[value="${filterClassId}"]`);
                 var exampromotionType = selectedOptions.data("promotion");
+                console.log(exampromotionType)
                 var examtotalPromotions = selectedOptions.data("total_number_of_promotion");
+                console.log(examtotalPromotions)
                 loadSemisterOrYear(examtotalPromotions, exampromotionType, "filter_semister_id");
             }
     });
@@ -43,7 +40,6 @@ $(document).ready(function () {
         const $row = $(this).closest('tr');
         let start_date, end_date;
     
-        // Check if the start and end dates are within span elements
         const $startDateSpan = $row.find('.start_date');
         const $endDateSpan = $row.find('.end_date');
     
@@ -51,20 +47,26 @@ $(document).ready(function () {
             start_date = $startDateSpan.data('date');
             end_date = $endDateSpan.data('date');
         } else {
-            // If not within span elements, assume they are directly within the td
             const dateRangeText = $row.find('.sorting_1').text();
             [start_date, end_date] = dateRangeText.split(' - ');
-        }
+        }   
     
         const resultDate = $row.find('.result_date').text();
         const examName = $row.find('.parent_exam_name').text();
         const classId = $row.find('.class_id').attr("data-class-id");
+        const semesterName = $row.find('.semistor').attr('data-class-semister'); 
+        console.log("Semester Name from data-class-semister:", semesterName);
         $('#parent_exam_id').val(parentExamId);
         $('#start_date').val(start_date);
         $('#end_date').val(end_date);
         $('#result_date').val(resultDate);
-        $('#parent_exam_name').val(examName);
+        $('#parent_exam_name').val(examName.trim());
         $('#class_id').val(classId).prop('disabled', true);
+        var promotionType = $('#class_id option:selected').data("promotion");
+        console.log(promotionType)
+        var  totalnumberofpromotions = $('#class_id option:selected').data("total_number_of_promotion");
+        console.log( totalnumberofpromotions) 
+        loadSemisterOrYear( totalnumberofpromotions, promotionType, 'semister_id',semesterName);
         $('#addeditExamModal').modal('show');
         editChildExam(parentExamId);
     });
@@ -112,7 +114,7 @@ function validateExamForm() {
 
 
 function resetExamForm() {
-    const fields = ["start_date", "end_date", "result_date", "parent_exam_name", "class_id","semister_id"];
+    const fields = ["start_date", "end_date", "result_date", "parent_exam_name", "class_id",];
     for (const field of fields) {
         const element = $(`#${field}`);
         if (element.length > 0) {
@@ -129,11 +131,9 @@ function resetAttendanceForm() {
         element.removeClass("is-invalid");  // Remove any error styling
     }
 }
-
-
 async function addParentExam() {
     let editExams = $("#parent_exam_id").val() !== "";
-    classesId = $("#class_id").val();
+    let classesId = $("#class_id").val();
     $('#class_id').prop('disabled', false);
     const data = {
         institute_id: instituteId,
@@ -148,97 +148,112 @@ async function addParentExam() {
     };
     const parentExamUrl = editExams ? apiUrl + "/ParentExams/update_parent_exam?parent_exam_id=" + data.parent_exam_id : apiUrl + "/ParentExams/create_parent_exam";
     const requestsType = editExams ? "PUT" : "POST";
-    await $.ajax({
-        type: requestsType,
-        url: parentExamUrl,
-        mode: "cors",
-        crossDomain: true,
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${jwtToken}`,
-        },
-        beforeSend: (e) => {
-            showLoader("ExamFormArea", "sm");
-        },
-        data: JSON.stringify(data),
-        success: async function (data) {
-            if (data) {
-                $("#addeditExamModal").modal("hide");
-                const responseData = data["response"];
-                if (editExams) {
-                    let rows = document.querySelectorAll('.subjectRow');
-                    rows.forEach(element => {
-                        var subjectId = element.querySelector(".sublabel").getAttribute("data-subjects-id")
-                        var fullMarksValue = element.querySelector(".fullMarks").value;
-                        var examId = element.querySelector(".fullMarks").getAttribute("data-child-id");
-                        updateChildExams(examId, responseData.parent_exam_id, subjectId, fullMarksValue);
-                    })                    
-                    const existingRow = $("tr[data-exams-id='" + responseData.parent_exam_id + "']");
- 
-                    if (existingRow.length) {
-                        existingRow.find('td:eq(0)').html(`
-                            <span class="start_date" data-date="${responseData.start_date}" data-start-date="${responseData.start_date}">
-                                ${responseData.start_date}
-                            </span> -
-                            <span class="end_date" data-date="${responseData.end_date}" data-exam-enddate="${responseData.end_date}">
-                                ${responseData.end_date}
-                            </span>
-                        `);
-                        existingRow.find('td:eq(1)').html(`
-                            <a href="/app/examinationInfo/${responseData.parent_exam_slug}">
-                                ${responseData.parent_exam_name}
-                            </a>
-                        `);
-                        existingRow.find('td:eq(2)').text(responseData.result_date);
-                        existingRow.find('td:eq(3)').text(`${responseData.classes.class_name}`);
-                        existingRow.find('td:eq(4)').text(` ${responseData.semistor}`
-                        );
-                    }
-                    raiseSuccessAlert("Examination Updated Successfully");
-                    $("#parent_exam_id").val("");
-                } else {
-                    var tableBody = $('#examination_details');
-                    var noDataImage = tableBody.find('.no_data_found-tr');
-                    if (noDataImage.length > 0) {
-                        noDataImage.remove();
-                    }
-                    addChildExams(responseData.parent_exam_id);
-                    const examNewRow = `
-                    <tr class="tr-exam-${responseData.parent_exam_id} exam-row" data-exams-id="${responseData.parent_exam_id}" data-start-date="${responseData.start_date}" data-exam-enddate="${responseData.end_date}" data-exam-class="${responseData.class_id}">
+    try {
+        const response = await $.ajax({
+            type: requestsType,
+            url: parentExamUrl,
+            mode: "cors",
+            crossDomain: true,
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${jwtToken}`,
+            },
+            beforeSend: () => {
+                showLoader("ExamFormArea", "sm");
+            },
+            data: JSON.stringify(data),
+        });
+        if (response) {
+            $("#addeditExamModal").modal("hide");
+            const responseData = response["response"];
+            if (editExams) {
+                let rows = document.querySelectorAll('.subjectRow');
+                rows.forEach(element => {
+                    var subjectId = element.querySelector(".sublabel").getAttribute("data-subjects-id");
+                    var fullMarksValue = element.querySelector(".fullMarks").value;
+                    var examIdElement = element.querySelector(".fullMarks");
+                    var examId = examIdElement.getAttribute("data-child-id");
+                    updateChildExams(examId, responseData.parent_exam_id, subjectId, fullMarksValue);
+                });
+
+                const existingRow = $("tr[data-exams-id='" + responseData.parent_exam_id + "']");
+                var editpromotionType = responseData.classes.promotion_type;
+                var editsemesterText = "";
+                if (editpromotionType === 'year_vise') {
+                    editsemesterText = `${responseData.semistor} Year`;
+                } else if (editpromotionType === 'course_vise') {
+                    editsemesterText = `${responseData.semistor}  Course`;
+                } else if (editpromotionType === 'semister_vise') {
+                    editsemesterText = `${responseData.semistor} Semester`;
+                }
+
+                if (existingRow.length) {
+                    existingRow.find('td:eq(0)').html(`
+                        <span class="start_date" data-date="${responseData.start_date}" data-start-date="${responseData.start_date}">
+                            ${responseData.start_date}
+                        </span> -
+                        <span class="end_date" data-date="${responseData.end_date}" data-exam-enddate="${responseData.end_date}">
+                            ${responseData.end_date}
+                        </span>
+                    `);
+                    existingRow.find('td:eq(1)').html(`
+                        <a href="/app/examinationInfo/${responseData.parent_exam_slug}">
+                            ${responseData.parent_exam_name}
+                        </a>
+                    `);
+                    existingRow.find('td:eq(2)').text(responseData.result_date);
+                    existingRow.find('td:eq(3)').text(`${responseData.classes.class_name}`);
+                    existingRow.find('td:eq(4)').text(`<span class="semister" data-promotions="${responseData.promotion_type}" data-total_number_of_promotion="${responseData.total_number_of_promotion}"> ${editsemesterText}</span>`);
+                }
+                raiseSuccessAlert("Examination Updated Successfully");
+                $("#parent_exam_id").val("");
+            } else {
+                var tableBody = $('#examination_details');
+                var noDataImage = tableBody.find('.no_data_found-tr');
+                if (noDataImage.length > 0) {
+                    noDataImage.remove();
+                }
+                addChildExams(responseData.parent_exam_id);
+                var ExampromotionType = responseData.classes.promotion_type;
+                var ExamsemesterText = "";
+                if (ExampromotionType === 'year_vise') {
+                    ExamsemesterText = `${responseData.semistor} Year`;
+                } else if (ExampromotionType === 'course_vise') {
+                    ExamsemesterText = `${responseData.semistor}  Course`;
+                } else if (ExampromotionType === 'semister_vise') {
+                    ExamsemesterText = `${responseData.semistor} Semester`;
+                }
+                const examNewRow = `
+                <tr class="tr-exam-${responseData.parent_exam_id} exam-row" data-exams-id="${responseData.parent_exam_id}" data-start-date="${responseData.start_date}" data-exam-enddate="${responseData.end_date}" data-exam-class="${responseData.class_id}">
                     <td class="text-break">
                         <span class="start_date" data-date="${responseData.start_date}" data-start-date="${responseData.start_date}">${responseData.start_date}</span> -
                         <span class="end_date" data-date="${responseData.end_date}" data-exam-enddate="${responseData.end_date}">${responseData.end_date}</span>
                     </td>
                     <td class="text-break parent_exam_name">
-                    <a href="/app/examinationInfo/${responseData.parent_exam_slug}">${responseData.parent_exam_name}</a>
-                </td>
-               
+                        <a href="/app/examinationInfo/${responseData.parent_exam_slug}">${responseData.parent_exam_name}</a>
+                    </td>
                     <td class="result_date">${responseData.result_date}</td>
-                    <td class=" text-break class_id" data-class-id="${responseData.class_id}" data-exam-class="${responseData.class_id}" data-promotion='${responseData.promotion_type}'
-                    data-total_number_of_promotion='${responseData.total_number_of_promotion}'>${responseData.classes.class_name}</td>
-                    <td class="semistor" data-promotions='${responseData.promotion_type}}' data-total_number_of_promotion='${responseData.total_number_of_promotion}}'>${responseData.semistor}</td>
+                    <td class="text-break class_id" data-class-id="${responseData.class_id}" data-exam-class="${responseData.class_id}" data-promotion='${responseData.promotion_type}' data-total_number_of_promotion='${responseData.total_number_of_promotion}'>${responseData.classes.class_name}</td>
+                    <td class="semistor" data-class-semister="${responseData.semistor}" data-promotions='${responseData.promotion_type}}' data-total_number_of_promotion='${responseData.total_number_of_promotion}}'>${ExamsemesterText}</td>
                     <td>
                         <button type="button" class="btn btn-sm btn-info btnEditExam" data-id="${responseData.parent_exam_id}">
                             <i class="bi bi-pencil-square"></i>
                         </button>
                         <button type="button" class="btndelete btn btn-sm btn-danger" id="btndelete" data-id="${responseData.parent_exam_id}">
-                        <i class="bi bi-trash3"></i>
-                    </button>
+                            <i class="bi bi-trash3"></i>
+                        </button>
                     </td>
-                </tr>`
-                    $('#examTable').DataTable().row.add($(examNewRow)).draw();
-                    raiseSuccessAlert("Examination Added Successfully.");
-                }
-                resetExamForm();
+                </tr>`;
+                $('#examTable').DataTable().row.add($(examNewRow)).draw();
+                raiseSuccessAlert("Examination Added Successfully.");
             }
-        },
-        error: (error) => {
-            raiseErrorAlert(error["responseJSON"]["detail"]);
-        },
-        complete: (e) => {
-            removeLoader("ExamFormArea", "sm");
-        },
-    });
+            resetExamForm();
+        }
+    } catch (error) {
+        raiseErrorAlert(error.responseJSON.detail);
+    } finally {
+        removeLoader("ExamFormArea", "sm");
+    }
 }
 
 async function addChildExams(parentExamsId) {
@@ -331,10 +346,11 @@ function initializeClassSelect() {
             },
         });
     } catch (error) {
+        console.error("Error in initializeClassSelect:", error);
     }
 }
 
-async function  loadSemisterOrYear(examdDurationTime, exampromotionType, examtnpId) {
+async function loadSemisterOrYear(examdDurationTime, exampromotionType, examtnpId, semesterName) {
     var examtnp = $(`#${examtnpId}`);
     var ExamlabelElement = $("label[for='" + examtnpId + "']");
 
@@ -351,18 +367,14 @@ async function  loadSemisterOrYear(examdDurationTime, exampromotionType, examtnp
     }
 
     ExamlabelElement.text(exampromotionTypeMap[exampromotionType]);
-
     examtnp.html("");
     examtnp.append(`<option value="">All ${exampromotionTypeMap[exampromotionType]}</option>`);
-
+    
     for (let index = 0; index < examdDurationTime; index++) {
-        var option = `<option value="${index + 1}">${index + 1} ${exampromotionTypeMap[exampromotionType]}</option>`;
+        var option = `<option value="${index + 1}" ${semesterName == index + 1 ? 'selected' : ''}>${index + 1} ${exampromotionTypeMap[exampromotionType]}</option>`;
         examtnp.append(option);
     }
-
 }
-
-
 
 
 function fetchSubjectsAndFullMarks(classId) {
@@ -394,18 +406,14 @@ function fetchSubjectsAndFullMarks(classId) {
                 </table>
             `;
             subjectsTable.append(tableStructure);
-
             const tableBody = $("#subjects tbody");
-
-            for (const subjectData of response) {
-                $("#subject_id").append(`<option value="${subjectData.subject_id}">${subjectData.subject_name}</option>`);
-
+            for (const subjectDatas of response) {
                 const newRow = `
-                    <tr class="subjectRow" id="subjectnameRow-${subjectData.subject_id}" }>
-                        <td class="sublabel" id="subjectsId" name="subject_id" data-subjects-id="${subjectData.subject_id}" value="${subjectData.subject_id}">${subjectData.subject_name}</td>
-                        <td><input type="text" class="form-control fullMarks" id="subject_Input" value="100"></td>
+                    <tr class="subjectRow" id="subjectnameRow-${subjectDatas.subject_id}" }>
+                        <td class="sublabel" id="subjectsId" name="subject_id" data-subjects-id="${subjectDatas.subject_id}" value="${subjectDatas.subject_id}">${subjectDatas.subject_name}</td>
+                        <td><input type="text" class="form-control fullMarks" id="subject_Input" value="100"  data-child-id=${subjectDatas.exam_id}></td>
                         <td>
-                        <button type="button" class="btndelete btn btn-sm btn-danger" onclick="removeSubjects(this)" data-subject-id="${subjectData.subject_id}">
+                        <button type="button" class="btndelete btn btn-sm btn-danger" onclick="removeSubjects(this)" data-subject-id="${subjectDatas.subject_id}">
                             <i class="bi bi-trash3"></i>
                         </button>
                     </td>
@@ -560,6 +568,8 @@ async function filterExamination() {
     const enddate = $('#enddate').val();
     const selectedClass = $('#filter_class_id').val();
     const selectedPromotions = $('#filter_semister_id').val();
+    console.log(selectedPromotions)
+
     DataTable.ext.search = [];
     DataTable.ext.search.push(function (settings, data, dataIndex) {
         let row = examTable.row(dataIndex).nodes().to$();
@@ -567,11 +577,16 @@ async function filterExamination() {
         let filterStartDate = new Date(startdate); 
         let filterEndDate = new Date(enddate);
         let filterPromotions = parseInt(selectedPromotions); // Convert to integer for comparison
+        console.log(filterPromotions)
+
         let examclass = parseInt(row.find(".class_id").data("exam-class"));
         let examstartdate = new Date(row.find(".start_date").data("start-date"));
         let examenddate = new Date(row.find(".end_date").data('exam-enddate'));
         let examPromotions = parseInt(row.find(".semistor").text());
+        console.log("Exam Promotions Data:", examPromotions);
+
         $("#examinationFilter").modal("hide");
+
         if (
             (isNaN(filterexamclass) || filterexamclass === examclass) &&
             (isNaN(filterStartDate) || filterStartDate <= examstartdate) &&
@@ -585,6 +600,11 @@ async function filterExamination() {
     });
 
     examTable.draw();
+    if (examTable.rows({ search: 'applied' }).count() === 0) {
+        $(".dataTables_empty").html(`<img src="/assets/img/no_data_found.png" alt="No Image" class="no_data_found">`)
+    } else {
+        $(".dataTables_empty").empty();
+    }
 
     resetFillterForm();
 }

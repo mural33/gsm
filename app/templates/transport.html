@@ -91,7 +91,7 @@
             <tbody class="tbl__bdy" id="transport_details">
                     {% for transport in transportation %}
                         <tr class="tr-transport-{{transport.transport_id}}">
-                            <td>{{forloop.counter}}</td>
+                            <td class="Numbers" data-number="{{forloop.counter}}">{{forloop.counter}}</td>
                             <td class=" text-break vehicle_number">{{transport.vehicle_number}}</td>
                             <td class=" text-break vehicle_details w-25">{{transport.vehicle_details}}</td>
                             <td class="register_date">{{transport.register_date}}</td>
@@ -113,12 +113,17 @@
                                     data-trans-id="{{transport.transport_id}}">View</button>
                             </td>
                             <td>
-                                <button type="button" class="btn  btn-sm btn-info btnEdit" id="btnEdit"
-                                    data-id="{{transport.transport_id}}">
-                                    <i class="bi bi-pencil-square"></i></button>
-                                <button type="button" class="btn btn-sm btn-danger btndelete" id="deleteButton"
-                                    data-id="{{transport.transport_id}}">
-                                    <i class="bi bi-trash3"></i></button>
+                                <button type="button" class="btn btn-sm btn-info btnEdit" 
+                                data-id="{{ transport.transport_id }}" 
+                                onclick="editTransport('{{ transport.transport_id }}')">
+                            <i class="bi bi-pencil-square"></i>
+                        </button>
+                        <button type="button" class="btn btn-sm btn-danger btndelete" 
+                        id="deleteButton{{ transport.transport_id }}" 
+                        onclick="deleteTransport('{{ transport.transport_id }}')">
+                    <i class="bi bi-trash3"></i>
+                </button>
+                
                             </td>
                         </tr>
                     {% endfor %}

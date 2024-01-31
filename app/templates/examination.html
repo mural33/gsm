@@ -7,24 +7,25 @@
 <script src="{% static 'app-js/examination.js' %}"></script>
 
 
-
 <div class="row" id="heading-row">
-    <div class="col-sm-12 col-md-8 col-xl-8">
+    <div class="col-sm-12 col-md-8 col-xl-8" style="padding: 1rem">
         <h5>Examination</h5>
         <quote>Success is Earned, Not Given Exam Day is Payday!</quote>
     </div>
-    <div class="col-sm-12 col-md-4 col-xl-4">
+    <div class="col-sm-12 col-md-4 col-xl-4" style="padding: 1rem">
         <div class="row">
             <div class="col text-end">
                 <button type="button" class="btn btn-success btn-label rounded-pill right" data-bs-toggle="modal"
                     data-bs-target="#addeditExamModal">
-                    <i class="bi bi-plus-circle label-icon align-middle fs-lg ms-2"></i>Add New Examination</button>
-                <button type="button" class="btn btn-dark btn-sm rounded-pill" data-bs-toggle="modal"
-                    data-bs-target="#examinationFilter"><i class="bi bi-funnel-fill "></i></button>
+                    <i class="bi bi-plus-circle label-icon align-middle fs-lg ms-2"></i>Add New Examination
+                </button>
+                <button type="button" class="btn btn-dark btn-sm rounded-pill" data-bs-toggle="modal" data-bs-target="#examinationFilter"><i
+                        class="bi bi-funnel-fill "></i></button>
             </div>
         </div>
     </div>
 </div>
+
 
 <div class="modal fade bs-example-modal-md" id="addeditExamModal" tabindex="-1" role="dialog"
     aria-labelledby="mySmallModalLabel" aria-hidden="true">
@@ -102,7 +103,7 @@
                     <th>Exam Name</th>
                     <th>Result Out Date</th>
                     <th>Class</th>
-                    <th>Semester</th>
+                    <th>Semester/Year</th>
                     <th>Action</th>
                 </tr>
             </thead>
@@ -124,7 +125,15 @@
                         data-exam-class="{{exam.class_id}}" data-promotion='{{exam.promotion_type}}'
                         data-total_number_of_promotion='{{exam.total_number_of_promotion}}'>{{exam.classes.class_name}}
                     </td>
-                    <td class="semistor"  data-class-semister="{{exam.semistor}}" data-semester='{{exam.promotion_type}}' data-total_number_of_promotion='{{exam.total_number_of_promotion}}'>{{exam.semistor}}</td>
+                    <td class="semistor"  data-class-semister="{{exam.semistor}}" data-semester='{{exam.promotion_type}}' data-total_number_of_promotion='{{exam.total_number_of_promotion}}'>
+                        {{exam.semistor}}
+                        {% if exam.classes.promotion_type == 'year_vise' %}
+                            Years
+                        {% elif exam.classes.promotion_type == 'course_vise' %}
+                            Course
+                        {% elif exam.classes.promotion_type == 'semister_vise' %}
+                            Semester
+                        {% endif %}</td>
                     <td>
                         <button type="button" class="btn btn-sm btn-info btnEditExam" data-id="{{exam.parent_exam_id}}">
                             <i class="bi bi-pencil-square"></i>
@@ -147,38 +156,44 @@
         <div class="modal-content" id="examfilter">
             <div class="modal-header">
                 <h5 class="modal-title" id="assignmentModalLabel">Filter Examination</h5>
-                <button type="button" class="btn-close btnCloseModel" data-bs-dismiss="modal"
-                    aria-label="Close"></button>
+                <button type="button" class="btn-close btnCloseModel" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <div class="d-flex mt-2 row">
-                    <div class="col-md-4 form-content">
-                        <label for="startdate" class="form-label">Start Date</label>
-                        <input type="date" class="form-control" id="startdate" name="startdate">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="startdate" class="form-label">Start Date</label>
+                            <input type="date" class="form-control" id="startdate" name="startdate">
+                        </div>
                     </div>
-                    <div class="col-md-4 form-content">
-                        <label for="enddate" class="form-label">End Date</label>
-                        <input type="date" class="form-control" id="enddate" name="enddate">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="enddate" class="form-label">End Date</label>
+                            <input type="date" class="form-control" id="enddate" name="enddate">
+                        </div>
                     </div>
-                    <div class="row mt-2">
-                        <div class="col-md-6">
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
                             <label class="form-label" for="filter_class_id">Class</label>
                             <select id="filter_class_id" class="form-select" name="filter_class_id">
                                 <option selected value="">Select Class</option>
                             </select>
                         </div>
-                        <div class="col-md-6">
-                            <label for="filter_semister_id" class="form-label">Semister</label>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="filter_semister_id" class="form-label">Semester</label>
                             <select id="filter_semister_id" class="form-select" name="filter_semister_id">
-                                <option value="" selected>select Semister</option>
+                                <option value="" selected>Select Semester</option>
                             </select>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="modal-footer">
-                <a href="javascript:void(0);" class="btn btn-link link-success fw-medium btnCloseModel"
-                    data-bs-dismiss="modal">
+                <a href="javascript:void(0);" class="btn btn-link link-success fw-medium btnCloseModel" data-bs-dismiss="modal">
                     <i class="ri-close-line me-1 align-middle"></i> Close
                 </a>
                 <button type="button" class="btn btn-primary" id="btnFilterExam" name="btnFilterExam">Filter</button>
@@ -186,6 +201,7 @@
         </div>
     </div>
 </div>
+
 
 
 {% endblock %}

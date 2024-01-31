@@ -13,9 +13,6 @@ $(document).ready(()=>{
         parentModel.modal("hide");
         $("input, textarea, select",parentModel).val("");
     });
-    $("#notificationDropdown").on("click", function(e){
-        getNotifications();
-    });
     var storedInstituteLogo = localStorage.getItem('institute_logo');
     var storedProfileImg = localStorage.getItem('profile_img');
     $("#organization_logo").attr("src", storedInstituteLogo);
@@ -32,7 +29,9 @@ $(document).ready(()=>{
     observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-sidebar-size'] });
         // $(document).on("contextmenu", function (e) {
     //     e.preventDefault();
+    getNotifications();
 });
+
 function updateNavbarBrandBoxAlignment() {
     var sidebarSize = $('html').attr('data-sidebar-size');
     if (sidebarSize === 'lg') {
@@ -273,30 +272,40 @@ function fetchDetailsBasedOnPincode(pincode, stateInput, cityInput, countryInput
 
 function getNotifications() {
     var method = "GET";
-    subscribers_id= $("#subscriberId").val();
-    var totalUrl =subscriptionUrl + `api/Notifications?product_id=2&subscriber_id=${subscribers_id}`;
+    subscribers_id = $("#subscriberId").val();
+    var totalUrl = subscriptionUrl + `api/Notifications?product_id=2&subscriber_id=${subscribers_id}`;
     $.ajax({
         type: method,
         url: totalUrl,
-        success: function (response) {
+        success: function(response) {
             var notificationTabContent = $("#notificationItemsTabContent");
             notificationTabContent.empty();
-            response.forEach(function (notification) {
+            var notificationCount = response.length;
+            console.log(notificationCount);
+            $("#notificationCount").text(notificationCount);
+            response.forEach(function(notification) {
                 var notificationItem = $("<div class='text-reset notification-item d-block dropdown-item position-relative unread-message'>");
                 var content = `
-                    <div class='d-flex'>
-                        <div class='flex-grow-1'>
-                            <h6 class='text-overflow text-muted fs-sm my-2 text-uppercase notification-title'>${notification.notification_title}</h6>
-                            <div>${notification.description}</div>
-                            <div>Date: ${notification.date}</div>
+                <div class="notification-item" data-notification-id="${notification.notification_id}">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h6 class="text-overflow text-muted fs-sm my-2 text-uppercase notification-title">${notification.notification_title}</h6>
+                                <div>${notification.description}</div>
+                                <div>Date: ${notification.date}</div>
+                            </div>
                         </div>
                     </div>
+                </div>
+            </div>
                 `;
                 notificationItem.append(content);
                 notificationTabContent.append(notificationItem);
             });
+            $(".notification-badge").text(notificationCount);
         },
-        error: function (error) {
+        error: function(error) {
             raiseErrorAlert(error);
         }
     });

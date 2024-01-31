@@ -13,10 +13,20 @@ $(document).ready(function () {
     initializeClass();
 
     getStudentAttendanceDetails();
-    $("#class_id").on("change", async () => {
-        const selectedClassId = $("#class_id").val();
-        await fetchStudentTable(selectedClassId);
+    $("#class_id").on("change", async function() {
+        const selectedClassId = $(this).val();
+        if (selectedClassId) {
+            var selectedClass = $(this).find(`option[value="${selectedClassId}"]`);
+            var studentpromotionType = selectedClass.data("promotion");
+            var studentPromotions = selectedClass.data("total_number_of_promotion");
+            await fetchStudentTable(selectedClassId); 
+            loadSemisterYearAttendance(studentPromotions, studentpromotionType, "semister_id");
+        }
     });
+    $("#semister_id").on("change", async function() {
+        filterStudentsBySemester();
+    });
+
     $("#classdrop").on("change", function () {
         const filterClassId = $(this).val();
             if (filterClassId) {
@@ -149,12 +159,23 @@ async function getStudentAttendanceDetails() {
                 } else if (entry.attendance_status === 'Absent') {
                     style = 'color: #CE2029;';
                 }
+                const AttendancepromotionType = entry.student.classes.promotion_type;
+                let AttendancesemesterText = "";
+                if (AttendancepromotionType === 'year_vise') {
+                    AttendancesemesterText = `${entry.student.current_position} Year`;
+                } else if (AttendancepromotionType === 'course_vise') {
+                    AttendancesemesterText = `${entry.student.current_position} Course`;
+                } else if (AttendancepromotionType === 'semister_vise') {
+                    AttendancesemesterText = `${entry.student.current_position} Semester`;
+                }
                 var newRow = `<tr class='tr-attendance-${entry.id} attendance-row'>
                 <td class="attendance_date" data-day=${entry.attendance_date}>${entry.attendance_date}</td>
                 <td>${entry.student.student_name}</td>
                 <td>${entry.student.roll_number}</td>
                 <td class="class_id" data-class='${entry.student.classes.class_id}'data-promotion='${entry.promotion_type}'
                 data-total_number_of_promotion='${entry.total_number_of_promotion}'>${entry.student.classes.class_name}</td>
+                <td class="semister" data-promotion='${entry.promotion_type}'
+                data-total_number_of_promotion='${entry.total_number_of_promotion}'>${AttendancesemesterText}</td>
                 <td style="${style}" class="attendance_status" data-student-status="${entry.attendance_status}">${entry.attendance_status}</td>
                 <td>
                     <button type="button" class="btn btn-sm btn-info btnEdit" id="btnEdit" data-id=${entry.id}>
@@ -207,7 +228,7 @@ function initializeClass() {
         },
         success: (response) => {
             for (const classes of response) {
-                $("#class_id").append(`<option value="${classes.class_id}">${classes.class_name}</option>`);
+                $("#class_id").append(`<option value="${classes.class_id}" data-promotion='${classes.promotion_type}' data-total_number_of_promotion='${classes.total_number_of_promotion}'>${classes.class_name}</option>`);
                 $("#classdrop").append(`<option value="${classes.class_id}" data-promotion='${classes.promotion_type}' data-total_number_of_promotion='${classes.total_number_of_promotion}'>${classes.class_name}</option>`);
             }
         },
@@ -241,6 +262,7 @@ async function  loadSemisterYearAttendance(studentDurationTime, studentpromotion
         studenttnp.append(option);
     }
 }
+
 function addStudentAttendance() {
     const selectedStudents = getSelectedStudentsData();
     const requestData = {
@@ -281,11 +303,21 @@ function addStudentAttendance() {
                             }
                             if (responseData.attendance_status === 'Present') {}
                             const style = responseData.attendance_status === 'Present' ? 'color: green' : 'color: #CE2029';
+                            const PromotionType = responseData.student.classes.promotion_type;
+                            let currentpramotion = "";
+                            if (PromotionType === 'year_vise') {
+                                currentpramotion = `${responseData.student.current_position} Year`;
+                            } else if (PromotionType === 'course_vise') {
+                                currentpramotion = `${responseData.student.current_position} Course`;
+                            } else if (PromotionType === 'semister_vise') {
+                                currentpramotion = `${responseData.student.current_position} Semester`;
+                            }    
                             const studentnewRow = `<tr class="tr-attendance-${responseData.id}">
                                 <td class="attendance_date" data-day=${responseData.attendance_date}>${responseData.attendance_date}</td>
                                 <td>${responseData.student.student_name}</td>
                                 <td>${responseData.student.roll_number}</td>
                                 <td class='class_id' data-class='${responseData.student.classes.class_id}'>${responseData.student.classes.class_name}</td>
+                                <td>${currentpramotion}</td>
                                 <td style='${style}'  class="attendance_status" data-student-status="${responseData.attendance_status}">${responseData.attendance_status}</td>
                                 <td>
                                     <button type="button" class="btn btn-sm btn-info btnEdit" id="btnEdit" data-id="${responseData.id}" data-bs-toggle="modal" data-bs-target="#editstudentModalForm">
@@ -359,7 +391,7 @@ function addStudentAttendance() {
         });
     
         $("#student_table tbody").empty();
-        $("#student_table thead").html("<tr><th>Roll Number</th><th>Name</th><th>Status</th></tr>");
+        $("#student_table thead").html("<tr><th>Roll Number</th><th>Name</th><th>Current Position</th><th>Status</th></tr>");
     
         for (const student of studentsResponse) {
             const statusHtml = `
@@ -369,17 +401,49 @@ function addStudentAttendance() {
                 <input type="radio" value="Absent" name="status_${student.student_id}">
                 <label class="absent-label">A</label>
             `;
-            const newRow = $("<tr>")
-                .append($("<td>").css("display", "none").addClass("student-id").text(student.student_id))
-                .append($("<td>").text(student.roll_number))
-                .append($("<td>").text(student.student_name))
-                .append($("<td>").attr("id", "attendance_status").html(statusHtml));
-            $("#student_table tbody").append(newRow);    
+            
+            // Access promotion type and determine current position
+            const promotionType = student.classes.promotion_type;
+            let currentText = "";
+            if (promotionType === 'year_vise') {
+                currentText = `${student.current_position} Year`;
+            } else if (promotionType === 'course_vise') {
+                currentText = `${student.current_position} Course`;
+            } else if (promotionType === 'semister_vise') {
+                currentText = `${student.current_position} Semester`;
+            }       
+            const newRow = $("<tr class='semister'>")
+            .append($("<td>").css("display", "none").addClass("student-id").text(student.student_id))
+            .append($("<td>").text(student.roll_number))
+            .append($("<td>").text(student.student_name))
+            .append($("<td>").attr("data-position", student.current_position).text(currentText)) 
+            .append($("<td>").attr("id", "attendance_status").html(statusHtml));
+        
+        $("#student_table tbody").append(newRow);
+            
         }
     }
+
+    function filterStudentsBySemester() {
+        const selectedSemesterId = $('#semister_id').val();
+        $('.semister').each(function() {
+            const row = $(this);
+            const positionType = parseInt(row.find("[data-position]").attr("data-position"));
+            if (selectedSemesterId === "" || selectedSemesterId === String(positionType)) {
+                row.show();
+            } else {
+                row.hide();
+            }
+        });
+    }
+    
+    
+    
+
+
+
     
 async function editStudentAttendance(attendanceId) {
-
         const fetchUrl = `${apiUrl}/StudentAttendance/get_attendance_by_id/?attendance_id=${attendanceId}`;
         setTimeout(() => {
             showLoader("editstudentModalForm", "sm");
@@ -488,7 +552,8 @@ async function editStudentAttendance(attendanceId) {
             var rowData = studentTable.row(dataIndex).nodes().to$();
             var dataClass = parseInt(rowData.find(".class_id").data("class"));
             var dataDay = new Date(rowData.find('.attendance_date').data('day')).getTime();
-            var dataPromotion = 1
+            var dataPromotion = parseInt(rowData.find(".semister").text());
+            console.log(dataPromotion)
             var status = rowData.find('.attendance_status').data('student-status');
             $("#studentAttendanceFilter").modal("hide");
     
@@ -510,6 +575,11 @@ async function editStudentAttendance(attendanceId) {
         });
     
         studentTable.draw();
+        if (studentTable.rows({ search: 'applied' }).count() === 0) {
+            $(".dataTables_empty").html(`<img src="/assets/img/no_data_found.png" alt="No Image" class="no_data_found">`)
+        } else {
+            $(".dataTables_empty").empty();
+        }
         resetStudentFillterForm();
     
         var totalAttendance = presentCount + absentCount;
@@ -537,7 +607,7 @@ async function editStudentAttendance(attendanceId) {
         if (existingChart) {
             existingChart.destroy();
         }
-        generateingStaffPieChart("staffAttendancePieChart", [present, absent], ["Present%", "Absent%"], ["#28a745", "#dc3545"]);
+        generateingStaffPieChart("staffAttendancePieChart", [present, absent], ["Present%", "Absent%"], ["green", " #CE2029"]);
     }
 
 async function getStaffAttendanceDetails() {
@@ -768,6 +838,11 @@ function filterStaffData() {
     });
     
     staffTable.draw();
+    if (staffTable.rows({ search: 'applied' }).count() === 0) {
+        $(".dataTables_empty").html(`<img src="/assets/img/no_data_found.png" alt="No Image" class="no_data_found">`)
+    } else {
+        $(".dataTables_empty").empty();
+    }
     resetStaffFillterForm()
     var totalstaffAttendance = presentCount + absentCount;
     var staffpresentPercentage = (presentCount / totalstaffAttendance) * 100;

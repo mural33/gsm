@@ -1,84 +1,22 @@
 $(document).ready(() => {
+    $('#transportTable').DataTable();
+    $(".dataTables_empty").html(`<img src="/assets/img/no_data_found.png" alt="No Image" class="no_data_found">`)
     $("#saveBtn").on("click", async (e) => {
         $("#saveBtn").removeClass("btn-shake");
-        if (validatetransportForm() === false) {
+        if (validateForm(fields) === false) {
             $("#saveBtn").addClass("btn-shake");
             return false;
         } else {
             addTransport();
         }
     });
-    bindGridButtonEvents();
 });
 
-let dataTable = $('#transportTable').DataTable();
-$(".dataTables_empty").html(`<img src="/assets/img/no_data_found.png" alt="No Image" class="no_data_found">`)
+    let fields = [
+        'vehicle_number', 'vehicle_details', 'register_date', 'transport_name',
+    ];
 
-function bindGridButtonEvents() {
-    $(".btnEdit").off("click");
-    $(".btnEdit").each(function () {
-        $(this).click(function () {
-            const transportId = $(this).attr("data-id");
-            if (transportId) {
-                const response = editTransport(transportId, jwtToken);
-            }
-        });
-    });
-    $(".btndelete").off("click");
-    $('.btndelete').each(function () {
-        $(this).click(function () {
-            const transportId = $(this).attr("data-id");
-            try {
-                const response = deleteTransport(transportId, jwtToken);
-                if (response.success) {
-                    $(this).closest('tr').remove();
-                    raiseSuccessAlert("Transport Deleted Successfully");
-                }
-            } catch (error) {
-                raiseErrorAlert(error.responseJSON.detail);
-            }
-        });
-    });
-}
-
-function validatetransportForm() {
-        var isValid = true;
-        const fields = ['vehicle_number', 'vehicle_details', 'register_date', 'transport_name'];
-        for (const field of fields) {
-            const element = $(`#${field}`);
-            const value = element.val();
-            if (value === "") {
-                element.focus().addClass("is-invalid");
-                isValid = false;
-            }
-        }
-        const vehicleNumber = $("#vehicle_number").val();
-        const isEditing = $("#id").val() !== "";
-        if (!isEditing) {
-            const vehicleNumbersEntered = JSON.parse(localStorage.getItem('vehicleNumbers')) || [];
-            if (vehicleNumbersEntered.includes(vehicleNumber)) {
-                raiseErrorAlert("Vehicle number already entered. Please enter a different vehicle number.");
-                isValid = false;
-            } else {
-                vehicleNumbersEntered.push(vehicleNumber);
-                localStorage.setItem('vehicleNumbers', JSON.stringify(vehicleNumbersEntered));
-            }
-        }
-        return isValid;
-    }
-
-    function resetTransportForm() {
-        const fields = [ 'vehicle_number', 'vehicle_details', 'register_date', 'transport_name',];
-        for (const field of fields) {
-            const element = $(`#${field}`);
-            if (element.length > 0) {
-                element.val("");
-                element.removeClass("is-invalid");
-            }
-        }
-    }
-
-
+let rowCounter = 1;
 
 function addTransport() {
     let isUpdate = $("#id").val() !== "";
@@ -120,12 +58,11 @@ function addTransport() {
                         }
                     }
                     $("#id").val("");
-                    $('#editModal').addClass("model fade");
                     raiseSuccessAlert("Transport Updated Successfully");
                 } else {
                     const newRow = `
                         <tr class="tr-transport-${responseData.transport_id}">
-                            <td>${$("#transport_details tr").length + 1}</td>
+                        <td>${rowCounter}</td>
                             <td class="text-break vehicle_number">${responseData.vehicle_number}</td>
                             <td class="text-break vehicle_details">${responseData.vehicle_details}</td>
                             <td class="register_date">${responseData.register_date}</td>
@@ -141,13 +78,13 @@ function addTransport() {
                                 <button class="btn btn-sm btn-dark rounded-pill" data-bs-toggle="modal"  data-bs-target="#staffModal" onclick="showStaffDetails(this)" data-trans-id="${responseData.transport_id}">View</button>
                                 </td>
                             <td>
-                            <button type="button" data-id="${responseData.transport_id}" class="btn  btn-sm btn-info btnEdit" id="btnEdit"><i class="bi bi-pencil-square"></i></button>
-                            <button type="button" class="btn btn-sm btn-danger btndelete" id="deleteButton" data-id="${responseData.transport_id}"><i class="bi bi-trash3"></i></button>
+                            <button type="button" data-id="${responseData.transport_id}" class="btn  btn-sm btn-info btnEdit" id="btnEdit" onclick="editTransport('${ responseData.transport_id }')"><i class="bi bi-pencil-square"></i></button>
+                            <button type="button" class="btn btn-sm btn-danger btndelete" id="deleteButton" data-id="${responseData.transport_id}"  onclick="deleteTransport('${ responseData.transport_id }')"><i class="bi bi-trash3"></i></button>
                         </td>
                         </tr>
                     `;
-                    dataTable.row.add($(newRow)).draw();
-                    bindGridButtonEvents();
+                    $('#transportTable').DataTable().row.add($(newRow)).draw();
+                    rowCounter++; 
                     raiseSuccessAlert(data.msg);
                 }
             }
@@ -157,12 +94,14 @@ function addTransport() {
         },
         complete: (e) => {
             removeLoader("transport", "lg");
-            resetTransportForm();
+            resetForm(fields);
         }
     });
 }
 
-async function deleteTransport(recordId, jwtToken) {
+async function deleteTransport(recordId) {
+    console.log("inside")
+    const dataTable = $('#transportTable').DataTable();
     const deletetransRow = dataTable.row(`.tr-transport-${recordId}`);
     const deleteEndpoint = `/Transports/delete_transport/?transport_id=${recordId}`;
     const deleteUrl = `${apiUrl}${deleteEndpoint}`;

@@ -39,11 +39,19 @@
                     <label class="form-label" for="attendanceDate">Date</label>
                     <input type="date" class="form-control" id="attendance_dates" name="attendance_dates">
                 </div>
-                <div class="col-md-12">
-                    <label for="class_id" class="form-label">Class</label>
-                    <select id="class_id" class="form-select" name="class_id">
-                        <option value="" selected>Select Class</option>
-                    </select>
+                <div class="row mt-2">
+                    <div class="col-md-6">
+                        <label class="form-label" for="class_id">Class</label>
+                        <select id="class_id" class="form-select" name="class_id">
+                            <option selected value="">Select Class</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="semister_id" class="form-label">Semister</label>
+                        <select id="semister_id" class="form-select" name="semister_id">
+                            <option value="" selected>Select Semister</option>
+                        </select>
+                    </div>
                 </div>
                 <div class="mt-2"></div>
                 <table class="table" id="student_table">
@@ -115,17 +123,21 @@
                                 </div>
                                 <table class="table mt-2" id="studentAttendanceTab">
                                     <thead>
-                                        <th>Date</th>
-                                        <th>Student Name</th>
-                                        <th>Roll No</th>
-                                        <th>Class</th>
-                                        <th>Status</th>
-                                        <th>Action</th>
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>Student Name</th>
+                                            <th>Roll No</th>
+                                            <th>Class</th>
+                                            <th>PC</th>
+                                            <th>Status</th>
+                                            <th>Action</th>
+                                        </tr>
                                     </thead>
                                     <tbody class="studentAttendance">
                                         <!-- Rows will be dynamically added here -->
                                     </tbody>
                                 </table>
+                                
                             </div>
                         </div>
                     </div>
@@ -140,14 +152,14 @@
                                 </button>
                                 <button type="button" class="btn btn-dark btn-sm rounded-pill" data-bs-toggle="modal" data-bs-target="#staffAttendanceFilter"><i
                                     class="bi bi-funnel-fill "></i></button>
-                                <div class="input-group">
+                                {% comment %} <div class="input-group">
                                     <ul class="dropdown-menu">
                                         <li><a class="dropdown-item" href="#"><i class="bi bi-upload me-2"></i>
                                                 Import Bulk</a></li>
                                         <li><a class="dropdown-item" href="#"><i
                                                     class="bi bi-download me-2"></i> Export CSV</a></li>
                                     </ul>
-                                </div>
+                                </div> {% endcomment %}
                             </div>
                         </div>
                         <!-- Grouping the pie chart in one div -->
@@ -236,30 +248,38 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content" id="studentfilter">
             <div class="modal-header">
-                <h5 class="modal-title" id="attendanceModalLabel">Filter Attendance</h5>
+                <h5 class="modal-title" id="attendanceModalLabel">Filter Attendances</h5>
                 <button type="button" class="btn-close btnCloseModel" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <div class="d-flex mt-2 row">
-                    <div class="col-md-4 form-content">
-                        <label for="startDate" class="form-label">Start Date</label>
-                        <input type="date" class="form-control" id="startDate" name="startDate">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="startDate" class="form-label">Start Date</label>
+                            <input type="date" class="form-control" id="startDate" name="startDate">
+                        </div>
                     </div>
-                    <div class="col-md-4 form-content">
-                        <label for="enddate" class="form-label">End Date</label>
-                        <input type="date" class="form-control" id="endDate" name="endDate">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="enddate" class="form-label">End Date</label>
+                            <input type="date" class="form-control" id="endDate" name="endDate">
+                        </div>
                     </div>
-                    <div class="row mt-2">
-                        <div class="col-md-6">
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
                             <label class="form-label" for="classdrop">Class</label>
                             <select id="classdrop" class="form-select" name="classdrop">
                                 <option selected value="">Select Class</option>
                             </select>
                         </div>
-                        <div class="col-md-6">
-                            <label for="filter_semister_id" class="form-label">Semister</label>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="filter_semister_id" class="form-label">Semester</label>
                             <select id="filter_semister_id" class="form-select" name="filter_semister_id">
-                                <option value="" selected>Select Semister</option>
+                                <option value="" selected>Select Semester</option>
                             </select>
                         </div>
                     </div>
@@ -274,6 +294,7 @@
         </div>
     </div>
 </div>
+
 
 <div class="modal fade" id="attedenceStaffModal" tabindex="-1" aria-labelledby="attendanceModalLabel"
     aria-hidden="true">
