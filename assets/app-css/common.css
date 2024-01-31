@@ -58,6 +58,24 @@ body{
     overflow:auto !important;
     background-color: #fff !important;
 }
+@media (max-width: 768px) {
+    .table_students {
+        font-size: 12px; 
+        overflow-x: auto !important;
+    }
+}
+@media (max-width: 500px) {
+    .table_students {
+        font-size: 10px; 
+        overflow-x: auto !important;
+    }
+}
+@media (max-width: 1000px) {
+    .table_students {
+        font-size: 14px; 
+        overflow-x: auto !important;
+    }
+}
 .page-content{
     margin-top: 1rem;
 }

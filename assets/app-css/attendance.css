@@ -1,15 +1,20 @@
 .present-label {
     color: green;
 }
-
+ 
 .absent-label {
     color: red;
 }
-
-
-
-
+ 
+#studentpiechat{
+    width: 225px;
+    margin-left: 20rem;
+ 
+}
+ 
+ 
 #staffpiechat{
-    width: 30rem;
+    width: 32rem;
     margin-left: 14rem;
+ 
 }

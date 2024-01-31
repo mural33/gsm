@@ -4,6 +4,10 @@ $("document").ready(function(){
         var staffId = $(this).attr("data-id");
         await deleteStaff(staffId);
     });
+    $('#btnStaffFilter').on('click', function () {
+        filterRecords();
+    });
+    
 })
 
 async function deleteStaff(staffId) {
@@ -53,3 +57,18 @@ async function deleteStaff(staffId) {
         }
     });
 }
+function filterRecords() {
+    var filterEmpID = $('#filter_emp_id').val();
+    var filterRole = $('#filter_role_id').val();
+    $('.tbl__bdy tr').each(function () {
+        var empID = $(this).find('.employee_id').text();
+        var role = $(this).find('.role').text();
+        var displayRow =
+            (filterEmpID === '' || empID.includes(filterEmpID)) &&
+            (filterRole === '' || role.includes(filterRole));
+
+        $(this).toggle(displayRow);
+        $("#staffFilter").modal("hide");
+    });
+}
+

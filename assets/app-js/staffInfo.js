@@ -157,13 +157,13 @@ function fetchTransportDetails(transportId, callback) {
     });
 }
 //----------------------------------------------------------------
-function callPieChart(absent, present, leave) {
+function callPieChart(absent, present) {
     var existingChart = Chart.getChart("staffPieChart");
     if (existingChart) {
         existingChart.destroy();
     }
     // Create a new pie chart
-    generatePieChart("staffPieChart", [present, absent, leave], ["Present", "Absent", "Leave"], ["#28a745", "#dc3545", "#ffc107"]);
+    generatePieChart("staffPieChart", [present, absent], ["Present", "Absent"], ["#28a745", "#dc3545"]);
 }
 let payrollFieldNames = [
     'payment_date','payroll_type','salary_amount','payment_mode',
@@ -525,8 +525,7 @@ class StaffData {
             this.displayAttendanceData(staffAttedance);
             var absent = response.staff_attendance_percentage.absent_percentage
             var present = response.staff_attendance_percentage.present_percentage
-            var leave = response.staff_attendance_percentage.leave_percentage
-            callPieChart(absent,present,leave)
+            callPieChart(absent,present)
         });
     }
     async displayAttendanceData(response) {     

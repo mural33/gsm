@@ -17,8 +17,9 @@
                 <a href="{% url 'register_staff' %}" type="button"
                     class="btn btn-success btn-label rounded-pill right"> 
                     <i class="bi bi-plus-circle label-icon align-middle fs-lg ms-2"></i>Enroll Staff</a>
-
-                <button class="btn btn-outline-primary rounded-pill btn-icon tripledots-dropdown-toggle"
+                <button type="button" class="btn btn-dark btn-sm rounded-pill" data-bs-toggle="modal" data-bs-target="#staffFilter"><i
+                    class="bi bi-funnel-fill "></i></button>
+                {% comment %} <button class="btn btn-outline-primary rounded-pill btn-icon tripledots-dropdown-toggle"
                     data-bs-toggle="dropdown" aria-expanded="false">
                     <i class="bi bi-three-dots-vertical"></i>
                 </button>
@@ -32,7 +33,7 @@
                         <li><a class="dropdown-item" href="#"><i class="bi bi-download me-2"> </i>Separated link</a>
                         </li>
                     </ul>
-                </div>
+                </div> {% endcomment %}
             </div>
         </div>
     </div>
@@ -46,7 +47,7 @@
                     <tr>
                         <th>Photo</th>
                         <th>Staff Name</th>
-                        <th>Emp ID</th>
+                        <th>Employee ID</th>
                         <th>Role </th>
                         <th>Phone Number</th>
                         <th>Joining Date</th>
@@ -91,4 +92,44 @@
         {% endif %}
 </div>
 </section>
+
+<div class="modal fade" id="staffFilter" tabindex="-1" aria-labelledby="assignmentModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" id="filter">
+            <div class="modal-header">
+                <h5 class="modal-title" id="assignmentModalLabel">Filter Staffs</h5>
+                <button type="button" class="btn-close btnCloseModel" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row mt-3">
+                <div class="col-md-6">
+                        <label for="filter_emp_id" class="form-label">Employee ID</label>
+                        <select id="filter_emp_id" class="form-select" name="filter_emp_id">
+                            <option value="" selected>Select Employee ID</option>
+                            {% for staff_item in staff_data %}
+                                <option value="{{ staff_item.employee_id }}">{{ staff_item.employee_id }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="filter_role_id" class="form-label">Role</label>
+                        <select id="filter_role_id" class="form-select" name="filter_role_id">
+                            <option value="" selected>Select Role</option>
+                            {% for staff_item in staff_data %}
+                                <option value="{{ staff_item.role }}">{{ staff_item.role }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a href="javascript:void(0);" class="btn btn-link link-success fw-medium btnCloseModel" data-bs-dismiss="modal">
+                    <i class="ri-close-line me-1 align-middle"></i> Close
+                </a>
+                <button type="button" class="btn btn-primary" id="btnStaffFilter" name="btnStaffFilter">Filter</button>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

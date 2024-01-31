@@ -6,11 +6,11 @@
 <script src="{% static 'app-js/classes.js' %}"></script>
 
 <div class="row" id="heading-row">
-  <div class="col-sm-12 col-md-8 col-xl-8" style="padding: 1rem">
+  <div class="col-sm-12 col-md-8 col-xl-8" style="padding: 1rem;">
     <h5>Classes</h5>
     <quote>In the classroom, every desk holds the promise of a journey into the realms of wisdom and discovery.</quote>
   </div>
-  <div class="col-sm-12 col-md-4 col-xl-4" style="padding: 1rem">
+  <div class="col-sm-12 col-md-4 col-xl-4" style="padding: 1rem;">
     <div class="row">
       <div class="col text-end">
         <button type="button" class="btn btn-success btn-label rounded-pill right" data-bs-toggle="modal"
@@ -256,27 +256,27 @@
           <div class="text-center" id="tabFees">
             <div class="row">
               <div class="col-md-12 d-flex gap-2">
-                <div class="col-md-2 form-content feesDiv">
+                <div class="col-md-2 form-content feesDiv feeSection">
                   <input type="hidden" name="fee_id" id="fee_id">
                   <label for="total_fee" class="form-label feesLabel">Total Fees</label><span class="text-danger ms-2">*</span>
                   <input type="number" class="form-control" id="total_fee" name="fee_total" placeholder="e.g. 20000" readonly />
                 </div>
-                <div class="col-md-2 form-content feesDiv">
+                <div class="col-md-2 form-content feesDiv feeSection">
                   <label for="fee_admission" class="form-label feesLabel">Admission Fees</label><span class="text-danger ms-2">*</span>
                   <input type="number" class="form-control" id="fee_admission" name="fee_admission"
                     placeholder="e.g. 20000" readonly />
                 </div>
-                <div class="col-md-2 form-content" id="totalAmount">
+                <div class="col-md-2 form-content feeSection" id="totalAmount">
                   <label for="install_amount" class="form-label feesLabel">Total Installment Amount</label>
                   <input type="number" class="form-control" id="install_amount" name="total_installments"
                     placeholder="e.g. 17000" readonly />
                 </div>
-                <div class="col-md-2 form-content feesDiv" id="installmentNo">
+                <div class="col-md-2 form-content feesDiv feeSection" id="installmentNo">
                   <label for="installment_display" class="form-label feesLabel">No. of Installments</label>
                   <input type="number" class="form-control" id="installment_display" name="installment_no"
                     placeholder="e.g. 4" readonly />
                 </div>
-                <div class="col-md-2 form-content feesDiv" id="Total_fees">
+                <div class="col-md-2 form-content feesDiv feeSection" id="Total_fees">
                   <label for="installment_dropdown" class="form-label feesLabel" id="Installment">Installment Type</label>
                   <span class="text-danger ms-2">*</span>
                   <select class="form-select custom-select-lg bg-white form-control singleDropDown" id="installment_dropdown"
@@ -290,7 +290,7 @@
                 <p class="form-label text-danger labelText" style="display: none;">Select One or More Installment Type.</p>
                 </div>
                 
-                <div class="col-md-2">
+                <div class="col-md-2 feeSection">
                   <label></label>
                   <input type="button" value="Edit Fee" class="btn btn-primary form-control" id="btnFeeChange">
                   <input type="button" value="Save" class="btn btn-primary form-control" id="btnUpdateFee" style="display: none;">
@@ -567,19 +567,22 @@
             </div>
             <div class="d-flex mt-2">
               <div class="col-md-12 form-content">
-                <label for="classesId" class="form-label">Year/Semester</label>
+                <label for="classesId" class="form-label" id="semesterLabel"></label>
             <select class="form-select" id="semistor" name="semistor">
 
           </select>
         </div>
       </div>
             <div class="d-flex mt-2">
-              <div class="col-md-12 form-content">
+              <div class="col-md-12 form-content">              
                 <table id="subjectTable">
                   <thead>
                     <th class="form-label">Subject</th>
                     <th class="form-label">Full Mark</th>
                     <th class="form-label">Action</th>
+                    <th>
+                      <button type="button" class="btn btn btn-success" id="addSubjectBtn"><i class="bi bi-plus-circle"></i></button>
+                    </th>
                   </thead>
                   <tbody id="subData">
                     <tr id="subRow">
@@ -598,4 +601,35 @@
         </div><!-- /.modal-content -->
       </div><!-- /.modal-dialog -->
     </div>
+
+
+    <div class="modal fade" id="getSubject" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel"
+    aria-hidden="true">
+<div class="modal-dialog">
+  <div class="modal-content" id="loadSubjectArea">
+    <div class="modal-header">
+      <h5 class="modal-title" id="mySmallModalLabel">Select Subject</h5>
+      <button type="button" class="btn-close btnCloseModel" data-bs-dismiss="modal" aria-label="Close">
+      </button>
+    </div>
+    <div class="modal-body" id="loadSub">
+      <div class="d-flex mt-2 row">
+        <div class="col-md-12 form-content">
+            <table class="table table-striped table-hover table-sticky table_students" id="selectSubject">
+              <thead class="thead-dark">
+                <th>Subject Name</th>
+                <th>Action</th>
+              </thead>
+              <tbody id="subjectSelection">
+                <tr id="selectSub">
+
+                </tr>
+              </tbody>
+            </table>
+          </div>
+      </div>
+    </div>
+  </div><!-- /.modal-content -->
+</div><!-- /.modal-dialog -->
+</div>
     {% endblock %}

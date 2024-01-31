@@ -3,6 +3,7 @@
     font-size: 1.1rem;
     color: #000;
 }
+
 .section3 {
     text-align: left;
 }
@@ -139,14 +140,21 @@
   .feesDiv{
   text-align: left;
   color: #000;
-  font-size: 1rem;
-  }
+  font-size: 14px;  
+}
   .feesLabel{
     color: #000;
+    font-size: 14px;
+  }
+  #selectSubject_info{
+    width: 11rem;
+  }
+  #install_amount{
+    margin-top: -2px;
   }
 #btnUpdateFee,#btnFeeChange{
     height: 2.5rem;
-    margin-top: 0.5rem;
+    margin-top: 0.3rem;
 }
   div.dataTables_wrapper div.dataTables_info {
     padding-top: .85em;
@@ -193,5 +201,71 @@
     #btnDelete {
         width:auto !important; 
         margin-top: 6px;
+    }
+}
+@media (max-width: 550px) {
+    .classSection {
+        flex-direction: column;
+        align-items: center;
+        gap: 6px;
+        max-width: 100%;
+    }
+    .filter {
+        width: calc(100% - 12px); 
+        max-width: 100%;
+    }
+
+    #class_list {
+        width: auto !important; 
+        min-width: 0 !important; 
+    }
+
+    #btnEdit,
+    #btnDelete {
+        width:auto !important; 
+        margin-top: 6px;
+    }
+}
+@media (max-width: 768px) {
+    .text-center .row .form-content,
+    .col-md-2 {
+        flex-basis: 100%;
+        max-width: 100% !important;
+    }
+    .form-label {
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 576px) {
+    .text-center .row .form-content,
+    .col-md-2 {
+        flex-basis: 100%;
+        max-width: 100% !important;
+    }
+    .form-label {
+        font-size: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .text-center .row .form-content,
+    .col-md-2 {
+        flex-basis: 100%;
+        max-width: 100% !important;
+    }
+    .form-label {
+        font-size: 9px;
+    }
+}
+
+@media (max-width: 360px) {
+    .text-center .row .form-content,
+    .col-md-2 {
+        flex-basis: 100%;
+        max-width: 100% !important;
+    }
+    .form-label {
+        font-size: 9px;
     }
 }

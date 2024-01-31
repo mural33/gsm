@@ -57,11 +57,11 @@
                             <div class="col-md-8 mb-2 d-flex">
                                 <p>
                                     <span class="d-block">Subscriber ID</span>
-                                    <span class="fs-13 fw-100 text-black">{{ institution_data.subscribers_id }}</span>
+                                    <span class="fs-13 fw-100 text-black badge rounded-pill bg-dark-subtle text-body">{{ institution_data.subscribers_id }}</span>
                                 </p>
                                 <p class="mx-4">
                                     <span class="d-block">Registration Date</span>
-                                    <span class="fs-13 fw-100 text-black">{{ institution_data.date_of_registration }}</span>
+                                    <span class="fs-13 fw-100 text-black badge rounded-pill bg-dark-subtle text-body">{{ institution_data.date_of_registration }}</span>
                                 </p>
                             </div>
                         </div>
@@ -99,7 +99,7 @@
                                     <div class="col-md-6">
                                         <label for="institute_pincode" class="form-label">Pincode</label>
                                         <div class="input-group">
-                                            <input type="text" class="form-control" id="institute_pincode" name="institute_pincode" value="{{ institution_data.institute_pincode }}">
+                                            <input type="number" class="form-control" id="institute_pincode" name="institute_pincode" value="{{ institution_data.institute_pincode }}">
                                             <button class="btn btn-primary" type="button" id="searchButton">Search</button>
                                         </div>
                                     </div>
@@ -191,13 +191,12 @@
 </div>
 
 <!-- Modal for Subscription Options -->
-<div class="modal fade" id="subscriptionModal" tabindex="-1" role="dialog" aria-labelledby="subscriptionModalLabel" aria-hidden="true">
+<div class="modal fade mt-5" id="subscriptionModal" tabindex="-1" role="dialog" aria-labelledby="subscriptionModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
+         <button type="button" class="btn-close close-btn" data-bs-dismiss="modal" aria-label="Close" id="closeButton"></button>
             <div class="modal-header">
-                <h5 class="modal-title" id="subscriptionModalLabel">Subscription Plans</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                
+                <h5 class="modal-title" id="subscriptionModalLabel">Subscription Plans</h5> 
             </div>
             <div class="modal-body">
                 <div class="container">
@@ -216,4 +215,5 @@
         </div>
     </div>
 </div>
+
 {% endblock %}

@@ -204,7 +204,10 @@ $(document).ready(function () {
       $("#exam_creation_modal .modal-title").text("Save Examination");
     }
   });
-  
+
+  $("#addSubjectBtn").on("click", function () {
+    addSubjectRow();
+  });
 });
 
 function showContent() {
@@ -453,6 +456,9 @@ async function loadClassOverview(selectedClassId) {
         overviewContainer.attr('data-promotion-type', responseData.promotion_type);
         overviewContainer.attr('data-total-promotion', responseData.total_number_of_promotion);
         overviewContainer.find('.no-data-found').remove();
+
+        const label = $('#semesterLabel');
+        label.text(`${promotionTypeHeadings[responseData.promotion_type]}`);        
         await loadSemandYear(responseData.total_number_of_promotion, responseData.promotion_type, 'semistor');
       } else {
         overviewContainer.empty().html('<img src="/assets/img/no_data_found.png" class="no-data-found">');
@@ -858,7 +864,7 @@ async function loadStudentDetails(selectedClassId) {
         var studentTableHtml = '<table class="table table-striped table-hover table-sticky table_students" id="classStudent">' +
           '<thead class="thead-dark">' +
           '<tr>' +
-          '<th>DP</th>' +
+          '<th>Photo</th>' +
           '<th>Student Name</th>' +
           '<th>Roll Number</th>' +
           '<th>Class </th>';
@@ -1412,7 +1418,7 @@ async function loadSemandYear(durationTime, promotionType, tnpId) {
   labelElement.text(promotionTypeMap[promotionType]);
 
   tnp.html("");
-  tnp.append(`<option value="">All ${promotionTypeMap[promotionType]}</option>`);
+  tnp.append(`<option value="">Select ${promotionTypeMap[promotionType]}</option>`);
 
   for (let index = 0; index < durationTime; index++) {
       var option = `<option value="${index + 1}">${index + 1} ${promotionTypeMap[promotionType]}</option>`;
@@ -1458,7 +1464,6 @@ async function addExam() {
           for (let i = 0; i < rows.length; i++) {
             let row = rows[i];
             let subjectId = row.dataset.subjectId;
-            // var examId = row.querySelector(".fullMarks").getAttribute("data-child-id");
             let examId = localStorage.getItem(`child_exam_id_${subjectId}`);
             let ancestorRow = row.closest('.subjectRow');
             if (ancestorRow) {
@@ -1642,7 +1647,7 @@ async function loadSemandYearEdit(durationTime, promotionType, tnpId, selectedSe
   labelElement.text(promotionTypeMap[promotionType]);
 
   tnp.html("");
-  tnp.append(`<option value="">All ${promotionTypeMap[promotionType]}</option>`);
+  tnp.append(`<option value="">Select ${promotionTypeMap[promotionType]}</option>`);
 
   for (let index = 0; index < durationTime; index++) {
     var option = `<option value="${index + 1}" ${selectedSemistor == index + 1 ? 'selected' : ''}>${index + 1} ${promotionTypeMap[promotionType]}</option>`;
@@ -1704,6 +1709,7 @@ async function editExam(element) {
               newRow.append(`<td><a class="btn btn-sm btn-danger" onclick="removeSubject(this)" data-subjects-id="${childExam.subject_id}"><i class="bi bi-trash3"></i></a></td>`);
               $("#subData").append(newRow);
               localStorage.setItem(`child_exam_id_${childExam.subject_id}`, childExam.exam_id);
+              $("#addSubjectBtn").show();
             }
           }
         },
@@ -1715,6 +1721,62 @@ async function editExam(element) {
     error: (error) => {
       raiseErrorAlert(error.responseJSON.detail);
     },
+  });
+}
+
+function addSubjectRow() {
+  var classId = $("#classes_id").val();
+  const getSubUrl = apiUrl + "/Subjects/get_subjects_by_class/?class_id=" + classId;
+  $.ajax({
+    url: getSubUrl,
+    method: 'GET',
+    mode: "cors",
+    crossDomain: true,
+    headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${jwtToken}`,
+    },
+    beforeSend: (e) => {
+      showLoader("loadSubjectArea", "sm");
+  },
+    success: function(data) {
+      if (data.length === 0) {
+        $("#subjectSelection").html('<tr><td colspan="2"><img src="/assets/img/no_data_found.png" class="no_data_found"></td></tr>');
+        $("#getSubject").modal("show");
+    } else {
+      $("#getSubject").modal("show");
+      var subTableBody = $('#subjectSelection');
+      subTableBody.empty(); 
+      var dataTable = $('#selectSubject').DataTable();
+      dataTable.clear().draw();
+      data.forEach(function(sub) {
+          var row = $('<tr id="selectSub">');
+          row.append('<td>' + sub.subject_name + '</td>');
+          row.append('<td><button type="submit" class="btn btn-primary selectBtn" id="btnSelects" data-selects-id="' + sub.subject_id + '" data-sub-id="' + sub.subject_id + '" data-sub-name="' + sub.subject_name + '">Select</button></td>');
+          dataTable.row.add(row).draw();
+      });
+      $('.selectBtn').click(function () {
+        $("#getSubject").modal("hide");
+        var selectedSubjectId = $(this).data('sub-id');
+        var selectedSubjectName = $(this).data('sub-name');
+        if ($('#subRow-' + selectedSubjectId).length === 0) {
+          var newRow = $(`<tr class="subjectRow" id="subRow-${selectedSubjectId}">`);
+          newRow.append(`<td class="sublabel" id="subjectId" name="subject_id" data-subject-id="${selectedSubjectId}" value="${selectedSubjectId}">${selectedSubjectName}</td>`);
+          newRow.append(`<td><input type="text" class="form-control fullMarks" id="subject_Input" value="100" name="full_marks"></td>`);
+          newRow.append(`<td><a class="btn btn-sm btn-danger" onclick="removeSubject(this)" data-subjects-id="${selectedSubjectId}"><i class="bi bi-trash3"></i></a></td>`);
+          $("#subData").append(newRow);
+      }else {
+        raiseWarningAlert('This subject is already for exam to the table.');
+      }
+      });
+    }
+    },
+    error: (error) => {
+      raiseErrorAlert(error.responseJSON.detail);
+  },
+  complete: (e) => {
+      removeLoader("loadSubjectArea", "sm");
+  },
   });
 }
 

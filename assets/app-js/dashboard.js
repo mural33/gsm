@@ -12,7 +12,6 @@ $(document).ready(function () {
 
 function loadUpcomingNotice() {
     const upomingNoticeUrl = apiUrl + `/Notice/get_notices_institute/?institute_id=${instituteId}`;
-    console.log(upomingNoticeUrl);
     $.ajax({
         type: "GET",
         url: upomingNoticeUrl,
@@ -216,7 +215,6 @@ function loadAccountSummary(){
 
 function loadUpcomingExamResults() {
     const upomingExamUrl = apiUrl + `/ParentExams/get_all_parent_exam_by_institute_id?institute_id=${instituteId}`;
-    console.log(upomingExamUrl);
     $.ajax({
         type: "GET",
         url: upomingExamUrl,
@@ -339,7 +337,6 @@ function loadAbsentData(){
             "Authorization": `Bearer ${jwtToken}`,
         },
         success: function (responseData) {
-            console.log(responseData);
             const absentStudents = responseData.response.student_absent;
             const absentStaff = responseData.response.staff_absent;
             $('#absentBoard').empty();
@@ -406,7 +403,6 @@ function getStudentAttendRate(){
             "Authorization": `Bearer ${jwtToken}`,
         },
         success: function (responseData) {
-            console.log(responseData);
             const studentAttendanceCard = $("#attendantRate");
             studentAttendanceCard.empty();
 

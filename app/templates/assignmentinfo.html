@@ -6,9 +6,9 @@
 <script src="{% static 'app-js/assignmentinfo.js' %}"></script>
 <section>
 <div class="row" id="heading-row">
-    <div class="col-sm-12 col-md-9 col-xl-12 d-flex align-items-center" style="padding: 1rem">
+    <div class="col-sm-12 col-md-9 col-xl-12 d-flex align-items-center" style="padding: 1rem;">
         <a href="{% url 'assignments' %}">
-            <i class="bi bi-arrow-left" style="font-size:1.5rem;"></i>
+            <i class="bi bi-arrow-left text-dark" style="font-size:1.5rem;"></i>
         </a>
         <div class="mx-2">
             {% for assignment in assignmentInfo_data %}
@@ -34,9 +34,9 @@
                                 <table class="table table-borderless">
                                     <tr>
                                         <td>
-                                            <span class="d-flex">
-                                                <p>Name :</p>
-                                                <span class="txt-color">
+                                            <span class="d-block">
+                                                <p>Name </p>
+                                                <span class="f-5 badge bg-dark-subtle text-body">
                                                     {{assignment.assignment_title}}
                                                 </span>
                                             </span>
@@ -45,7 +45,7 @@
                                     <tr>
                                         <td class="">
                                             <span class="d-flex"><p>Date :</p>
-                                                <span class="txt-color">
+                                                <span class="f-5 badge bg-dark-subtle text-body ms-2">
                                                   {{assignment.assignment_Date}}
                                                 </span>
                                             </span>
@@ -54,7 +54,7 @@
                                     <tr>
                                         <td class="">
                                             <span class="d-flex"><p>Due Date :</p>
-                                                <span class="txt-color">
+                                                <span class="f-5 badge bg-dark-subtle text-body ms-2">
                                                     {{assignment.assignment_due_date}}
                                                 </span>
                                             </span>
@@ -64,7 +64,7 @@
                                         <td class="">
                                             <span class="d-flex">
                                                 <p>Class :</p>
-                                                <span class="txt-color classId" data-classes-id="{{assignment.class_id}}">
+                                                <span class="f-5 badge bg-dark-subtle text-body ms-2 classId" data-classes-id="{{assignment.class_id}}">
                                                    {{assignment.classes.class_name}}
                                                 </span>
                                             </span>
@@ -83,15 +83,15 @@
                                              {% endif %}  
                                             </p>
                                                 {% if assignment.classes.promotion_type == 'year_vise' %}
-                                                <span class="txt-color semesterId" data-semestor-id="{{assignment.semistor}}">
+                                                <span class="f-5 badge bg-dark-subtle text-body ms-2 semesterId" data-semestor-id="{{assignment.semistor}}">
                                                     {{ assignment.semistor }} Year
                                                 </span>
                                               {% elif assignment.classes.promotion_type == 'course_vise' %}
-                                              <span class="txt-color semesterId" data-semestor-id="{{assignment.semistor}}">
+                                              <span class="f-5 badge bg-dark-subtle text-body ms-2 semesterId" data-semestor-id="{{assignment.semistor}}">
                                                 {{ assignment.semistor }} Course
                                             </span>
                                                 {% elif assignment.classes.promotion_type == 'semister_vise' %}
-                                                <span class="txt-color semesterId" data-semestor-id="{{assignment.semistor}}">
+                                                <span class="f-5 badge bg-dark-subtle text-body ms-2 semesterId" data-semestor-id="{{assignment.semistor}}">
                                                     {{ assignment.semistor }} Semester
                                                 </span>
                                               {% endif %} 
@@ -102,7 +102,7 @@
                                         <td class="">
                                             <span class="d-flex">
                                                <p>Section :</p>
-                                                <span class="txt-color sectionId" data-section-id="{{assignment.section_id}}">
+                                                <span class="f-5 badge bg-dark-subtle text-body ms-2 sectionId" data-section-id="{{assignment.section_id}}">
                                                     {{ assignment.sections.section_name }}
                                                 </span>
                                             </span>
@@ -162,7 +162,7 @@
 </section>
 
     <div class="modal fade" id="searchStudentModal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel"
-    aria-hidden="true">
+        aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content" id="loadStudentsArea">
         <div class="modal-header">
