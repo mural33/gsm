@@ -258,7 +258,7 @@ async function validateStudentForm(){
     }
     var dateOfBirth = new Date($("#date_of_birth").val());
     var admissionDate = new Date($("#admission_date").val());
-    if (dateOfBirth <= admissionDate) {
+    if (dateOfBirth >= admissionDate) {
         $("#date_of_birth").addClass("is-invalid");
         $("#admission_date").addClass("is-invalid")
         raiseWarningAlert("Birthday  cannot be earlier than Admission Day.")
